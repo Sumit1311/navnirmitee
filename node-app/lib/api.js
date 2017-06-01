@@ -34,9 +34,9 @@ exports.constants = constants;
  *   db_host, db_user,db_password,db_name,db_port
  */
 exports.options = {
-    db_host: process.env.DB_HOST || "ec2-54-235-195-226.compute-1.amazonaws.com",
-    db_user: process.env.DB_USER || "zklvkdliedxtoh",
-    db_password: process.env.DB_PASS || "5lVS7NtIIqSJh771jVleD3t1FC",
-    db_name: process.env.DB_NAME || "d2a9jep4550f3q",
-    db_port: process.env.DB_PORT || "5432"
+    db_host: process.env.DB_HOST || "localhost",
+    db_user: process.env.DB_USER || "admin",
+    db_password: process.env.DB_PASS || "admin",
+    db_name: process.env.DB_NAME || "navnirmitee",
+    db_port: process.env.DB_PORT || "5433"
 }

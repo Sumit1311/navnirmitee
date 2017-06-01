@@ -28,15 +28,31 @@ module.exports = SetupDB;
  */
 SetupDB.prototype.setupSchema = function () {
     var self = this;
-    return Q.resolve();
-        /*.catch(function (error) {
+    return this.dbQuery('CREATE TABLE IF NOT EXISTS "user_master" (' +
+        ' "_id" VARCHAR(36) NOT NULL ,' +
+        ' "first_name" VARCHAR(45) NULL DEFAULT NULL ,' +
+        ' "last_name" VARCHAR(45) NULL DEFAULT NULL ,' +
+        ' "login_email_id" VARCHAR(30) NULL DEFAULT NULL ,' +
+        ' "mobile_no" VARCHAR(15) NULL DEFAULT NULL ,' +
+        ' "residence_no" VARCHAR(20) NULL DEFAULT NULL ,' +
+        ' "alternate_mobile_no" VARCHAR(15) NULL DEFAULT NULL ,' +
+        ' "login_password" TEXT NULL ,' +
+        ' "user_type" SMALLINT NULL ,' +
+        ' "email_verification" TEXT NULL,' +
+        ' PRIMARY KEY ("_id") );')
+        .then(function () {
+            //create the root user who is super admin and have all the accesses by default
+            var userDAO = new UserDAO();
+            return userDAO.createRootUser();
+        }) 
+        .catch(function (error) {
             if (error instanceof Error) {
                 navnirmiteeApi.logger.fatal('[setupDB] [setupSchema] Error creating tables ', error.stack);
             } else {
                 navnirmiteeApi.logger.fatal('[setupDB] [setupSchema] Error creating tables ', error);
             }
             return Q.reject(error);
-        });*/
+        });
 };
 
 

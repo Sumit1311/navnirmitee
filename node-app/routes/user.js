@@ -7,13 +7,8 @@ var router = express.Router(),
     url = require("url"),
     Q = require('q'),
     moment = require('moment'),
-    UserDAO = require(process.cwd() + "/dao/user/masterDAO.js"),
-    UserFollowers = require(process.cwd() + "/dao/user/followersDAO.js");
-router.get('/home', function (req, res) {
-    res.render('home', {
-        user: req.user
-    });
-});
+    UserDAO = require(process.cwd() + "/dao/user/masterDAO.js");
+
 
 router.get('/logout', function (req, res) {
     req.session.destroy();

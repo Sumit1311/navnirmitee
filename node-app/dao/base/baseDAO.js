@@ -87,10 +87,11 @@ BaseDAO.prototype.dbQuery = function (sql, params) {
             return query(client, sql, params);
         })
         .catch(function (error) {
+            navnirmiteeApi.logger.error("[baseDAO] [dbQuery] failed to execute",error);
             return Q.reject(error);
         })
         .finally(function () {
-            if (self.providedClient == undefined) {
+            if (self.providedClient == undefined || client) {
                 client.release();
             }
         })

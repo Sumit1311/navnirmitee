@@ -24,7 +24,7 @@ var navnirmiteeApi = require(process.cwd() + "/lib/api.js");
  */
 //mongoose.connect('mongodb://localhost/loginapp');
 //var db = mongoose.connection;
-var users = require('./routes/users.js');
+//var users = require('./routes/users.js');
 var morgan = require('morgan');
 
 // Init App
@@ -34,7 +34,9 @@ var setupDB = new SetupDB();
 setupDB.setupSchema()
     .then(function () {
         var hbs = exphbs.create({
-            defaultLayout: 'layout'
+            defaultLayout: 'layout',
+            extname : '.hbs'
+
         });
         hbshelpers({
             handlebars: hbs.handlebars
@@ -42,8 +44,8 @@ setupDB.setupSchema()
         require(process.cwd() + "/lib/passport.js")(passport);
 
         app.set('views', path.join(__dirname, 'views'));
-        app.engine('handlebars', hbs.engine);
-        app.set('view engine', 'handlebars');
+        app.engine('hbs', hbs.engine);
+        app.set('view engine', 'hbs');
 
 // BodyParser Middleware
         app.use(bodyParser.json());
@@ -98,7 +100,7 @@ setupDB.setupSchema()
             res.locals.user = req.user || null;
             next();
         });
-
+        console.log("Setting up routes");
         app.use('/', require('./routes/regAndAuth/login.js'));
         app.use('/registration', require('./routes/regAndAuth/registration.js'));
         app.use('/user', navnirmiteeApi.util.ensureAuthenticated,

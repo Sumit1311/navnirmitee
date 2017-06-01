@@ -11,8 +11,14 @@ var router = express.Router(),
     Q = require('q'),
     moment = require('moment');
 
+router.get('/', function (req, res) {
+    res.render('index', {
+        user : req.user,
+        layout : false
+    });
+});
 //the root path which should redirect authenticated users to there home page
-router.get('/',
+router.get('/home',
     navnirmiteeApi.util.ensureAuthenticated,
     navnirmiteeApi.util.isSessionAvailable,
     function (req, res, next) {
@@ -20,7 +26,7 @@ router.get('/',
     });
 
 //root path which logs in the user to there account
-router.post('/', passport.authenticate('local'), function (req, res) {
+router.post('/home', passport.authenticate('local'), function (req, res) {
     res.redirect('/user/home');
 });
 
