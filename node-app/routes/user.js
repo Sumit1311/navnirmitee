@@ -15,9 +15,9 @@ router.get('/logout', function (req, res) {
     res.redirect('/');
 });
 
-router.get('/homeMain', function (req, res) {
+/*router.get('/homeMain', function (req, res) {
     res.render('homeMain');
-});
+});*/
 
 /*router.post('/follow', isSameUser, function (req, res) {
     var emailId = req.body.email, userDetails = req.user;

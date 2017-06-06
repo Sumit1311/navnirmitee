@@ -53,7 +53,7 @@ setupDB.setupSchema()
         app.use(cookieParser());
 
 // Set Static Folder
-//       app.use(express.static(path.join(__dirname, 'public')));
+       app.use(express.static(path.join(__dirname, '../public')));
 
 // Express Session
         app.use(session({
@@ -102,6 +102,7 @@ setupDB.setupSchema()
         });
         console.log("Setting up routes");
         app.use('/', require('./routes/regAndAuth/login.js'));
+        app.use('/', require('./routes/temp.js'));	
         app.use('/registration', require('./routes/regAndAuth/registration.js'));
         app.use('/user', navnirmiteeApi.util.ensureAuthenticated,
             navnirmiteeApi.util.isSessionAvailable,
