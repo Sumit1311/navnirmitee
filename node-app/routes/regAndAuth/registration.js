@@ -8,7 +8,7 @@ var express = require('express'),
 var router = express.Router(),
     passport = require('passport'),
     url = require("url"),
-    UserDAO = require(process.cwd() + "/dao/user/masterDAO.js");
+    UserDAO = require(process.cwd() + "/dao/user/userDAO.js");
 
 /**
  * used to verify email address of the user this route expects verification code as query parameter
@@ -19,7 +19,7 @@ router.get('/verify', function (req, res) {
     (new UserDAO()).getUserDetailsByCode(code)
         .then(function (userDetails) {
             if (userDetails != 0) {
-                res.redirect('/registration/details?login=' + userDetails[0].login_email_id + "&id=" + userDetails[0].email_verification + "&mobile=" + userDetails[0].mobile_no);
+                res.redirect('/registration/details?login=' + userDetails[0].email_address + "&id=" + userDetails[0].email_verification + "&mobile=" + userDetails[0].mobile_no);
             } else {
                 res.status(400).send("<html><title>Invalid URL</title><body><h1>Bad Request</h1></body></html>");
             }
@@ -137,7 +137,7 @@ router.post("/details", function (req, res) {
         //todo : uncomment once email verification done and comment above then
         /*.then(function () {
          user = userDetails[0];
-         if (loginEmailId != user.login_email_id) {
+         if (loginEmailId != user.email_address) {
          return Q.reject({
          status: 400,
          body: "Bad Request"

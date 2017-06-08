@@ -30,7 +30,7 @@ util.inherits(UserDAO, BaseDAO);
 
 module.exports = UserDAO;
 //private variables
-var tableName = "user_master",
+var tableName = "nav_user",
     rootUserId = "45058a54-b3e2-4a3b-96ab-c13dcf3023e3",
     fileName = 'user/masterDAO';
 
@@ -40,8 +40,8 @@ var tableName = "user_master",
  * @returns {*}
  */
 UserDAO.prototype.getLoginDetails = function (loginName) {
-    return this.dbQuery("SELECT _id,login_password,email_verification,login_email_id,mobile_no,first_name,last_name,user_type" +
-    " FROM " + tableName + " WHERE login_email_id=$1", [loginName])
+    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type" +
+    " FROM " + tableName + " WHERE email_address=$1", [loginName])
         .then(function (result) {
             return result.rows;
         })
@@ -61,7 +61,7 @@ UserDAO.prototype.createRootUser = function (client) {
     return self.dbQuery('select * from ' + tableName + ' where _id=$1', [rootUserId])
         .then(function (result) {
             if (result.rowCount == 0) {
-                return self.dbQuery('INSERT INTO ' + tableName + '(_id,first_name,user_type,login_email_id,login_password) ' +
+                return self.dbQuery('INSERT INTO ' + tableName + '(_id,first_name,user_type,email_address,password) ' +
                 'VALUES($1,$2,$3,$4,$5)', [rootUserId, "Admin", navnirmiteeApi.constants.userRoleMapping.SUPER_ADMIN, "_root_@localhost.com", navnirmiteeApi.util.encryptPassword("_toor_")]);
             } else {
                 return Q.resolve();
@@ -80,8 +80,8 @@ UserDAO.prototype.createRootUser = function (client) {
  * @returns {*}
  */
 UserDAO.prototype.getEmailVerificationDetails = function (email) {
-    return this.dbQuery("select login_email_id,mobile_no,email_verification " +
-    "from " + tableName + " where login_email_id = $1", [email])
+    return this.dbQuery("select email_address,mobile_no,email_verification " +
+    "from " + tableName + " where email_address = $1", [email])
         .then(function (result) {
             return result.rows;
         })
@@ -101,7 +101,7 @@ UserDAO.prototype.getEmailVerificationDetails = function (email) {
  */
 UserDAO.prototype.insertRegistrationData = function (email, phone, verificationCode) {
     return this.dbQuery("INSERT INTO " + tableName +
-    " (_id,login_email_id,mobile_no,email_verification)" +
+    " (_id,email_address,mobile_no,email_verification)" +
     " VALUES($1,$2,$3,$4)", [navnirmiteeApi.util.uuid(), email, phone, verificationCode])
         .then(function (result) {
             return result.rowCount;
@@ -124,7 +124,7 @@ UserDAO.prototype.insertRegistrationData = function (email, phone, verificationC
  */
 UserDAO.prototype.updateUserDetails = function (pkey, loginPassword, firstName, lastName, userType) {
     return this.dbQuery("UPDATE " + tableName +
-    " SET login_password=$1," +
+    " SET password=$1," +
     " first_name=$2," +
     " last_name=$3," +
     " user_type=$4" +
@@ -161,7 +161,7 @@ UserDAO.prototype.clearVerificationCode = function (_id) {
  * @returns {*}
  */
 UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
-    return this.dbQuery("SELECT login_email_id,email_verification,mobile_no" +
+    return this.dbQuery("SELECT email_address,email_verification,mobile_no" +
     " FROM " + tableName +
     " WHERE email_verification=$1", [verifCode])
         .then(function (result) {

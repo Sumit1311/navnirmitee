@@ -7,7 +7,7 @@ var router = express.Router(),
     url = require("url"),
     Q = require('q'),
     moment = require('moment'),
-    UserDAO = require(process.cwd() + "/dao/user/masterDAO.js");
+    UserDAO = require(process.cwd() + "/dao/user/userDAO.js");
 
 
 router.get('/logout', function (req, res) {
@@ -72,7 +72,7 @@ module.exports = router;
 
 function isSameUser(req, res, next) {
     var emailId = req.body.email, userDetails = req.user;
-    if (emailId == userDetails.login_email_id) {
+    if (emailId == userDetails.email_address) {
         res.status(400).send(JSON.stringify({
             code: "SameEmailId"
         }));

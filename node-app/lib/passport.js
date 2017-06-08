@@ -3,7 +3,7 @@
 var navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
     LocalStrategy = require('passport-local').Strategy,
     Q = require('q'),
-    UserDAO = require(process.cwd() + "/dao/user/masterDAO.js");
+    UserDAO = require(process.cwd() + "/dao/user/userDAO.js");
 
 // expose this function to our app using module.exports
 module.exports = function (passport) {
@@ -17,7 +17,7 @@ module.exports = function (passport) {
     // used to serialize the user for the session
     passport.serializeUser(function (user, done) {
         //console.log("User Details while serialize : ", user);
-        done(null, {userId: user.login_email_id});
+        done(null, {userId: user.email_address});
     });
 
     // used to deserialize the user
@@ -25,7 +25,7 @@ module.exports = function (passport) {
         return (new UserDAO()).getLoginDetails(user.userId)
             .then(function (userData) {
                 if (userData.length != 0) {
-                    if (userData[0].login_email_id == user.userId) {
+                    if (userData[0].email_address == user.userId) {
                         return done(null, userData[0]);
                     } else {
                         return done(null, false);
@@ -48,7 +48,7 @@ module.exports = function (passport) {
             return (new UserDAO()).getLoginDetails(userName)
                 .then(function (user) {
                     if (user.length != 0) {
-                        if (password && navnirmiteeApi.util.comparePassword(password, user[0].login_password)) {
+                        if (password && navnirmiteeApi.util.comparePassword(password, user[0].password)) {
                             return done(null, user[0]);
                         } else {
                             return done(null, false);

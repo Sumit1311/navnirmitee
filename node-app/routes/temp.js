@@ -4,7 +4,7 @@ var router = express.Router(),
     url = require("url"),
     Q = require('q'),
     moment = require('moment'),
-    UserDAO = require(process.cwd() + "/dao/user/masterDAO.js");
+    UserDAO = require(process.cwd() + "/dao/user/userDAO.js");
 
 
 router.get('/contact', function (req, res) {

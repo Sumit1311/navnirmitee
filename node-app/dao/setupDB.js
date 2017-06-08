@@ -6,7 +6,7 @@
 "use strict";
 
 var BaseDAO = require(process.cwd() + "/dao/base/baseDAO.js"),
-    UserDAO = require("./user/masterDAO"),
+    UserDAO = require("./user/userDAO"),
     Q = require("q"),
     navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
     util = require("util");
@@ -28,23 +28,24 @@ module.exports = SetupDB;
  */
 SetupDB.prototype.setupSchema = function () {
     var self = this;
-    return this.dbQuery('CREATE TABLE IF NOT EXISTS "user_master" (' +
-        ' "_id" VARCHAR(36) NOT NULL ,' +
-        ' "first_name" VARCHAR(45) NULL DEFAULT NULL ,' +
-        ' "last_name" VARCHAR(45) NULL DEFAULT NULL ,' +
-        ' "login_email_id" VARCHAR(30) NULL DEFAULT NULL ,' +
-        ' "mobile_no" VARCHAR(15) NULL DEFAULT NULL ,' +
-        ' "residence_no" VARCHAR(20) NULL DEFAULT NULL ,' +
-        ' "alternate_mobile_no" VARCHAR(15) NULL DEFAULT NULL ,' +
-        ' "login_password" TEXT NULL ,' +
-        ' "user_type" SMALLINT NULL ,' +
-        ' "email_verification" TEXT NULL,' +
-        ' PRIMARY KEY ("_id") );')
+    return this.dbQuery('CREATE TABLE IF NOT EXISTS nav_user( _id varchar(36) NOT NULL, first_name text, last_name text, email_address varchar(30), mobile_no varchar(15), password text, emai_verification smallint, address text, city varchar(50), state varchar(30), is_active smallint, user_type smallint, CONSTRAINT nav_user_id_pk PRIMARY KEY (_id));')
         .then(function () {
             //create the root user who is super admin and have all the accesses by default
             var userDAO = new UserDAO();
             return userDAO.createRootUser();
-        }) 
+        })
+        .then(() => {
+            return self.dbQuery('CREATE TABLE IF NOT EXISTS nav_toys (_id varchar(36), name varchar(50), stock integer, price varchar(20), points integer, age_group smallint, category smallint, parent_toys_id varchar(36), CONSTRAINT _id PRIMARY KEY (_id), CONSTRAINT nav_toys_parent_toys_id_fk FOREIGN KEY (parent_toys_id) REFERENCES  nav_toys (_id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE)');
+        })
+        .then(() => {
+            return self.dbQuery('CREATE TABLE IF NOT EXISTS nav_rentals( user_id varchar(36), toys_id varchar(36), lease_start_date bigint, lease_end_date bigint, CONSTRAINT nav_rental_id_pk PRIMARY KEY (user_id,toys_id),CONSTRAINT nav_rentals_toys_id_fk FOREIGN KEY (toys_id) REFERENCES  nav_toys (_id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE,CONSTRAINT nav_rentals_user_id_fk FOREIGN KEY (user_id) REFERENCES  nav_user (_id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE); ');
+        })
+        .then(() => {
+            return self.dbQuery('CREATE TABLE IF NOT EXISTS nav_payments( _id varchar(36), last_payment_date bigint, user_id varchar(36), balance_points integer, balance_amount integer, CONSTRAINT nav_payments_id PRIMARY KEY (_id), CONSTRAINT nav_payments_user_id FOREIGN KEY (user_id) REFERENCES  nav_user (_id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE) ');
+        })
+        .then(() => {
+            return self.dbQuery('CREATE TABLE IF NOT EXISTS nav_payments( _id varchar(36), last_payment_date bigint, user_id varchar(36), balance_points integer, balance_amount integer, CONSTRAINT nav_payments_id PRIMARY KEY (_id), CONSTRAINT nav_payments_user_id FOREIGN KEY (user_id) REFERENCES  nav_user (_id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE) ');
+        })
         .catch(function (error) {
             if (error instanceof Error) {
                 navnirmiteeApi.logger.fatal('[setupDB] [setupSchema] Error creating tables ', error.stack);

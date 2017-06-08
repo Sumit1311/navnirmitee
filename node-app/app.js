@@ -101,6 +101,9 @@ setupDB.setupSchema()
             next();
         });
         console.log("Setting up routes");
+        app.use('/ping',function(req,res){
+            res.status(200).send('pong');
+        });
         app.use('/', require('./routes/regAndAuth/login.js'));
         app.use('/', require('./routes/temp.js'));	
         app.use('/registration', require('./routes/regAndAuth/registration.js'));
