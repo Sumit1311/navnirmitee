@@ -6,6 +6,7 @@
     "bcrypt-nodejs": "0.0.3",
     "bcryptjs": "*",
     "body-parser": "*",
+    "chai": "^4.0.2",
     "connect-flash": "*",
     "connect-redis": "^3.1.0",
     "cookie-parser": "^1.4.1",
@@ -19,6 +20,7 @@
     "humanize-duration": "^3.9.1",
     "jive-persistence-postgres": "git://github.com/Sumit1311/jive-persistence-postgres",
     "log4js": "^0.6.38",
+    "mocha": "^3.4.2",
     "moment": "^2.14.1",
     "morgan": "^1.7.0",
     "node-uuid": "^1.4.7",
@@ -28,7 +30,8 @@
     "passport-http": "*",
     "passport-local": "*",
     "q": "^1.4.1",
-    "redis": "^2.6.2"
+    "redis": "^2.6.2",
+    "request": "^2.81.0"
   },
   "description": "Toy Library",
   "main": "app.js",
@@ -36,6 +39,7 @@
   "license": "MIT",
   "PORT": 3030,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test" : "./node_modules/.bin/mocha --reporter spec"
   }
 }
