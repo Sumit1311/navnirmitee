@@ -9,7 +9,7 @@
     <meta name="author" content="afriq yasin ramadhan">
     <link rel="shortcut icon" href="img/favicon.png">
 
-    <title>Navnirmitee Smart Toy Library</title>
+    <title>Dodolan Manuk - Responsive catalog Template</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
@@ -26,93 +26,87 @@
   </head>
 
   <body>
-  <div id="modal" class="modal fade" role="dialog">
-<div class="modal-dialog">
-  <div class="modal-content">
- <!--     <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header"><a class="close" data-dismiss="modal">&times;</a>
-                <h3 class="text-center">Log In</h3>
-              </div>
-              <div class="modal-body">
-                <form class="form-horizontal" action="/login" method="post" role="form">
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label" for="email">Email</label>
-                    <div class="col-sm-10">
-                      <input class="form-control" type="text" name="email" placeholder="Email Address"/>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label" for="password">Password</label>
-                    <div class="col-sm-10">
-                      <input class="form-control" type="password" name="password" placeholder="Password"/>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div class="modal-footer"><a class="btn" data-dismiss="modal">Close</a><a class="btn btn-primary" onclick="$('.modal-body &gt; form').submit();">Log In</a></div>
-            </div>
-        </div>
--->
-    </div>	
-    </div>	
-    </div>	
+	
 	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand visible-xs" href="/">Navnirmitee</a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        	<ul class="nav navbar-nav nav-left">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Navnirmitee</a>
+            </div>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <button class="navbar-btn btn btn-default visible-xs" style="margin-left: 10px; margin-top: 12px; height: 34px; width: 44px;"><i style="" class="glyphicon glyphicon-shopping-cart"></i>
+                                    </button>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div style="height: 1px;" class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
                 <!-- <li class="active"><a href="/">Home</a></li> -->
-			  <li><a href="/howitworks">How It Works</a></li>
-			  <!-- <li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">Search By Category <b class="caret"></b></a>
-				<ul class="dropdown-menu">
-				  <li><a href="/product">Canary</a></li>
-				  <li><a href="/product">Emprit</a></li>
-				  <li>
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Doro <i class="fa fa-caret-down icon-dropdown"></i></a>
-					<ul class="dropdown-menu sub-menu">
-					  <li><a href="/product">Doro Pos</a></li>
-					  <li><a href="/product">Doro Kucir</a></li>
-					  <li><a href="/product">Doro Belehan</a></li>
-					  <li><a href="/product">Doro Sungut</a></li>
-					</ul>
-				  </li>
-				  <li class="divider"></li>
-				  <li><a href="/product">Pitik</a></li>
-				  <li><a href="/product">Cucak Rowo</a></li>
-				</ul>
+                <ul class="nav navbar-nav nav-right" style="margin-left: 5px;">
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Toys By Category<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/product">Canary</a></li>
+                        <li><a href="/product">Emprit</a></li>
+                        <li>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Doro <i class="fa fa-caret-down icon-dropdown"></i></a>
+                        <ul class="dropdown-menu sub-menu">
+                            <li><a href="/product">Doro Pos</a></li>
+                            <li><a href="/product">Doro Kucir</a></li>
+                            <li><a href="/product">Doro Belehan</a></li>
+                            <li><a href="/product">Doro Sungut</a></li>
+                        </ul>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="/product">Pitik</a></li>
+                        <li><a href="/product">Cucak Rowo</a></li>
+                    </ul>
+                    </li>
+                    <!-- <li><a href="/register">Register</a></li> -->
+                    <!--<li><a href="/pricing">Price</a></li>-->
+                    <!--<li><a href="/order">Order</a></li>-->
+                    <li><a href="/about">About</a></li> 
+                    <!-- <li><a href="/profile">Profile</a></li>-->
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/login">Login</a></li>
+                    <li>
+                        <button style="margin-top: 12px;" class="btn btn-default navbar-btn dropdown-toggle hidden-xs"><i class="glyphicon glyphicon-shopping-cart"></i><span class="caret"></span></button>   
+                    </li>
+                    <!--<li class="dropdown">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Blog <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/blog">Blog 1</a></li>
+                  <li><a href="/blog2">Blog 2</a></li>
+                  <li><a href="/single">Single 1</a></li>
+                  <li><a href="/single2">Single 2</a></li>
+                </ul>
               </li>-->
-			  <li><a href="/search">Search Toys</a></li>
-                <li><a href="/pricing">Pricing</a></li>
-              <!-- <li><a href="/">Toys by Category</a></li> -->
-			</ul>
-			<a href="/" class="logo visible-lg visible-md"><img src="img/logo.jpg" alt="dodolan manuk responsive catalog themes"></a>
-			<div id="brand" class="visible-lg visible-md">&nbsp;</div>
-			<ul class="nav navbar-nav nav-right">
-                <li><a href="/about">About Us</a></li> 
-                <!-- <li><a href="/profile">Profile</a></li>-->
-                <li><a href="/contact">Contact</a></li>
-                <li><a href="/login" data-target="#modal" data-toggle="modal">Login</a></li>
-                <li>
-                <a class="navbar-btn dropdown-toggle hidden-xs"><i class="glyphicon glyphicon-shopping-cart"></i><span>Cart</span><span class="caret"></span></a>   
-                </li>
-              <!--<li><a href="order.html">Order</a></li>-->
-			</ul>
-          
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
+                </ul>
+
+                <form style="margin-top: 15px;" class="navbar-form">
+                    <div class="form-group" style="display:inline;">
+                        <div class="input-group" style="display:table;">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All  <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">All</a></li>
+                                    <li><a href="#">Age Group : 0 - 3</a></li>
+                                    <li><a href="#">Age Group : 4 - 5</a></li>
+
+                                    <li><a href="#">Age Group : 6 - 8</a></li><li><a href="#">Age Group : 9 - 12</a></li><li><a href="#">Age Group : 13 - 16</a></li>
+                                </ul>
+                            </div>
+
+                            <input class="form-control" name="search" placeholder="Search Here" autocomplete="off" autofocus="autofocus" type="text">
+                            <span class="input-group-addon" style="width:1%;"><span class="glyphicon glyphicon-search"></span></span></div>
+                    </div>
+                </form>
+            </div><!-- /.navbar-collapse -->
+        </div>
     </nav>
 
     <!-- begin:slider -->
@@ -248,7 +242,7 @@
 						<h3>Border Canary</h3>
 						<span class="price">$200</span>
 					  </div>
-					  <a href="detail.html"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
+					  <a href="/detail"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
 					</div>
 				</div>
 				<div class="col-md-3 col-sm-4 col-xs-12">
@@ -258,7 +252,7 @@
 						<h3>Border Canary</h3>
 						<span class="price">$200</span>
 					  </div>
-					  <a href="detail.html"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
+					  <a href="/detail"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
 					</div>
 				</div>
 				<div class="col-md-3 col-sm-4 col-xs-12">
@@ -268,7 +262,7 @@
 						<h3>Border Canary</h3>
 						<span class="price">$200</span>
 					  </div>
-					  <a href="detail.html"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
+					  <a href="/detail"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
 					</div>
 				</div>
 				<div class="col-md-3 col-sm-4 col-xs-12">
@@ -278,7 +272,7 @@
 						<h3>Border Canary</h3>
 						<span class="price">$200</span>
 					  </div>
-					  <a href="detail.html"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
+					  <a href="/detail"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
 					</div>
 				</div>
 				<div class="col-md-3 col-sm-4 col-xs-12">
@@ -288,7 +282,7 @@
 						<h3>Border Canary</h3>
 						<span class="price">$200</span>
 					  </div>
-					  <a href="detail.html"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
+					  <a href="/detail"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
 					</div>
 				</div>
 				<div class="col-md-3 col-sm-4 col-xs-12">
@@ -298,7 +292,7 @@
 						<h3>Border Canary</h3>
 						<span class="price">$200</span>
 					  </div>
-					  <a href="detail.html"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
+					  <a href="/detail"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
 					</div>
 				</div>
 				<div class="col-md-3 col-sm-4 col-xs-12">
@@ -308,7 +302,7 @@
 						<h3>Border Canary</h3>
 						<span class="price">$200</span>
 					  </div>
-					  <a href="detail.html"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
+					  <a href="/detail"><div class="caption-link"><i class="fa fa-plus"></i></div></a>
 					</div>
 				</div>
 			</div>
@@ -370,9 +364,9 @@
 							<span class="meta-date">26</span>
 							<span class="meta-month-year">MAR 2014</span>
 						</div>
-						<h3><a href="single.html">the post title</a></h3>
+						<h3><a href="/single">the post title</a></h3>
 						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque.</p>
-						<p><a href="single.html" class="btn btn-green">Read more &raquo;</a></p>
+						<p><a href="/single" class="btn btn-green">Read more &raquo;</a></p>
 					</div>
 				</div>
 				<div class="col-md-4 col-sm-4">
@@ -382,9 +376,9 @@
 							<span class="meta-date">03</span>
 							<span class="meta-month-year">FEB 2014</span>
 						</div>
-						<h3><a href="single.html">the post title</a></h3>
+						<h3><a href="/single">the post title</a></h3>
 						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque.</p>
-						<p><a href="single.html" class="btn btn-green">Read more &raquo;</a></p>
+						<p><a href="/single" class="btn btn-green">Read more &raquo;</a></p>
 					</div>
 				</div>
 				<div class="col-md-4 col-sm-4">
@@ -394,9 +388,9 @@
 							<span class="meta-date">19</span>
 							<span class="meta-month-year">JAN 2014</span>
 						</div>
-						<h3><a href="single.html">the post title</a></h3>
+						<h3><a href="/single">the post title</a></h3>
 						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque.</p>
-						<p><a href="single.html" class="btn btn-green">Read more &raquo;</a></p>
+						<p><a href="/single" class="btn btn-green">Read more &raquo;</a></p>
 					</div>
 				</div>
 				
@@ -423,10 +417,10 @@
 
 					<div class="sitemap">
 						<ul>
-							<li><a href="index.html">HOME</a></li>
-							<li><a href="about.html">ABOUT</a></li>
-							<li><a href="profile.html">PROFILE</a></li>
-							<li><a href="contact.html">CONTACT</a></li>
+							<li><a href="/">HOME</a></li>
+							<li><a href="/about">ABOUT</a></li>
+							<li><a href="/profile">PROFILE</a></li>
+							<li><a href="/contact">CONTACT</a></li>
 						</ul>
 					</div>
 				</div>
@@ -454,7 +448,7 @@
     <script src="js/bootstrap.js"></script>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script>
     <script src="js/gmap3.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/script.js"></scripe>
 
   </body>
 </html>

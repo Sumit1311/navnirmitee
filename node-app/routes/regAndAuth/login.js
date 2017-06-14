@@ -36,7 +36,9 @@ router.get('/login', function (req, res) {
     if (req.isAuthenticated()) {
         return res.redirect('/user/home');
     } else {
-        return res.render('login');
+        return res.render('modals/login',{
+            layout:false
+        });
     }
 });
 
