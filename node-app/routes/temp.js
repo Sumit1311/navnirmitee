@@ -7,20 +7,6 @@ var router = express.Router(),
     UserDAO = require(process.cwd() + "/dao/user/userDAO.js");
 
 
-router.get('/contact', function (req, res) {
-    res.render('contact', {
-        user : req.user,
-        layout : false
-    });
-
-});
-router.get('/pricing', function (req, res) {
-    res.render('pricing', {
-        user : req.user,
-        layout : false
-    });
-
-});
 router.get('/order', function (req, res) {
         res.render('order', {
                     user : req.user,
@@ -36,13 +22,7 @@ router.get('/profile', function (req, res) {
     });
 
 });
-router.get('/about', function (req, res) {
-    res.render('about', {
-        user : req.user,
-        layout : false
-    });
 
-});
 router.get('/single', function (req, res) {
     res.render('single', {
         user : req.user,

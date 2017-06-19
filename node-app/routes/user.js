@@ -10,10 +10,6 @@ var router = express.Router(),
     UserDAO = require(process.cwd() + "/dao/user/userDAO.js");
 
 
-router.get('/logout', function (req, res) {
-    req.session.destroy();
-    res.redirect('/');
-});
 
 /*router.get('/homeMain', function (req, res) {
     res.render('homeMain');

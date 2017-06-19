@@ -34,7 +34,7 @@ var setupDB = new SetupDB();
 setupDB.setupSchema()
     .then(function () {
         var hbs = exphbs.create({
-            defaultLayout: 'layout',
+            //defaultLayout: 'layout',
             extname : '.hbs'
 
         });
@@ -109,7 +109,10 @@ setupDB.setupSchema()
         app.use('/registration', require('./routes/regAndAuth/registration.js'));
         app.use('/user', navnirmiteeApi.util.ensureAuthenticated,
             navnirmiteeApi.util.isSessionAvailable,
-            require('./routes/user.js'));
+            require('./routes/user/user.js'));
+        app.use('/toys', navnirmiteeApi.util.ensureAuthenticated,
+            navnirmiteeApi.util.isSessionAvailable,
+            require('./routes/toys/toyDetail.js'));
         /*app.use('/amenities', navnirmiteeApi.util.ensureAuthenticated,
             navnirmiteeApi.util.isSessionAvailable,
             require('./routes/society/amenities.js'));

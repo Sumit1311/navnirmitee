@@ -933,17 +933,19 @@ blockquote {
 	text-align: center;
 }
 
-#catalogue h3{
+#catalogue h3,
+#_nav_ordered_toy h3{
 	font-size: 16px;
 	line-height: 18px;
 	text-transform: capitalize;
 }
-
+#_nav_ordered_toy .thumbnail,
 #catalogue .thumbnail{
 	position: relative;
 	overflow: hidden;
 }
 
+#_nav_ordered_toy .thumbnail .caption-img,
 #catalogue .thumbnail .caption-img{
 	width: 100%;
 	height: 280px;
@@ -960,7 +962,7 @@ blockquote {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 }
-
+#_nav_ordered_toy .thumbnail .caption-link,
 #catalogue .thumbnail .caption-link{
 	position: absolute;
 	left: 0;
@@ -975,7 +977,7 @@ blockquote {
 	-webkit-transition: all 0.3s ease-in-out;
 	transition: all 0.3s ease-in-out;
 }
-
+#_nav_ordered_toy .thumbnail > a:hover > .caption-link,
 #catalogue .thumbnail > a:hover > .caption-link{
 	-o-transition: all 0.3s ease-in-out;
 	-moz-transition: all 0.3s ease-in-out;
@@ -984,7 +986,7 @@ blockquote {
 	opacity: 1;
 	filter: alpha(opacity=100);
 }
-
+#_nav_ordered_toy .thumbnail .caption-link .fa, 
 #catalogue .thumbnail .caption-link .fa{
 	font-size: 54px;
 	position: absolute;
@@ -2019,6 +2021,7 @@ blockquote {
 .coment input[type="email"],
 .coment textarea,
 .confirm input[type="text"],
+.confirm input[type="password"],
 .confirm input[type="email"],
 .confirm textarea{
 	border-radius: 4px;
@@ -2395,18 +2398,21 @@ blockquote {
 	background: #B9C6D0;
 }
 
+.modal-body .sitemap > *,  
 #footer .sitemap > *{
 	margin-left: auto;
 	margin-right: auto;
 	display: table;
 }
 
+.modal-body .sitemap > ul,
 #footer .sitemap > ul{
 	list-style-type: none;
 	padding-left: 0;
 	margin-top: 20px;
 }
 
+.modal-body .sitemap > ul > li,
 #footer .sitemap > ul > li{
 	float: left;
 }
@@ -2419,6 +2425,11 @@ blockquote {
 }
 
 
+.modal-body .sitemap > ul > li > a{
+	text-transform: uppercase;
+	padding: 5px 10px;
+	font-size: 14px;
+}
 /* 
 	==================
 	[22. COPYRIGHT]

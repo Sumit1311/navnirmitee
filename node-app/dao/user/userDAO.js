@@ -18,7 +18,7 @@ var BaseDAO = require(process.cwd() + "/dao/base/baseDAO.js"),
     navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
     util = require("util");
 
-function UserDAO(persistence, client) {
+function UserDAO(client, persistence) {
     if (persistence) {
         BaseDAO.call(this, persistence);
     }

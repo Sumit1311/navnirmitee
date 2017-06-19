@@ -41,11 +41,11 @@ module.exports = function (passport) {
 
     //the callback is used to authenticate user
     passport.use(new LocalStrategy({
-            usernameField: 'userName',
+            usernameField: 'email',
             passwordField: 'password'
-        }, function (userName, password, done) {
-            //console.info("Fetching from DB.....", email, password);
-            return (new UserDAO()).getLoginDetails(userName)
+        }, function (email, password, done) {
+            console.log("Fetching from DB.....", email, password);
+            return (new UserDAO()).getLoginDetails(email)
                 .then(function (user) {
                     if (user.length != 0) {
                         if (password && navnirmiteeApi.util.comparePassword(password, user[0].password)) {

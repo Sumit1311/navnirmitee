@@ -36,6 +36,8 @@ CREATE TABLE  nav_toys(
 	name varchar(50),
 	stock integer,
 	price varchar(20),
+    short_description varchar(100),
+    long_description TEXT,
 	points integer,
 	age_group smallint,
 	category smallint,
@@ -48,9 +50,10 @@ WITH (OIDS=FALSE);
 CREATE TABLE  nav_rentals(
 	user_id varchar(36),
 	toys_id varchar(36),
+    shipping_address TEXT,
 	lease_start_date bigint,
 	lease_end_date bigint,
-	CONSTRAINT nav_rental_id_pk PRIMARY KEY (user_id,toys_id)
+	CONSTRAINT nav_rentals_id_pk PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
 
