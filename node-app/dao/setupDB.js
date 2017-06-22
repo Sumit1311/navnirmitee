@@ -9,6 +9,7 @@ var BaseDAO = require(process.cwd() + "/dao/base/baseDAO.js"),
     UserDAO = require("./user/userDAO"),
     Q = require("q"),
     navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
+    navDatabaseException = require(process.cwd()+'/dao/exceptions/navDatabaseException.js'),
     util = require("util");
 
 function SetupDB(persistence) {
@@ -47,12 +48,8 @@ SetupDB.prototype.setupSchema = function () {
             return self.dbQuery('CREATE TABLE IF NOT EXISTS nav_payments( _id varchar(36), last_payment_date bigint, user_id varchar(36), balance_points integer, balance_amount integer, CONSTRAINT nav_payments_id PRIMARY KEY (_id), CONSTRAINT nav_payments_user_id FOREIGN KEY (user_id) REFERENCES  nav_user (_id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE) ');
         })
         .catch(function (error) {
-            if (error instanceof Error) {
-                navnirmiteeApi.logger.fatal('[setupDB] [setupSchema] Error creating tables ', error.stack);
-            } else {
-                navnirmiteeApi.logger.fatal('[setupDB] [setupSchema] Error creating tables ', error);
-            }
-            return Q.reject(error);
+            navnirmiteeApi.util.log.call(self, "setupSchema",  error.message, "error" );
+            return Q.reject(navnirmiteeApi.util.getErrorObject(error,500,"DBSETUP", navDatabaseException));
         });
 };
 
@@ -102,3 +99,4 @@ function executeIndex(dbClient, indexName, createSql) {
             }
         });
 }
+

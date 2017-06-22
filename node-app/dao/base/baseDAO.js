@@ -9,6 +9,8 @@
 var db;
 var pgConnection = require("./pg-conn.js"),
     Q = require("q"),
+    navDatabaseException = require(process.cwd()+'/dao/exceptions/navDatabaseException.js'),
+    fileName = "baseDAO.js"
     navnirmiteeApi = require(process.cwd() + "/lib/api.js");
 
 function BaseDAO(persistence) {
@@ -27,7 +29,12 @@ module.exports = BaseDAO;
  * @returns {Q.promise}
  */
 BaseDAO.prototype.getClient = function () {
-    return db.getQueryClient();
+    var self = this;
+    return db.getQueryClient()
+        .catch(function(error){
+            navnirmiteeApi.util.log.call(self,"getClient","Error occured connecting database : " + error.message, "error");
+            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBCONN", navDatabaseException));
+        })
 };
 
 /**
@@ -55,8 +62,13 @@ BaseDAO.prototype.executeTransaction = function (query, param) {
                 .then(function (results) {
                     deferred.resolve(results);
                 }, function (err) {
-                    deferred.reject(err);
+                    deferred.reject();
                 })
+            .catch(function(error){
+                
+                navnirmiteeApi.util.log.call(self, "executeTransaction","Error : " + error.message, "error");
+                return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBTRANSAC", navDatabaseException));
+            })
 
             return deferred.promise;
         }
@@ -87,18 +99,18 @@ BaseDAO.prototype.dbQuery = function (sql, params) {
             return query(client, sql, params);
         })
         .catch(function (error) {
-            navnirmiteeApi.logger.error("[baseDAO] [dbQuery] failed to execute",error);
-            return Q.reject(error);
+            navnirmiteeApi.util.log.call(self, "dbQuery","Error executing query "+ sql +" params : "+ params +" : " + error.message, "debug" );
+            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBQUERY", navDatabaseException));
         })
         .finally(function () {
-            if (self.providedClient == undefined || client) {
+            if (self.providedClient == undefined && client) {
                 client.release();
             }
         })
+    
 }
 
 function query(dbClient, sql, params) {
-    try {
         return dbClient.query(sql, params)
             .then(function () {
                 var results = dbClient.results();
@@ -112,13 +124,8 @@ function query(dbClient, sql, params) {
                 return Q.resolve(results);
             })
             .catch(function (error) {
-                navnirmiteeApi.logger.error("Error executing query ", sql, "with params ", params, error);
-                return Q.reject(error);
+                return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBQUERY", navDatabaseException));
             })
-    } catch (exception) {
-        navnirmiteeApi.logger.error("Error executing query ", sql, "with params ", params, exception);
-        return Q.reject(exception);
-    }
 };
 
 BaseDAO.prototype.startTx = startTx;
@@ -128,24 +135,25 @@ BaseDAO.prototype.rollBackTx = rollbackTx;
 
 function startTx() {
     if (!this.providedClient) {
-        throwError("Can't start tx, invalid client");
+        navnirmiteeApi.util.log.call(this, "startTx", "Invalid Client", "error");
+        return Q.reject(navnirmiteeApi.util.getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
     }
     return this.dbQuery("BEGIN");
 }
 
 function commitTx() {
     if (!this.providedClient) {
-        throwError("Can't commit tx, invalid client");
+        navnirmiteeApi.util.log.call(this, "commitTx", "Invalid Client", "error");
+        return Q.reject(navnirmiteeApi.util.getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
     }
     return this.dbQuery("COMMIT");
 }
 
-function rollbackTx(clientFromPool, e, savePointName) {
+function rollbackTx(clientFromPool, savePointName) {
     if (!this.providedClient) {
-        throwError("Can't rollback tx, invalid client");
-    }
-    if (e) {
-        jive.logger.error(e.stack);
+        navnirmiteeApi.util.log.call(this, "rollBackTx", "Invalid Client", "error");
+        return Q.reject(navnirmiteeApi.util.getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
+
     }
     if (savePointName) {
         return this.dbQuery("ROLLBACK TO SAVEPOINT " + savePointName + ";");
@@ -164,3 +172,4 @@ function rollbackTx(clientFromPool, e, savePointName) {
  }
  return clientFromPool.query("SAVEPOINT " + savePointName + ";");
  }*/
+

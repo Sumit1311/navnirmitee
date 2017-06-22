@@ -52,6 +52,7 @@ exports.convertArrayToJSON = function (array, key) {
  * @param error
  */
 exports.logError = function (fileName, functionName, error) {
+
     if (error instanceof Error) {
         navnirmiteeApi.logger.error('[' + fileName + '] [' + functionName + '] Error occured ', error.stack);
     } else {
@@ -59,6 +60,23 @@ exports.logError = function (fileName, functionName, error) {
     }
     return;
 };
+
+exports.log =function(functionName, message, level)
+{
+    navnirmiteeApi.logger[level]("["+ this.constructor.name +"] ["+ functionName  +"] " + message );
+}
+
+exports.getErrorObject = function getErrorObject(error, status, code, exception) {
+    if(error.name != exception.name)
+    {
+        console.log("Generating New Error");
+        return new exception(error.message, status, code);
+    }
+    else
+    {
+        return error;
+    }
+}
 
 /**
  * Ensure authentication of user.
@@ -77,6 +95,25 @@ exports.ensureAuthenticated = function (req, res, next) {
     res.redirect('/login');
 };
 
+/**
+ * Ensure authentication of user.
+ * This is a middle ware for common routes which are protected from anonymous user
+ *
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
+exports.ensureVerified = function (req, res, next) {
+    if (req.user == undefined || (req.user && req.user.email_verification == null)  ) {
+        return next();
+    }
+    // Redirect if not authenticated
+    res.render('completeRegistration',{
+        isLoggedIn : true,
+        layout : 'nav_bar_layout'
+    });
+};
 /**
  * Ensures that the user is deserialized properly to the session.
  *
@@ -233,4 +270,16 @@ exports.getNoOfFilesMatchPat = function(pattern, directory)
         .catch(function(err){
             return Q.reject(err);
         })
+}
+
+exports.generateErrorResponse = function(error) {
+    return generateResponse(error.code, error.message, error.status);
+}
+
+exports.generateResponse = function(code, body, status) {
+    return {
+        code : code,
+        body : body,
+        status : status
+    }
 }

@@ -21,7 +21,7 @@ CREATE TABLE  nav_user(
 	email_address varchar(30),
 	mobile_no varchar(15),
 	password text,
-	emai_verification smallint,
+	email_verification VARCHAR(36),
 	address text,
 	city varchar(50),
 	state varchar(30),

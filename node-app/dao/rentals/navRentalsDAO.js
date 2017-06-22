@@ -22,12 +22,14 @@ var tableName = "nav_rentals",
     fileName = 'toys/navRentalsDAO';
 
 navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, startDate, endDate) {
+    var self = this;
    return this.dbQuery("INSERT INTO "+tableName+" (_id, user_id,toys_id,shipping_address,lease_start_date, lease_end_date) VALUES($1,$2,$3,$4,$5,$6)",
            [navnirmiteeApi.util.uuid(), userId, toyId, shippingAddress, startDate, endDate])
       .then(function(result){
          return result.rowCount;
       })
       .catch(function(err){
-         return Q.reject(err); 
+            navnirmiteeApi.util.log.call(self, "saveAnOrder",  error.message, "error" );
+            return Q.reject(navnirmiteeApi.util.getErrorObject(error,500,"DBSETUP", navDatabaseException));
       });
 }

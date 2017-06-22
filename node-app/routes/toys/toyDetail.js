@@ -5,6 +5,7 @@ var router = express.Router(),
     helpers = require('handlebars-helpers')(),
     passport = require('passport'),
     navToysDAO = require(process.cwd() + "/dao/toys/navToysDAO.js"),
+    navUserDAO = require(process.cwd() + "/dao/user/userDAO.js"),
     navRentalsDAO = require(process.cwd() + "/dao/rentals/navRentalsDAO.js"),
     url = require("url"),
     Q = require('q'),
@@ -44,8 +45,14 @@ router.get('/detail', function (req, res) {
 
 });
 router.get('/order', function (req, res) {
-    var id = req.query.id;
-    (new navToysDAO()).getToyDetailById(id)
+    var id = req.query.id, user = req.user;
+    (new navUserDAO()).getAddress(user._id)
+    .then(function(n_User){
+        user.address = n_User[0].address;
+        user.city = n_User[0].city;
+        user.state = n_User[0].state;
+        return (new navToysDAO()).getToyDetailById(id)
+    })
     .then(function(toyDetail){
         //console.log(toyDetail, id);
         if(toyDetail.length == 0)
@@ -53,7 +60,7 @@ router.get('/order', function (req, res) {
             return Q.reject();
         }
         res.render('order', {
-            user : req.user,
+            user : user,
             layout : 'nav_bar_layout',
             isLoggedIn : req.user ? true : false,
             toyDetail : toyDetail[0],
