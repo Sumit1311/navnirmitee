@@ -2,6 +2,7 @@
 
 var BaseDAO = require(process.cwd() + "/dao/base/baseDAO.js"),
     Q = require("q"),
+    navDatabaseException = require(process.cwd()+'/dao/exceptions/navDatabaseException.js'),
     navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
     util = require("util");
 

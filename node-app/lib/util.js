@@ -273,7 +273,24 @@ exports.getNoOfFilesMatchPat = function(pattern, directory)
 }
 
 exports.generateErrorResponse = function(error) {
-    return generateResponse(error.code, error.message, error.status);
+    switch(error.name){
+        case "navDatabaseException" :
+            return exports.generateResponse(error.code, {
+                message : "Internal Server Error", 
+                subMessage: error.message
+            }, error.status);
+        case "navValidationException" :
+            return exports.generateResponse(error.code,{
+                message : "Bad Request",
+                subMessage : error.message
+            }, error.status);
+        default :
+            return exports.generateResponse("UNKNOWN", {
+                message : "Internal Server Error",
+                subMessage : "Something Went Wrong, Please try again"
+            }, 500)
+    }
+
 }
 
 exports.generateResponse = function(code, body, status) {

@@ -23,20 +23,12 @@ router.get('/',
         navnirmiteeApi.util.ensureVerified, 
         function (req, res) {
             var promise = Q.resolve();
-            try
-            {
-                if(!req.user)
-                {
-                    promise = (new navToysDAO()).getAllToys(0,10);
-                }
-                else
-                {
-                    promise = (new navToysDAO()).getAllToys(0,10);
-                }
+
+            if(!req.user){
+                promise = (new navToysDAO()).getAllToys(0,10);
             }
-            catch(error)
-            {
-                
+            else{
+                promise = (new navToysDAO()).getAllToys(0,10);
             }
             promise.then(function(toysList){
                 //console.log(toysList);
@@ -45,6 +37,16 @@ router.get('/',
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
                     toysList : toysList
+                });
+            })
+            .done(null,function(error){
+                console.log("error",error.name);
+                var response = navnirmiteeApi.util.generateErrorResponse(error);
+                res.status(response.status).render("errorDocument",{
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : req.user ? true : false,
+                    layout : 'nav_bar_layout',
                 });
             });
         });
