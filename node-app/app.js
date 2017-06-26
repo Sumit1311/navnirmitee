@@ -1,5 +1,4 @@
-var navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
-    navPassportHandler = require(process.cwd() + "/lib/navPassportInitializer.js"),
+var navPassportHandler = require(process.cwd() + "/lib/navPassportInitializer.js"),
     navSessionStoreInitializer = require(process.cwd() + "/lib/navSessionStoreInitializer.js"),
     navDatabaseInitializer = require(process.cwd() + "/lib/dao/navDBInitializer.js"),
     navAppInitializer = require(process.cwd() + "/lib/navAppInitializer.js"),

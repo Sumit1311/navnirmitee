@@ -1,6 +1,6 @@
 var LocalStrategy = require('passport-local').Strategy,
     Q = require('q'),
- passport = require('passport'),
+    passport = require('passport'),
     navUserNotFoundException = require(process.cwd() + "/lib/exceptions/navUserNotFoundException.js"),
     UserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
 
@@ -15,7 +15,7 @@ module.exports = class navPassportHandler {
         p.use(new LocalStrategy({
             usernameField: 'email',
             passwordField: 'password'
-        }, this.authenticate)); 
+        }, this.authenticateHandler));
         this.passport = p;
     }
 
@@ -46,7 +46,7 @@ module.exports = class navPassportHandler {
             });
     }
 
-    authenticate(email, password, done) {
+    authenticateHandler(email, password, done) {
         return (new UserDAO()).getLoginDetails(email)
             .then(function (user) {
                 if (user.length != 0) {
@@ -61,6 +61,24 @@ module.exports = class navPassportHandler {
             })
         .catch(function (error) {
             return done(error);
+        });
+    }
+
+    static authenticate(req, res, next, deferred){
+        passport.authenticate('local',function(err, user, info){
+            if(err) {
+                return deferred.reject(err);
+            }
+            if(!user) {
+                return deferred.reject();
+            }
+            req.logIn(user, err => {
+                if (err) {
+                    return deferred.reject(err);
+                }
+                // Redirect to homepage
+                return deferred.resolve();
+            }) 
         });
     }
 }

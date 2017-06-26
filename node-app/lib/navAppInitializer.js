@@ -20,7 +20,9 @@ module.exports = class navAppInitializer {
             app.use(bodyParser.urlencoded({extended: false}));
             app.use(cookieParser());
             // Set Static Folder
-            app.use(express.static(path.join(__dirname, '../public')));
+            var staticRelPath = navConfigParser.instance().getConfig("StaticPath",'../public');
+            if(staticRelPath != "")
+            app.use(express.static(path.join(process.cwd(),staticRelPath )));
             // Express Validator
             app.use(expressValidator({
                 customValidators : {
