@@ -3,6 +3,7 @@
 var navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
     LocalStrategy = require('passport-local').Strategy,
     Q = require('q'),
+    navUserNotFoundException = require(process.cwd() + "/lib/exceptions/navUserNotFoundException.js"),
     UserDAO = require(process.cwd() + "/dao/user/userDAO.js");
 
 // expose this function to our app using module.exports
@@ -44,17 +45,16 @@ module.exports = function (passport) {
             usernameField: 'email',
             passwordField: 'password'
         }, function (email, password, done) {
-            console.log("Fetching from DB.....", email, password);
             return (new UserDAO()).getLoginDetails(email)
                 .then(function (user) {
                     if (user.length != 0) {
                         if (password && navnirmiteeApi.util.comparePassword(password, user[0].password)) {
                             return done(null, user[0]);
                         } else {
-                            return done(null, false);
+                            return done(new navUserNotFoundException());
                         }
                     } else {
-                        return done(null, false);
+                        return done(new navUserNotFoundException());
                     }
                 })
                 .catch(function (error) {

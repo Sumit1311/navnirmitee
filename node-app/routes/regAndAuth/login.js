@@ -5,9 +5,17 @@
  */
 var express = require('express');
 var router = express.Router(),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navPasswordUtil = require(process.cwd() + "/lib/navPasswordUtil.js"),
+    navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
+    navEmailVerification= require(process.cwd() + "/lib/navEmailVerification.js"),
     navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
-    navToysDAO = require(process.cwd() + "/dao/toys/navToysDAO.js"),
-    navUserDAO = require(process.cwd() + "/dao/user/userDAO.js"),
+    navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
+    navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
+    navUserNotException = require(process.cwd() + "/lib/exceptions/navUserNotFoundException.js"),
+    navUserExistsException = require(process.cwd() + "/lib/exceptions/navUserExistsException.js"),
+    navLogicalException = require("node-exceptions").LogicalException;
+    navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
     passport = require('passport'),
     url = require("url"),
     Q = require('q'),
@@ -40,8 +48,7 @@ router.get('/',
                 });
             })
             .done(null,function(error){
-                console.log("error",error.name);
-                var response = navnirmiteeApi.util.generateErrorResponse(error);
+                var response = new navResponseUtil().generateErrorResponse(error);
                 res.status(response.status).render("errorDocument",{
                     errorResponse : response,
                     user : req.user,
@@ -51,32 +58,57 @@ router.get('/',
             });
         });
 
-router.post('/', passport.authenticate('local'), function (req, res) {
-    return res.redirect('/');
+router.post('/',  function (req, res) {
+    var deferred = Q.defer();
+    deferred.promise
+        .done(function(){
+            res.redirect('/');
+        },(error) => {
+            response = new navResponseUtil().generateErrorResponse(error);
+            res.status(response.status).render("errorDocument",{
+                errorResponse : response,
+                user : req.user,
+                isLoggedIn : false,
+                layout : 'nav_bar_layout',
+            
+        })
+        });
+    req.assert("email","Email is Required").notEmpty();
+    req.assert("email","Valid Email Required").isEmail();
+    req.assert("password","Password is Required").notEmpty();
+    req.assert("password","Valid Password Required").isValidPassword();
+    var validationErrors = req.validationErrors();
+    var response;
+    if(validationErrors)
+    {
+        return deferred.reject(new navValidationException(validationErrors));
+    }
+    passport.authenticate('local',function(err, user, info){
+        if(err) {
+            return deferred.reject(err);
+        }
+        if(!user) {
+            return deferred.reject();
+        }
+        req.logIn(user, err => {
+            if (err) {
+                return deferred.reject(err);
+            }
+            // Redirect to homepage
+            return deferred.resolve();
+        }) 
+    })(req,res);
 });
 
 //the path which will be used to login this is the route for displaying sign in page to user
-router.get('/login', function (req, res) {
-    //if the user is already authenticated i.e. exist in the session then continue to the home page
-    if (req.isAuthenticated()) {
-        if(req.user.email_verification != "")
-        {
-            res.render('completeRegistration',{
-                isLoggedIn : true,
-                layout : 'nav_bar_layout'
-            });
-        }
-        else
-        {
+router.get('/login',
+        navnirmiteeApi.util.ensureAuthenticated,        
+        navnirmiteeApi.util.ensureVerified, 
+        function (req, res) {
+        //if the user is already authenticated i.e. exist in the session then continue to the home page
             res.redirect('/');
-        }
-    } else {
-        return res.render('login',{
-            layout: 'nav_bar_layout',
-            hideNavBar : true
+
         });
-    }
-});
 
 router.get('/about', function (req, res) {
     res.render('about', {
@@ -102,43 +134,71 @@ router.get('/pricing', function (req, res) {
 
 });
 router.post('/register', function (req, res) {
-    var email = req.body.email, password = req.body.password, contactNo = req.body.mobileNo;
+    var email = req.body.email, password = req.body.password, contactNo = req.body.mobileNo = req.body.mobileNo, passwordConf = req.body.passwordConf;
     var userDAO = new navUserDAO();
     var verificationCode;
+    var deferred = Q.defer();
+    deferred.promise
+    .done(function(){
+        res.render('registrationSuccess',{
+            layout : 'nav_bar_layout',
+            isLoggedIn : req.user ? true : false,
+        });
+
+    },function(error){
+        response = new navResponseUtil().generateErrorResponse(error);
+        res.status(response.status).render("errorDocument",{
+            errorResponse : response,
+            user : req.user,
+            isLoggedIn : false,
+            layout : 'nav_bar_layout',
+        });
+
+    })
+    req.assert("email","Email is Required").notEmpty();
+    req.assert("email","Valid Email Required").isEmail();
+    req.assert("password","Password is Required").notEmpty();
+    req.assert("password","Valid Password Required").isValidPassword();
+    req.assert("passwordConf","Password is Required").notEmpty();
+    req.assert("passwordConf","Valid Password Required").isValidPassword();
+    req.assert("mobileNo","Mobile No Required").notEmpty();
+    //req.assert("mobileNo","Valid Mobile No Required").isMobilePhone(contactNo, "any");
+    var validationErrors = req.validationErrors();
+    var response;
+    console.log(validationErrors);
+    if(validationErrors) {
+        return deferred.reject(new navValidationException(validationErrors));
+    }
+    if(password != passwordConf) {
+        return deferred.reject(new navLogicalException());
+    }
+
 
     userDAO.getLoginDetails(email)
         .then(function(user){
-            /*if(user.length == 0)
+            if(user.length != 0)
             {
-                throw new Error("User Exists");
-            }*/
-            verificationCode = navnirmiteeApi.util.generateEmailVerificationCode();
+               return Q.reject(new navUserExistsException());
+            }
+            emailVer = new navEmailVerification();
+            verificationCode = emailVer.generateEmailVerificationCode();
 
             var verificationLink = req.protocol + "://" + req.get("host") + "/verify?id=" + verificationCode;
-            console.log("Inserting");
             //return userDAO.insertRegistrationData(email, contactNo, password,verificationCode);
                     //todo : uncomment when want to send verification email
-            return navnirmiteeApi.email.sendVerificationEmail(email, null, verificationLink)
+            return emailVer.sendVerificationEmail(email, null, verificationLink)
         })
         .then(function (response) {
-            navnirmiteeApi.logger.debug("[users] [/register] Sent verificiation email", response);
-            return userDAO.insertRegistrationData(email, contactNo, navnirmiteeApi.util.encryptPassword(password), verificationCode);
+            navLogUtil.instance().log.call(self, "/register"," Sent verificiation email" + response, 'debug');
+            return userDAO.insertRegistrationData(email, contactNo, new navPasswordUtil().encryptPassword(password), verificationCode);
         })
-        /*.then(function () {
-            res.status(200).send("<html><title>Registration Success</title><body>Thanks. <br> Verification email sent successfully." +
-                " Please verify email addresss</body></html>");
-        })*/
-        .then(function(result){
-            console.log("Rendering")
-            res.render('registrationSuccess',{
-                layout : 'nav_bar_layout',
-                isLoggedIn : req.user ? true : false,
-            });
-        })
-        .catch(function (error) {
-            navnirmiteeApi.logger.error("[users] [/register] Error sending verificiation email", error);
-            res.status(500).send({"code": "InternalServerError"});
+        .done(function(result){
+            return deferred.resolve();
+        },
+        function (error) {
+            return deferred.reject(error);
         });
+
 });
 
 /**
@@ -147,9 +207,38 @@ router.post('/register', function (req, res) {
  *    */
 router.get('/verify', function (req, res) {
     var code = req.query.id;
+    var deferred = Q.defer();
+    deferred.promise
+        .done((user) => {
+            res.render('registrationDetails',{
+                layout : "nav_bar_layout",
+                isLoggedIn : true,
+                user : user[0],
+                verificationCode : user[0].email_verification
+            } );
+        },(error) => {
+            response = new navResponseUtil().generateErrorResponse(error);
+            res.status(response.status).render("errorDocument",{
+                errorResponse : response,
+                user : req.user,
+                isLoggedIn : false,
+                layout : 'nav_bar_layout',
+            });
+        
+        })
+    req.assert("id","Id is Required").notEmpty();
+    req.assert("id","Id not valid").isUUID();
+
+    var validationErrors = req.validationErrors();
+    var response;
+    if(validationErrors)
+    {
+        return deferred.reject(new navLogicalException());
+    }
     (new navUserDAO()).getUserDetailsByCode(code)
-    .then(function (userDetails) {
+    .done(function (userDetails) {
         if (userDetails != 0) {
+            return deferred.resolve(userDetails);
             res.render('registrationDetails',{
                 layout : "nav_bar_layout",
                 isLoggedIn : true,
@@ -157,16 +246,9 @@ router.get('/verify', function (req, res) {
                 verificationCode : userDetails[0].email_verification
             } );
         } else {
-            res.status(400).send("<html><title>Invalid URL</title><body><h1>Bad Request</h1></body></html>");
+            return deferred.reject(new navLogicalException());
         }
     })
-    .catch(function (error) {
-        navnirmiteeApi.logger.error('[registration] [/verify] Error occured while verifying email');
-        if (error instanceof Error) {
-            navnirmiteeApi.logger.error('[registration] [/verify] ', error.stack);
-        }
-        res.status(500).send("<html><title>Internal Server Error</title><body><h1>Internal Server Error, Try again later.</h1></body></html>");
-    });
 });
 
 router.post("/registrationDetails", function(req,res) {
@@ -179,30 +261,58 @@ router.post("/registrationDetails", function(req,res) {
     var userDAO = new navUserDAO(),
         client, user;
 
+    var deferred = Q.defer();
+    deferred.promise
+        .done(() => {
+             res.redirect("/login");
+        },(error) => {
+            response = new navResponseUtil().generateErrorResponse(error);
+            res.status(response.status).render("errorDocument",{
+                errorResponse : response,
+                user : req.user,
+                isLoggedIn : false,
+                layout : 'nav_bar_layout',
+            });
+        
+        })
+    req.assert("email","Email is Required").notEmpty();
+    req.assert("email","Valid Email is Required").isEmail();
+    req.assert("firstName","First Name is Required").notEmpty();
+    req.assert("lastName","First Name is Required").notEmpty();
+    req.assert("shippingAddress","First Name is Required").notEmpty();
+    req.assert("code","Code is Required").notEmpty();
+    req.assert("code","Bad Request").isUUID();
+   
+
+    var validationErrors = req.validationErrors();
+    var response;
+    if(validationErrors)
+    {
+        return deferred.reject(new navValidationException(validationErrors));
+    }
     userDAO.getClient()
         .then(function (_client) {
             userDAO.providedClient = _client;
             return userDAO.startTx();
         })
         .then(function () {
-            return userDAO.getLoginDetails(loginEmailId);
+            return userDAO.getUserDetailsByCode(verificationCode);
         })
         //todo : uncomment once email verification done and comment above then
         .then(function (userDetails) {
-            user = userDetails[0];
-            if (loginEmailId != user.email_address) {
-                return Q.reject({
-                    status: 400,
-                    body: "Bad Request"
-                });
+
+            if(userDetails.length == 0) {
+                return Q.reject(new navLogicalException());
             }
+            if(userDetails[0].email_address != loginEmailId) {
+                return Q.reject(new navLogicalException());
+            }
+
+            user = userDetails[0];
             if (user.email_verification == verificationCode) {
                 return userDAO.clearVerificationCode(user._id)
             } else {
-                return Q.reject({
-                    status: 400,
-                    body: "Please verify email first.."
-                });
+                return Q.reject(new navLogicalException());
             }
         })
         .then(function () {
@@ -211,19 +321,18 @@ router.post("/registrationDetails", function(req,res) {
         .then(function () {
             return userDAO.commitTx();
         })
-        .then(function () {
-            res.redirect("/login");
-        })
-        .catch(function (error) {
+        .catch(
+        function (error) {
             //logg error
-            navnirmiteeApi.logger.error('[users] [/registerDetails] Error while doing registration step 2', error);
+            navLogUtil.instance().log.call(self,'[/registerDetails]', 'Error while doing registration step 2' + error, "error");
             userDAO.rollBackTx()
                 .then(function () {
-                    res.status(500).send("Internal Server Error");
+                    return Q.reject(new Error());
+                    //res.status(500).send("Internal Server Error");
                 })
                 .catch(function (error) {
                     //log error
-                    res.status(500).send("Internal Server Error");
+                    return Q.reject(error)
                 })
         })
         .finally(function () {
@@ -232,6 +341,13 @@ router.post("/registrationDetails", function(req,res) {
                 userDAO.providedClient = undefined;
             }
         })
+        .done(() => {
+            return deferred.resolve();
+
+            //res.redirect("/login");
+        },(error) => {
+            return deferred.reject(error);
+        });
 })
 
 module.exports = router;

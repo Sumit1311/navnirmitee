@@ -8,7 +8,7 @@ var express = require('express'),
 var router = express.Router(),
     passport = require('passport'),
     url = require("url"),
-    UserDAO = require(process.cwd() + "/dao/user/userDAO.js");
+    UserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
 
 /**
  * used to verify email address of the user this route expects verification code as query parameter

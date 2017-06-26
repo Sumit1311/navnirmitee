@@ -1,6 +1,7 @@
 "use strict";
-
-var BaseDAO = require(process.cwd() + "/dao/base/baseDAO.js"),
+var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navCommonUtils = require(process.cwd() + "/lib/navCommonUtil.js"),
+    BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     Q = require("q"),
     navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
     util = require("util");
@@ -24,12 +25,12 @@ var tableName = "nav_rentals",
 navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, startDate, endDate) {
     var self = this;
    return this.dbQuery("INSERT INTO "+tableName+" (_id, user_id,toys_id,shipping_address,lease_start_date, lease_end_date) VALUES($1,$2,$3,$4,$5,$6)",
-           [navnirmiteeApi.util.uuid(), userId, toyId, shippingAddress, startDate, endDate])
+           [new navCommonUtils().uuid(), userId, toyId, shippingAddress, startDate, endDate])
       .then(function(result){
          return result.rowCount;
       })
       .catch(function(err){
-            navnirmiteeApi.util.log.call(self, "saveAnOrder",  error.message, "error" );
+            navLogUtil.instance().log.call(self, "saveAnOrder",  error.message, "error" );
             return Q.reject(navnirmiteeApi.util.getErrorObject(error,500,"DBSETUP", navDatabaseException));
       });
 }

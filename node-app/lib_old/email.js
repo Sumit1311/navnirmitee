@@ -2,12 +2,10 @@ var Q = require('q'),
     htmlToText = require('html-to-text'),
     navnirmiteeApi = require("./api.js"),
     nodemailer = require('nodemailer'),
+    navSendEmailException = require(process.cwd() + "/lib/exceptions/navSendEmailException.js"),
     exphbs = require('express-handlebars'),
     handleBars = require('nodemailer-express-handlebars');
 
-const NE = require('node-exceptions')
-class navSendEmailException extends NE.LogicalException {
-}
  
 // create reusable transporter object using the default SMTP transport
 var transporter = nodemailer.createTransport('smtps://postmaster%40sandboxc22cd49475a84fb084112d1ae7fc171e.mailgun.org:7d79211555e00c458bd6ca5bea33f527@smtp.mailgun.org');
@@ -49,11 +47,8 @@ function sendMail(to, subject, htmlTemplate) {
     // send mail with defined transport object
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            navnirmiteeApi.util.log.call({constructor : {name : "email"}}, "sendMail",  error.message, "error" );
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error,500,"DBSETUP", navDatabaseException));
             navnirmiteeApi.logger.error('[email] [sendMail] Error sending mail ', error);
-            def.reject(error);
-            return;
+            return def.reject(new navSendEmailException(error));
         }
         navnirmiteeApi.logger.debug('[email] [sendMail] Email sent to ' + to + ':  ' + info.response);
         def.resolve(info);

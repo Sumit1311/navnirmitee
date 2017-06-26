@@ -48,6 +48,7 @@ WITH (OIDS=FALSE);
 
 -- object:  nav_rentals | type: TABLE -- 
 CREATE TABLE  nav_rentals(
+    _id varchar(36),
 	user_id varchar(36),
 	toys_id varchar(36),
     shipping_address TEXT,

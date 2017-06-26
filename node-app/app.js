@@ -11,15 +11,10 @@ var session = require('express-session');
 var redisStore = require('connect-redis')(session);
 var client;
 var passport = require('passport');
-var SetupDB = require(process.cwd() + "/dao/setupDB.js");
-var navnirmiteeApi = require(process.cwd() + "/lib/api.js");
-/*
-   var LocalStrategy = require('passport-local').Strategy;
-   var mysql = require('mysql');
-   */
-//mongoose.connect('mongodb://localhost/loginapp');
-//var db = mongoose.connection;
-//var users = require('./routes/users.js');
+var SetupDB = require(process.cwd() + "/lib/dao/setupDB.js");
+var navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
+    navPassportHandler = require(process.cwd() + "/lib/navPassportHandler.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
 var morgan = require('morgan');
 
 process.on('uncaughtException', function (err) {
@@ -50,7 +45,7 @@ try
             hbshelpers({
                 handlebars: hbs.handlebars
             });
-            require(process.cwd() + "/lib/passport.js")(passport);
+            (new navPassportHandler(passport));
             app.set('views', path.join(__dirname, 'views'));
             app.engine('hbs', hbs.engine);
             app.set('view engine', 'hbs');
@@ -80,19 +75,26 @@ try
 
             // Express Validator
             app.use(expressValidator({
+                customValidators : {
+                    isValidPassword: function(input){
+                        return true;
+                    }
+                },
                 errorFormatter: function (param, msg, value) {
                     var namespace = param.split('.')
-                , root = namespace.shift()
-                , formParam = root;
+                    , root = namespace.shift()
+                    , formParam = root;
 
-            while (namespace.length) {
-                formParam += '[' + namespace.shift() + ']';
-            }
-            return {
-                param: formParam,
-                msg: msg,
-                value: value
-            };
+                    while (namespace.length) {
+                        formParam += '[' + namespace.shift() + ']';
+                    }
+                    var errors = {}
+                    errors = {
+                        param : formParam,
+                        msg : msg,
+                        value : value
+                    }
+                    return errors;
                 }
             }));
 
@@ -125,90 +127,21 @@ try
                     navnirmiteeApi.util.ensureAuthenticated,
                     navnirmiteeApi.util.isSessionAvailable,
                     require('./routes/toys/toyDetail.js'));
-            /*app.use('/amenities', navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              require('./routes/society/amenities.js'));
-              app.use('/committee', navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              require('./routes/society/committee.js'));
-              app.use('/community', navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              require('./routes/society/community.js'));
-              app.use('/grievances', navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              require('./routes/society/grievances.js'));
-              app.use('/forum', navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              require('./routes/forum.js'));
-              app.use('/rules', navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              require('./routes/society/rules.js'));
-              app.use('/contacts', navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              require('./routes/society/contacts.js'));
-              app.use('/todo', navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              require('./routes/society/todo.js'));
-              app.use('/configure/society',
-              navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              navnirmiteeApi.util.isAuthorized,
-              require('./routes/configure/society.js'));
-              app.use('/configure/management',
-              navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              navnirmiteeApi.util.isAuthorized,
-              require('./routes/configure/management.js'));
-              app.use('/configure/events',
-              navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              navnirmiteeApi.util.isAuthorized,
-              require('./routes/configure/events.js'));
-              app.use('/configure/financial',
-              navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              navnirmiteeApi.util.isAuthorized,
-              require('./routes/configure/financial.js'));
-              app.use('/configure/notifications',
-              navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              navnirmiteeApi.util.isAuthorized,
-              require('./routes/configure/notifications.js'));
-              app.use('/configure/vendors',
-              navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              navnirmiteeApi.util.isAuthorized,
-              require('./routes/configure/vendors.js'));
-              app.use('/configure/amenities',
-              navnirmiteeApi.util.ensureAuthenticated,
-              navnirmiteeApi.util.isSessionAvailable,
-              navnirmiteeApi.util.isAuthorized,
-              require('./routes/configure/amenities.js'));*/
-
-            //app.use('/users', users);
 
             // Set Port
             app.set('port', (process.env.PORT || 3000));
 
             app.listen(app.get('port'), function () {
-                navnirmiteeApi.logger.info('Server started on port ' + app.get('port'));
+                navLogUtil.instance().log.call(this,"app.js",'Server started on port ' + app.get('port'), "info");
             });
         }, function (error) {
-            navnirmiteeApi.logger.fatal("Error setting up database", error);
+             navLogUtil.instance().log.call(this,"app.js","Error setting up database"+ error,"fatal");
             process.exit(-1);
         })
     .done();
 }
 catch(error){
-    navnirmiteeApi.logger.fatal("Fatal Error Occured : ",error);
-    navnirmiteeApi.logger.fatal("Exiting Now.....Bye");
+    navLogUtil.instance().log.call(this, "app.js", "Fatal Error Occured : " + error, "fatal");
+    navLogUtil.instance().log.call(this, "app.js", "Exiting Now", "fatal");
     process.exit(-1);
 }
-/*
-
-   var https = require("https");
-   function processRequest(req, res){
-   res.end("Hello world");
-   }
-   var s = https.createServer(processRequest);
-   s.listen(8090);*/

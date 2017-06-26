@@ -7,17 +7,20 @@
 
 // will be used to save database persistence
 var db;
-var pgConnection = require("./pg-conn.js"),
+var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navCommonUtils = require(process.cwd() + "/lib/navCommonUtil.js");
+var navDbConnection = require("./pg-conn.js"),
     Q = require("q"),
-    navDatabaseException = require(process.cwd()+'/dao/exceptions/navDatabaseException.js'),
+    navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
     fileName = "baseDAO.js"
     navnirmiteeApi = require(process.cwd() + "/lib/api.js");
 
 function BaseDAO(persistence) {
     //if some custom persistence provided use it other wise use the default postgres persistence
-    db = persistence;
+
+    db = new navDbConnection(persistence).persistence;
     if (!db) {
-        db = pgConnection.persistence;
+        db = new navDbConnection().persistence;
     }
 }
 
@@ -29,11 +32,11 @@ module.exports = BaseDAO;
  * @returns {Q.promise}
  */
 BaseDAO.prototype.getClient = function () {
-    var self = this;
+    var self = this, commonUtil = new navCommonUtils();
     return db.getQueryClient()
         .catch(function(error){
-            navnirmiteeApi.util.log.call(self,"getClient","Error occured connecting database : " + error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBCONN", navDatabaseException));
+            navLogUtil.instance().log.call(self,"getClient","Error occured connecting database : " + error.message, "error");
+            return Q.reject(commonUtil.getErrorObject(error, 500, "DBCONN", navDatabaseException));
         })
 };
 
@@ -44,7 +47,7 @@ BaseDAO.prototype.getClient = function () {
  * @returns {{setClient: Function, execute: Function}}
  */
 BaseDAO.prototype.executeTransaction = function (query, param) {
-    var client;
+    var client, commonUtil = new navCommonUtils();
     var self = this;
     return {
         setClient: function (clientToUse) {
@@ -66,8 +69,8 @@ BaseDAO.prototype.executeTransaction = function (query, param) {
                 })
             .catch(function(error){
                 
-                navnirmiteeApi.util.log.call(self, "executeTransaction","Error : " + error.message, "error");
-                return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBTRANSAC", navDatabaseException));
+                navLogUtil.instance().log.call(self, "executeTransaction","Error : " + error.message, "error");
+                return Q.reject(commonUtil.getErrorObject(error, 500, "DBTRANSAC", navDatabaseException));
             })
 
             return deferred.promise;
@@ -85,22 +88,23 @@ BaseDAO.prototype.executeTransaction = function (query, param) {
  * @returns {*}
  */
 BaseDAO.prototype.dbQuery = function (sql, params) {
-    var client, promise, self = this;
+    var client, promise, self = this, commonUtil = new navCommonUtils();
+
     if (this.providedClient == undefined) {
-        navnirmiteeApi.logger.debug("[baseDAO] [dbQuery] No client provided getting new one");
+        navLogUtil.instance().log.call(this, "dbQuery", "No client provided getting new one", "debug");
         promise = this.getClient();
     } else {
-        navnirmiteeApi.logger.debug("[baseDAO] [dbQuery] Using provided client");
+        navLogUtil.instance().log.call(this, "dbQuery", "Usign provided client", "debug");
         promise = Q.resolve(this.providedClient)
     }
     return promise
         .then(function (_client) {
             client = _client;
-            return query(client, sql, params);
+            return query.call(self, client, sql, params);
         })
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "dbQuery","Error executing query "+ sql +" params : "+ params +" : " + error.message, "debug" );
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBQUERY", navDatabaseException));
+            navLogUtil.instance().log.call(self, "dbQuery","Error executing query "+ sql +" params : "+ params +" : " + error.message, "debug" );
+            return Q.reject(commonUtil.getErrorObject(error, 500, "DBQUERY", navDatabaseException));
         })
         .finally(function () {
             if (self.providedClient == undefined && client) {
@@ -111,6 +115,7 @@ BaseDAO.prototype.dbQuery = function (sql, params) {
 }
 
 function query(dbClient, sql, params) {
+        var logUtil = new navLogUtil();
         return dbClient.query(sql, params)
             .then(function () {
                 var results = dbClient.results();
@@ -120,11 +125,11 @@ function query(dbClient, sql, params) {
                  rowCount:<<number>>
                  }
                  */
-                navnirmiteeApi.logger.debug("Successfully Executed query ", sql, "with params ", params);
+                navLogUtil.instance().log("query", "Successfully Executed query " + sql + "with params " + params, "debug");
                 return Q.resolve(results);
             })
             .catch(function (error) {
-                return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBQUERY", navDatabaseException));
+                return Q.reject(new navCommonUtils().getErrorObject(error, 500, "DBQUERY", navDatabaseException));
             })
 };
 
@@ -135,24 +140,24 @@ BaseDAO.prototype.rollBackTx = rollbackTx;
 
 function startTx() {
     if (!this.providedClient) {
-        navnirmiteeApi.util.log.call(this, "startTx", "Invalid Client", "error");
-        return Q.reject(navnirmiteeApi.util.getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
+        navLogUtil.instance().log.call(this, "startTx", "Invalid Client", "error");
+        return Q.reject(new navCommonUtils().getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
     }
     return this.dbQuery("BEGIN");
 }
 
 function commitTx() {
     if (!this.providedClient) {
-        navnirmiteeApi.util.log.call(this, "commitTx", "Invalid Client", "error");
-        return Q.reject(navnirmiteeApi.util.getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
+        navLogUtil.instance().log.call(this, "commitTx", "Invalid Client", "error");
+        return Q.reject(navCommonUtils.getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
     }
     return this.dbQuery("COMMIT");
 }
 
 function rollbackTx(clientFromPool, savePointName) {
     if (!this.providedClient) {
-        navnirmiteeApi.util.log.call(this, "rollBackTx", "Invalid Client", "error");
-        return Q.reject(navnirmiteeApi.util.getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
+        navLogUtil,instance().log.call(this, "rollBackTx", "Invalid Client", "error");
+        return Q.reject(new navCommonUtils().getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
 
     }
     if (savePointName) {

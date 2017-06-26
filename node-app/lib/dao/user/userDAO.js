@@ -13,10 +13,12 @@
 
 "use strict";
 
-var BaseDAO = require(process.cwd() + "/dao/base/baseDAO.js"),
+var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navPasswordUtil = require(process.cwd() + "/lib/navPasswordUtil.js"),
+    navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     Q = require("q"),
-    navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
-    navDatabaseException = require(process.cwd()+'/dao/exceptions/navDatabaseException.js'),
+    navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
     util = require("util");
 
 function UserDAO(client, persistence) {
@@ -48,8 +50,8 @@ UserDAO.prototype.getLoginDetails = function (loginName) {
             return result.rows;
         })
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "getLoginDetails", error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            navLogUtil.instance().log.call(self, "getLoginDetails", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         });
 };
 
@@ -66,8 +68,8 @@ UserDAO.prototype.getAddress = function (userId) {
             return result.rows;
         })
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "getAddress", error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            navLogUtil.instance().log.call(self, "getAddress", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         });
 };
 /**
@@ -81,14 +83,14 @@ UserDAO.prototype.createRootUser = function (client) {
         .then(function (result) {
             if (result.rowCount == 0) {
                 return self.dbQuery('INSERT INTO ' + tableName + '(_id,first_name,user_type,email_address,password) ' +
-                'VALUES($1,$2,$3,$4,$5)', [rootUserId, "Admin", navnirmiteeApi.constants.userRoleMapping.SUPER_ADMIN, "_root_@localhost.com", navnirmiteeApi.util.encryptPassword("_toor_")]);
+                'VALUES($1,$2,$3,$4,$5)', [rootUserId, "Admin", 0, "_root_@localhost.com", new navPasswordUtil().encryptPassword("_toor_")]);
             } else {
                 return Q.resolve();
             }
         })
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "getAddress", error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            navLogUtil.instance().log.call(self, "getAddress", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         });
 };
 
@@ -106,8 +108,8 @@ UserDAO.prototype.getEmailVerificationDetails = function (email) {
             return result.rows;
         })
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "getAddress", error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            navLogUtil.instance().log.call(self, "getAddress", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         })
 };
 
@@ -123,13 +125,13 @@ UserDAO.prototype.insertRegistrationData = function (email, phone, password, ver
     var self = this;
     return this.dbQuery("INSERT INTO " + tableName +
     " (_id,email_address,mobile_no,email_verification, password)" +
-    " VALUES($1,$2,$3,$4,$5)", [navnirmiteeApi.util.uuid(), email, phone, verificationCode, password])
+    " VALUES($1,$2,$3,$4,$5)", [new navCommonUtil().uuid(), email, phone, verificationCode, password])
         .then(function (result) {
             return result.rowCount;
         })
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "insertRegistrationData", error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            navLogUtil.instance().log.call(self, "insertRegistrationData", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         });
 };
 
@@ -152,8 +154,8 @@ UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, addre
     " address = $3" +
     " WHERE _id=$4", [ firstName, lastName, address, pkey])
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "updateUserDetails", error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            navLogUtil.instance().log.call(self, "updateUserDetails", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         });
 };
 
@@ -172,8 +174,8 @@ UserDAO.prototype.clearVerificationCode = function (_id) {
             return result.rowCount;
         })
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "insertRegistrationData", error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            new navLogutil().log.call(self, "clearVerificationCode", error.message, "error");
+            return Q.reject(navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
 
         });
 };
@@ -193,8 +195,8 @@ UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
             return result.rows;
         })
         .catch(function (error) {
-            navnirmiteeApi.util.log.call(self, "getUserDetailsByCode", error.message, "error");
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            navLogUtil.instance().log.call(self, "getUserDetailsByCode", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         })
 };
 
