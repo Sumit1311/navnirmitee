@@ -7,7 +7,9 @@ module.exports = class navConfigParser {
                 DatabaseUser: process.env.DB_USER || "admin",
                 DatabasePassword: process.env.DB_PASS || "admin",
                 DatabaseName: process.env.DB_NAME || "navnirmitee",
-                DatabasePort: process.env.DB_PORT || "5433"
+                DatabasePort: process.env.DB_PORT || "5433",
+                RedisServerURL: process.env.REDISCLOUD_URL,
+                ListeningPort : process.env.PORT
             }
     }
 

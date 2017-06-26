@@ -13,14 +13,14 @@ var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
     util = require("util");
 
-function SetupDB(persistence) {
+function navDatabaseInitializer(persistence) {
     BaseDAO.call(this, persistence);
     return this;
 }
 
-util.inherits(SetupDB, BaseDAO);
+util.inherits(navDatabaseInitializer, BaseDAO);
 
-module.exports = SetupDB;
+module.exports = navDatabaseInitializer;
 
 
 /**
@@ -28,7 +28,7 @@ module.exports = SetupDB;
  *
  * @returns Q.Promise
  */
-SetupDB.prototype.setupSchema = function () {
+navDatabaseInitializer.prototype.init = function () {
     var self = this;
     return this.dbQuery('CREATE TABLE IF NOT EXISTS nav_user( _id varchar(36) NOT NULL, first_name text, last_name text, email_address varchar(30), mobile_no varchar(15), password text, emai_verification smallint, address text, city varchar(50), state varchar(30), is_active smallint, user_type smallint, CONSTRAINT nav_user_id_pk PRIMARY KEY (_id));')
         .then(function () {

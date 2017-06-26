@@ -1,10 +1,14 @@
 var LocalStrategy = require('passport-local').Strategy,
     Q = require('q'),
+ passport = require('passport'),
     navUserNotFoundException = require(process.cwd() + "/lib/exceptions/navUserNotFoundException.js"),
     UserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
 
 module.exports = class navPassportHandler {
     constructor(p) {
+        if(!p) {
+            p = passport;
+        }
         p.serializeUser(this.serializeUser);
         // used to deserialize the user
         p.deserializeUser(this.deserializeUser);
@@ -12,6 +16,12 @@ module.exports = class navPassportHandler {
             usernameField: 'email',
             passwordField: 'password'
         }, this.authenticate)); 
+        this.passport = p;
+    }
+
+    register(app) {
+        app.use(this.passport.initialize());
+        app.use(this.passport.session());    
     }
 
     serializeUser (user, done) {
