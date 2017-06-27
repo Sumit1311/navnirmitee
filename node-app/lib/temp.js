@@ -1,6 +1,5 @@
 var express = require('express'),
-    navnirmiteeApi = require(process.cwd() + "/lib/api.js");
-var router = express.Router(),
+    router = express.Router(),
     url = require("url"),
     Q = require('q'),
     moment = require('moment'),

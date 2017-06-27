@@ -21,9 +21,9 @@ module.exports = class navToysRouter extends navBaseRouter {
 
     setup() {
         this.router.use(this.ensureAuthenticated, this.ensureVerified, this.isSessionAvailable);
-        this.router.get('/detail', getToysDetails);
-        this.router.get('/order', getOrder);
-        this.router.post('/placeOrder',placeOrder);
+        this.router.get('/detail', this.getToysDetails);
+        this.router.get('/order', this.getOrder);
+        this.router.post('/placeOrder',this.placeOrder);
         return this;
     }
     getToysDetails(req, res) {
@@ -190,5 +190,6 @@ module.exports = class navToysRouter extends navBaseRouter {
             deferred.resolve();
         },(error) => {
             deferred.reject(error);
-
+        });
+    }        
 }
