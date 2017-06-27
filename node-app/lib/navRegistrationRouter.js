@@ -31,13 +31,22 @@ module.exports = class navRegistration extends navBaseRouter {
                     isLoggedIn : req.user ? true : false,
                 });
         },function(error){
-            response = new navResponseUtil().generateErrorResponse(error);
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+            /*response = new navResponseUtil().generateErrorResponse(error);
             res.status(response.status).render("errorDocument",{
                 errorResponse : response,
                 user : req.user,
                 isLoggedIn : false,
                 layout : 'nav_bar_layout',
-            });
+            });*/
 
         })
         req.assert("email","Email is Required").notEmpty();
@@ -98,13 +107,22 @@ module.exports = class navRegistration extends navBaseRouter {
                     verificationCode : user[0].email_verification
                 } );
             },(error) => {
-                response = new navResponseUtil().generateErrorResponse(error);
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+                /*response = new navResponseUtil().generateErrorResponse(error);
                 res.status(response.status).render("errorDocument",{
                     errorResponse : response,
                     user : req.user,
                     isLoggedIn : false,
                     layout : 'nav_bar_layout',
-                });
+                });*/
         
             });
         req.assert("id","Id is Required").notEmpty();
@@ -145,15 +163,24 @@ module.exports = class navRegistration extends navBaseRouter {
         var deferred = Q.defer();
         deferred.promise
             .done(() => {
-                res.redirect("/login");
+                new ResponseUtil().redirect("/login");
             },(error) => {
-                response = new navResponseUtil().generateErrorResponse(error);
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+                /*response = new navResponseUtil().generateErrorResponse(error);
                 res.status(response.status).render("errorDocument",{
                     errorResponse : response,
                     user : req.user,    
                     isLoggedIn : false,
                     layout : 'nav_bar_layout',
-                });
+                });*/
         
              })
         req.assert("email","Email is Required").notEmpty();

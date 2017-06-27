@@ -4,7 +4,7 @@
  * @returns {{doRequest: Function}}
  * @constructor
  */
-function RequestHandler() {
+function navRequestHandler() {
     return {
         doRequest: function (url, method, body, responseType) {
             var deferred = Q.defer();
@@ -18,12 +18,34 @@ function RequestHandler() {
                         deferred.resolve(result);
                         return;
                     }
-                    var response = JSON.parse(result);
-                    deferred.resolve(response);
+                    debugger;
+                    if(result != "") {
+                        var response = JSON.parse(result);
+                    } else {
+                        var response = {};
+                    }
+                    if(response.redirect && response.redirect.length != 0)
+                    {
+                       deferred.resolve(window.location.replace(response.redirect));
+                       return;
+                    }
+                    deferred.resolve({
+                        status : 200,
+                        body : response,
+                        code : response.code ? response.code : "UNKNOWN"
+                    });
                     return;
 
                 },
                 error: function (xhr, status, error) {
+                    if(xhr.status == 400 || xhr.status == 404 || xhr.status == 500 || xhr.status == 401) {
+                        deferred.reject(
+                        JSON.parse(xhr.responseText)
+                        );
+                        return;
+                    }
+ 
+                    debugger;
                     deferred.reject(error);
                 }
             };

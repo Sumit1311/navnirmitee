@@ -14,7 +14,7 @@ module.exports = class navResponseUtils {
             case "navUserNotFoundException" :
                 return this.generateResponse(error.code,{
                     message : "Bad Request",
-                       subMessage : "Username or Password not matched"
+                       subMessage : "Username or Password Invalid"
                 }, error.status);
             case "navLoginFailureException" :
                 return this.generateResponse(error.code,{
@@ -57,6 +57,35 @@ module.exports = class navResponseUtils {
             body : body,
             status : status
         }
-}
+    }
 
+    sendAjaxResponse(res, response) {
+        res.status(response.status).send(JSON.stringify(response.body));
+    }
+
+    redirect(req, res, path) {
+        if(req.xhr) {
+            this.sendAjaxResponse(res, {
+                status : 200,
+                body : {
+                    redirect : path
+                },
+                code : "OK"
+
+            });
+        } else {
+            res.redirect(path);
+        }
+    }
+    
+    renderErrorPage(req, res, context) {
+        if(req.xhr) {
+            this.sendAjaxResponse(res, context.errorResponse); 
+            return;
+        } else {    
+            res.status(context.errorResponse.status).render("errorDocument", context);
+        }
+            
+
+    }
 }

@@ -43,13 +43,22 @@ module.exports = class navToysRouter extends navBaseRouter {
                     }
                 });
             },(error) => {
-                response = new navResponseUtil().generateErrorResponse(error);
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+                /*response = new navResponseUtil().generateErrorResponse(error);
                 res.status(response.status).render("errorDocument",{
                     errorResponse : response,
                     user : req.user,
                     isLoggedIn : false,
                     layout : 'nav_bar_layout',
-                });
+                });*/
 
             })
         req.assert("id"," Bad Request").notEmpty();
@@ -89,13 +98,22 @@ module.exports = class navToysRouter extends navBaseRouter {
                     toyDetail : result[0]
                 });
             },(error) => {
-                response = new navResponseUtil().generateErrorResponse(error);
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+                /*response = new navResponseUtil().generateErrorResponse(error);
                 res.status(response.status).render("errorDocument",{
                     errorResponse : response,
                     user : req.user,
                     isLoggedIn : false,
                     layout : 'nav_bar_layout',
-                });
+                });*/
 
             })
         req.assert("id"," Bad Request").notEmpty();
@@ -140,13 +158,22 @@ module.exports = class navToysRouter extends navBaseRouter {
                     layout : 'nav_bar_layout'
                 });
             },(error) => {
-                response = new navResponseUtil().generateErrorResponse(error);
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+                /*response = new navResponseUtil().generateErrorResponse(error);
                 res.status(response.status).render("errorDocument",{
                     errorResponse : response,
                     user : req.user,
                     isLoggedIn : false,
                     layout : 'nav_bar_layout',
-                });
+                });*/
 
             })
         req.assert("id"," Bad Request").notEmpty();

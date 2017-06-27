@@ -59,13 +59,22 @@ module.exports = class navMainRouter extends navBaseRouter {
                 });
             })
             .done(null,function(error){
-                var response = new navResponseUtil().generateErrorResponse(error);
-                res.status(response.status).render("errorDocument",{
+                //var response = new navResponseUtil().generateErrorResponse(error);
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+                /*res.status(response.status).render("errorDocument",{
                     errorResponse : response,
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
-                });
+                });*/
             });
 
     }

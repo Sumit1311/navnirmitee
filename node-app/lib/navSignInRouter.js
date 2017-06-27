@@ -21,25 +21,26 @@ module.exports = class navSignInRouter extends navBaseRouter {
         var deferred = Q.defer();
         deferred.promise
             .done(function(){
-                res.redirect('/');
+                new navResponseUtil().redirect(req, res, '/');
             },(error) => {
-                var response = new navResponseUtil().generateErrorResponse(error);
-                res.status(response.status).render("errorDocument",{
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
                     errorResponse : response,
                     user : req.user,
                     isLoggedIn : false,
                     layout : 'nav_bar_layout',
             
-                })
+                });
              });
-        navAuthenticateUser().authenticate(req, res);
+        new navAuthenticateUser().authenticate(req, res, deferred);
     }
     logOut(req, res) {
         req.session.destroy();
-        res.redirect('/');
+        new navResponseUtil().redirect(req, res, '/');
     }
     logIn (req, res) {
         //if the user is already authenticated i.e. exist in the session then continue to the home page
-        res.redirect('/');
+        new navResponseUtil().redirect(req, res, '/');
     }
 }

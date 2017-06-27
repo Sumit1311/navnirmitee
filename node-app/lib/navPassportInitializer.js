@@ -80,7 +80,7 @@ module.exports = class navPassportHandler {
                 // Redirect to homepage
                 return deferred.resolve();
             }) 
-        });
+        })(req,res);
     }
 }
 
