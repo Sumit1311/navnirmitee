@@ -12,8 +12,7 @@ var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
 var navDbConnection = require("./pg-conn.js"),
     Q = require("q"),
     navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
-    fileName = "baseDAO.js"
-    navnirmiteeApi = require(process.cwd() + "/lib/api.js");
+    fileName = "baseDAO.js";
 
 function BaseDAO(persistence) {
     //if some custom persistence provided use it other wise use the default postgres persistence

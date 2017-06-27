@@ -3,7 +3,6 @@ var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navCommonUtils = require(process.cwd() + "/lib/navCommonUtil.js"),
     BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     Q = require("q"),
-    navnirmiteeApi = require(process.cwd() + "/lib/api.js"),
     util = require("util");
 
 function navRentalsDAO(client, persistence) {
@@ -31,6 +30,6 @@ navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, sta
       })
       .catch(function(err){
             navLogUtil.instance().log.call(self, "saveAnOrder",  error.message, "error" );
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error,500,"DBSETUP", navDatabaseException));
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBSETUP", navDatabaseException));
       });
 }

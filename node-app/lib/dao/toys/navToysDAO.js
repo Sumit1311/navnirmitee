@@ -3,6 +3,7 @@
 var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     Q = require("q"),
     navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
+    navCommonUtils = require(process.cwd() + "/lib/navCommonUtil.js"),
     util = require("util");
 
 function navToysDAO(client, persistence) {
@@ -31,7 +32,7 @@ navToysDAO.prototype.getAllToys = function (offset, limit) {
         })
         .catch(function (error) {
             navLogUtil.instance().log.call(self, "getAllToys",  error.message, "error" );
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error,500,"DBTOYS", navDatabaseException));
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBTOYS", navDatabaseException));
         });
 
 };
@@ -45,7 +46,7 @@ navToysDAO.prototype.getToyDetailById = function (toyId) {
         })
     .catch(function (error) {
             navLogUtil.instance().log.call(self, "getToyDetailsById",  error.message, "error" );
-            return Q.reject(navnirmiteeApi.util.getErrorObject(error,500,"DBTOYS", navDatabaseException));
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBTOYS", navDatabaseException));
     });
 };
 

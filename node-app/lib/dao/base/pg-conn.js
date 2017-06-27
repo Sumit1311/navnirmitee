@@ -15,12 +15,10 @@ module.exports = class navDbConnectionHandler {
         var databaseUrl = "pg://" + navConfigParser.instance().getConfig("DatabaseUser", "admin") + ":" + navConfigParser.instance().getConfig("DatabasePassword","admin") + "@" +navConfigParser.instance().getConfig("DatabaseHost") + ":" + navConfigParser.instance().getConfig("DatabasePort","5432") + "/" +navConfigParser.instance().getConfig("DatabaseName", "navnirmitee");
     if (!databaseUrl) {
         navLogUtil.instance().log.call(this,"constructor", "Please check db url " + databaseUrl, "error");
-        //navnirmiteeApi.logger.error("Please check database url ", databaseUrl);
         return;
     }
 
         navLogUtil.instance().log.call(this,"constructor", "Configuring database , URL " + databaseUrl, "debug");
-        //navnirmiteeApi.logger.debug("Cofiguring database , URL : ", databaseUrl);
         this.persistence = new postgresPersistence({
             databaseUrl: databaseUrl,
             customLogger: navLogUtil.instance().getLogger()

@@ -2,6 +2,7 @@ var LocalStrategy = require('passport-local').Strategy,
     Q = require('q'),
     passport = require('passport'),
     navUserNotFoundException = require(process.cwd() + "/lib/exceptions/navUserNotFoundException.js"),
+    navPasswordUtil = require(process.cwd() + "/lib/navPasswordUtil.js"),
     UserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
 
 module.exports = class navPassportHandler {
@@ -50,7 +51,7 @@ module.exports = class navPassportHandler {
         return (new UserDAO()).getLoginDetails(email)
             .then(function (user) {
                 if (user.length != 0) {
-                    if (password && navnirmiteeApi.util.comparePassword(password, user[0].password)) {
+                    if (password && new navPasswordUtil().comparePassword(password, user[0].password)) {
                         return done(null, user[0]);
                     } else {
                         return done(new navUserNotFoundException());

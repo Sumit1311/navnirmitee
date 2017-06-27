@@ -1,6 +1,5 @@
 var Q = require('q'),
     htmlToText = require('html-to-text'),
-    navnirmiteeApi = require("./api.js"),
     nodemailer = require('nodemailer'),
     navSendEmailException = require(process.cwd() + "/lib/exceptions/navSendEmailException.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
@@ -38,7 +37,6 @@ module.exports = class navEmailSender {
 
         var self = this;
         if (!to || !subject || !htmlTemplate) {
-            //navnirmiteeApi.logger.error('[email] [sendMail] Please provide subject, to and body of email');
             return Q.reject(new Error("Please provide subject, to and body of email"));
         }
         var def = Q.defer();
