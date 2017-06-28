@@ -1,0 +1,40 @@
+{
+    "plans" : [
+        [
+            {
+                "id" : 0 ,
+                "duration" : "Monthly",
+                "noOfToys" : 1,
+                "amount" : 300,
+                "deposit" : 1000 ,
+                "rentDuration" : "7 Days"
+            },
+            {
+                "id" : 1 ,
+                "duration" : "Quarterly",
+                "noOfToys" : 1,
+                "amount" : 700 ,
+                "deposit" : 1000 ,
+                "rentDuration" : "7 Days"
+            },
+            {
+                "id" : 2 ,
+                "duration" : "Half-Yearly",
+                "noOfToys" : 1,
+                "amount" : 1200 ,
+                "deposit" : 1000 ,
+                "rentDuration" : "7 Days"
+            },
+            {
+                "id" : 3 ,
+                "duration" : "Yearly",
+                "noOfToys" : 1,
+                "amount" : 3000 ,
+                "deposit" : 1000 ,
+                "rentDuration" : "7 Days"
+            }
+        ]
+    ]
+
+
+}

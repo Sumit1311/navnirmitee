@@ -24,6 +24,7 @@
     "mocha": "^3.4.2",
     "moment": "^2.14.1",
     "morgan": "^1.7.0",
+    "mustache": "^2.3.0",
     "node-exceptions": "^2.0.2",
     "node-uuid": "^1.4.7",
     "nodemailer": "^2.5.0",

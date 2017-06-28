@@ -10,10 +10,10 @@ module.exports = class navSignInRouter extends navBaseRouter {
     }
 
     setup(){
-        this.router.post('/', this.authentication);
-        this.router.get('/logout', this.ensureAuthenticated, this.isSessionAvailable, this.logOut);        
+        this.router.post('/', this.authentication.bind(this));
+        this.router.get('/logout', this.ensureAuthenticated, this.isSessionAvailable, this.logOut.bind(this));        
         //the path which will be used to login this is the route for displaying sign in page to user
-        this.router.get('/login', this.ensureAuthenticated,this.ensureVerified, this.logIn);
+        this.router.get('/login', this.ensureAuthenticated,this.ensureVerified, this.logIn.bind(this));
         return this;
     }
 

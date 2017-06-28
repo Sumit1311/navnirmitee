@@ -20,7 +20,11 @@ function navRequestHandler() {
                     }
                     debugger;
                     if(result != "") {
-                        var response = JSON.parse(result);
+                        try{
+                            var response = JSON.parse(result);
+                        } catch(exception) {
+                            var response = {};
+                        }
                     } else {
                         var response = {};
                     }
@@ -39,10 +43,14 @@ function navRequestHandler() {
                 },
                 error: function (xhr, status, error) {
                     if(xhr.status == 400 || xhr.status == 404 || xhr.status == 500 || xhr.status == 401) {
-                        deferred.reject(
-                        JSON.parse(xhr.responseText)
-                        );
-                        return;
+                        if(xhr.responseText != "" ){
+                            try{
+                            var response = JSON.parse(xhr.responseText);
+                            } catch(e) {
+                                response = "Server Error";
+                            }
+                            return deferred.reject(response);
+                        }
                     }
  
                     debugger;

@@ -44,6 +44,7 @@ $(function(){
         $("#_nav_forgotpassword").click(resetPassword);
         $("#_nav_createanaccount").click(createAccount);
 	$("#_nav_login_div > form").submit(function(event) { new navLogInHelper().logInHandler(event, this)});
+	$("#_nav_register_div > form").submit(function(event) { new navRegistrationHelper().registrationHandler(event, this)});
 
 })
 

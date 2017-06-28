@@ -18,6 +18,6 @@ module.exports = class navEmailVerification extends navEmailSender {
     }
 
     generateCode() {
-        return new navCommonUtil().generateUUID();
+        return new navCommonUtil().generateUuid();
     }
 }

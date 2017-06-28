@@ -125,7 +125,7 @@ UserDAO.prototype.insertRegistrationData = function (email, phone, password, ver
     var self = this;
     return this.dbQuery("INSERT INTO " + tableName +
     " (_id,email_address,mobile_no,email_verification, password)" +
-    " VALUES($1,$2,$3,$4,$5)", [new navCommonUtil().uuid(), email, phone, verificationCode, password])
+    " VALUES($1,$2,$3,$4,$5)", [new navCommonUtil().generateUuid(), email, phone, verificationCode, password])
         .then(function (result) {
             return result.rowCount;
         })
@@ -188,7 +188,7 @@ UserDAO.prototype.clearVerificationCode = function (_id) {
  */
 UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
     var self = this;
-    return this.dbQuery("SELECT email_address,email_verification,mobile_no" +
+    return this.dbQuery("SELECT _id, email_address,email_verification,mobile_no" +
     " FROM " + tableName +
     " WHERE email_verification=$1", [verifCode])
         .then(function (result) {
@@ -200,3 +200,5 @@ UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
         })
 };
 
+UserDAO.prototype.changePlan = function (){
+}

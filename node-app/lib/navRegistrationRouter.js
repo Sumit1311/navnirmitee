@@ -13,25 +13,24 @@ module.exports = class navRegistration extends navBaseRouter {
     constructor() {
         super();
     }
-    setup(){ 
-        this.router.post('/register', this.doRegistration);
-        this.router.get('/verify', this.doEmailVerification); 
-        this.router.post("/registrationDetails", this.saveAdditionalDetails);
+    setup(){
+        var self = this;
+        this.router.post('/register', function(req,res, next) {self.doRegistration(req,res,next)});
+        this.router.get('/verify', function(req,res, next) {self.doEmailVerification(req,res,next)}); 
+        this.router.post("/registrationDetails", function(req,res, next) {self.saveAdditionalDetails(req,res,next)});
+        this.router.get("/registrationSuccess",this.getRegistrationSuccess.bind(this));
         return this;
     }
     doRegistration(req, res, next){
         var email = req.body.email, password = req.body.password, contactNo = req.body.mobileNo = req.body.mobileNo, passwordConf = req.body.passwordConf;
         var userDAO = new navUserDAO();
         var verificationCode;
-        var deferred = Q.defer();
+        var deferred = Q.defer(), self = this;
+        var respUtil =  new navResponseUtil();
         deferred.promise
             .done(function(){
-                res.render('registrationSuccess',{
-                    layout : 'nav_bar_layout',
-                    isLoggedIn : req.user ? true : false,
-                });
+                respUtil.redirect(req, res, "/registrationSuccess");
         },function(error){
-                var respUtil =  new navResponseUtil();
                 var response = respUtil.generateErrorResponse(error);
                 respUtil.renderErrorPage(req, res, {
                     errorResponse : response,
@@ -66,18 +65,14 @@ module.exports = class navRegistration extends navBaseRouter {
         if(password != passwordConf) {
             return deferred.reject(new navLogicalException());
         }
-
-        this.saveRegistrationData(req, email, contactNo, password, deferred);
-
-    }
-    saveRegistartionData(req, email, contactNo, password, deferred) {
+        var verificationCode 
         userDAO.getLoginDetails(email)
         .then(function(user){
              if(user.length != 0) {
                  return Q.reject(new navUserExistsException());
              }
-             emailVer = new navEmailVerification();
-             verificationCode = emailVer.generateEmailVerificationCode();
+             var emailVer = new navEmailVerification();
+             verificationCode = emailVer.generateCode();
 
              var verificationLink = req.protocol + "://" + req.get("host") + "/verify?id=" + verificationCode;
              //return userDAO.insertRegistrationData(email, contactNo, password,verificationCode);
@@ -94,6 +89,9 @@ module.exports = class navRegistration extends navBaseRouter {
         function (error) {
              return deferred.reject(error);
         });
+
+    }
+    saveRegistrationData(req, email, contactNo, password, deferred) {
     }
     doEmailVerification(req, res, next) {
         var code = req.query.id;
@@ -163,7 +161,7 @@ module.exports = class navRegistration extends navBaseRouter {
         var deferred = Q.defer();
         deferred.promise
             .done(() => {
-                new ResponseUtil().redirect("/login");
+                new navResponseUtil().redirect(req, res, "/login");
             },(error) => {
                 var respUtil =  new navResponseUtil();
                 var response = respUtil.generateErrorResponse(error);
@@ -208,7 +206,6 @@ module.exports = class navRegistration extends navBaseRouter {
         })
         //todo : uncomment once email verification done and comment above then
         .then(function (userDetails) {
-
             if(userDetails.length == 0) {
                 return Q.reject(new navLogicalException());
             }
@@ -233,14 +230,14 @@ module.exports = class navRegistration extends navBaseRouter {
         function (error) {
             //logg error
             navLogUtil.instance().log.call(self,'[/registerDetails]', 'Error while doing registration step 2' + error, "error");
-            userDAO.rollBackTx()
+            return userDAO.rollBackTx()
                 .then(function () {
-                    return Q.reject(new Error());
+                    return Q.reject(error);
                     //res.status(500).send("Internal Server Error");
                 })
-                .catch(function (error) {
+                .catch(function (err) {
                     //log error
-                    return Q.reject(error)
+                    return Q.reject(err)
                 })
         })
         .finally(function () {
@@ -257,5 +254,10 @@ module.exports = class navRegistration extends navBaseRouter {
             return deferred.reject(error);
         });
     }
-
+    getRegistrationSuccess(req, res, next) {
+                res.render('registrationSuccess',{
+                    layout : 'nav_bar_layout',
+                    isLoggedIn : req.user ? true : false,
+                });
+    }
 }

@@ -20,10 +20,11 @@ module.exports = class navToysRouter extends navBaseRouter {
     }
 
     setup() {
+        var self = this;
         this.router.use(this.ensureAuthenticated, this.ensureVerified, this.isSessionAvailable);
-        this.router.get('/detail', this.getToysDetails);
-        this.router.get('/order', this.getOrder);
-        this.router.post('/placeOrder',this.placeOrder);
+        this.router.get('/detail', function(req,res,next){self.getToysDetails(req,res,next)});
+        this.router.get('/order', function(req,res,next){self.getOrder(req,res,next)});
+        this.router.post('/placeOrder',(req, res, next) => {self.placeOrder(req,res,next)});
         return this;
     }
     getToysDetails(req, res) {
@@ -199,13 +200,16 @@ module.exports = class navToysRouter extends navBaseRouter {
         .then(function(){
             return rDAO.commitTx();
         })
-        .catch(function(err){
-            return rDAO.rollbackTx()
-            .done(() => {
-                return Q.reject(err);
-            }, (error) => {
-                return Q.reject(error);
-            })
+        .catch(function(error){
+            return rDAO.rollBackTx()
+                .then(function () {
+                    return Q.reject(error);
+                    //res.status(500).send("Internal Server Error");
+                })
+                .catch(function (err) {
+                    //log error
+                    return Q.reject(err);
+                })
         })
         .finally(function () {
             if (rDAO.providedClient) {

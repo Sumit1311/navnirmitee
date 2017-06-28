@@ -1,7 +1,7 @@
-function navLogInHelper() {
+function navRegistrationHelper() {
 }
 
-navLogInHelper.prototype.logInHandler = function(event, that) {
+navRegistrationHelper.prototype.registrationHandler = function(event, that) {
            var form = $(that);
            event.preventDefault();
            /*form.validate({
@@ -22,28 +22,28 @@ navLogInHelper.prototype.logInHandler = function(event, that) {
             highlight : function(element, errorClass, validClass) {
                 $(element).parent().addClass('has-error');
             },
-            submitHandler : self.logIn
+            submitHandler : self.registration
            })*/
-           debugger;
-           $("#_nav_login_button").prop('disabled', true);;
-           this.logIn(form)
+           $("#_nav_register_button").prop('disabled', true);
+           var self = this;
+           this.registration(form)
            .catch(function(error){
+                   debugger;
                if(typeof error == "string") {
-                this.showError(error);
+                self.showError(error);
                } else {
-                this.showError(error.subMessage);
+                self.showError(error.subMessage);
                }
-               $("#_nav_login_button").prop('disabled', false);;
+               $("#_nav_register_button").prop('disabled', false);;
            });
 }
 
-navLogInHelper.prototype.logIn = function(form) {
+navRegistrationHelper.prototype.registration = function(form) {
     var body = form.serialize();
-    //console.log(body);
-    return navRequestHandler().doRequest('/', 'POST', body);
+    return navRequestHandler().doRequest('/register', 'POST', body);
 }
 
-navLogInHelper.prototype.showError = function(message) {
-    $("#_nav_login_error .alert").text(message);
-    $("#_nav_login_error").removeClass("hidden");
+navRegistrationHelper.prototype.showError = function(message) {
+    $("#_nav_register_error .alert").text(message);
+    $("#_nav_register_error").removeClass("hidden");
 }

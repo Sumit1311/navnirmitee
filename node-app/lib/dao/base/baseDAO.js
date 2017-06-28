@@ -93,7 +93,7 @@ BaseDAO.prototype.dbQuery = function (sql, params) {
         navLogUtil.instance().log.call(this, "dbQuery", "No client provided getting new one", "debug");
         promise = this.getClient();
     } else {
-        navLogUtil.instance().log.call(this, "dbQuery", "Usign provided client", "debug");
+        navLogUtil.instance().log.call(this, "dbQuery", "Usign provided client", "info");
         promise = Q.resolve(this.providedClient)
     }
     return promise
