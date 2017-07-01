@@ -21,6 +21,10 @@ module.exports = class navSignInRouter extends navBaseRouter {
         var deferred = Q.defer();
         deferred.promise
             .done(function(){
+                console.log("Re : ", req.query.redirect);
+                if(req.query.redirect) {
+                    return new navResponseUtil().redirect(req, res, req.query.redirect);
+                }
                 new navResponseUtil().redirect(req, res, '/');
             },(error) => {
                 var respUtil =  new navResponseUtil();

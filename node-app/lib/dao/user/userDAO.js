@@ -174,7 +174,7 @@ UserDAO.prototype.clearVerificationCode = function (_id) {
             return result.rowCount;
         })
         .catch(function (error) {
-            new navLogutil().log.call(self, "clearVerificationCode", error.message, "error");
+            new navLogUtil().log.call(self, "clearVerificationCode", error.message, "error");
             return Q.reject(navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
 
         });
@@ -200,5 +200,17 @@ UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
         })
 };
 
-UserDAO.prototype.changePlan = function (){
+UserDAO.prototype.updatePlan = function (userId, plan, points, deposit, balance){
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET subscribed_plan = $1, points = $2, deposit = $3, balance = $4  WHERE _id = $5 AND subscribed_plan IS NULL;",
+    [plan, points, deposit, balance, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "updatePlan", error.message, "error");
+            return Q.reject(navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
 }

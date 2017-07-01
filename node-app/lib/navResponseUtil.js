@@ -40,7 +40,7 @@ module.exports = class navResponseUtils {
             case "LogicalException" :
                 return this.generateResponse("INPUT_ERROR",{
                     message : "Bad Request",
-                       subMessage : "",
+                       subMessage : error.message ? error.message : "",
                 }, 400);
             default :
                 console.log(error);

@@ -21,7 +21,8 @@ module.exports = class navBaseRouter {
         }else {
             return res.render('login',{
                 layout: 'nav_bar_layout',
-                hideNavBar : true
+                hideNavBar : true,
+                redirection : req.query.redirect ? req.query.redirect : false
             });
         }
     }

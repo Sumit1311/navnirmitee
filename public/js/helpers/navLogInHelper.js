@@ -41,7 +41,7 @@ navLogInHelper.prototype.logInHandler = function(event, that) {
 navLogInHelper.prototype.logIn = function(form) {
     var body = form.serialize();
     //console.log(body);
-    return navRequestHandler().doRequest('/', 'POST', body);
+    return navRequestHandler().doRequest(form.attr('action'), 'POST', body);
 }
 
 navLogInHelper.prototype.showError = function(message) {

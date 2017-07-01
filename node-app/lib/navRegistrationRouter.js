@@ -161,7 +161,7 @@ module.exports = class navRegistration extends navBaseRouter {
         var deferred = Q.defer();
         deferred.promise
             .done(() => {
-                new navResponseUtil().redirect(req, res, "/login");
+                new navResponseUtil().redirect(req, res, "/login?redirect=/pricing");
             },(error) => {
                 var respUtil =  new navResponseUtil();
                 var response = respUtil.generateErrorResponse(error);

@@ -3,35 +3,37 @@
         [
             {
                 "id" : 0 ,
-                "duration" : "Monthly",
                 "noOfToys" : 1,
-                "amount" : 300,
+                "amount" : 100,
                 "deposit" : 1000 ,
-                "rentDuration" : "7 Days"
+                "points" : 25 ,
+                "rentDuration" : 7
+
             },
             {
                 "id" : 1 ,
-                "duration" : "Quarterly",
                 "noOfToys" : 1,
-                "amount" : 700 ,
+                "amount" : 200 ,
                 "deposit" : 1000 ,
-                "rentDuration" : "7 Days"
+                "points" : 55,
+                "rentDuration" : 7
+
             },
             {
                 "id" : 2 ,
-                "duration" : "Half-Yearly",
                 "noOfToys" : 1,
-                "amount" : 1200 ,
+                "amount" : 300 ,
                 "deposit" : 1000 ,
-                "rentDuration" : "7 Days"
+                "points" : 85,
+                "rentDuration" : 7
             },
             {
                 "id" : 3 ,
-                "duration" : "Yearly",
                 "noOfToys" : 1,
-                "amount" : 3000 ,
+                "amount" : 400 ,
                 "deposit" : 1000 ,
-                "rentDuration" : "7 Days"
+                "points" : 120,
+                "rentDuration" : 7
             }
         ]
     ]

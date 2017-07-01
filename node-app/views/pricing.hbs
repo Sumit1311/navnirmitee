@@ -33,21 +33,23 @@
             {{#each plans}}
 			<div class="row padd20-top-btm">
 				<div class="col-md-12 text-center">
-					<h2>Basic Membership</h2>
+					<h2>Basic Recharges</h2>
 				</div>
 			</div>
 			<div class="row">
             {{#each this}} 
 				<div class="col-md-3 col-sm-6 col-xs-12 pricing-table">
+                <!--<form method="post" action="/subscribePlan?type={{@../index}}&plan={{@index}}">-->
 		            <ul class="list-unstyled">
 		              <li class="head"></li>
-		              <li class="price"><sup>&#x20b9;</sup>{{amount}} <p>{{duration}}</p><p></p></li>
-		              <li>Rent {{noOfToys}} Toy(s) for {{rentDuration}}</li>
-		              <li>With Deposite of <sup>&#x20b9;</sup>{{deposit}} <p></p></li>
-		              <li class="foot"><a href="/subscribePlan?type={{@../index}}&plan={{@index}}" class="btn btn-green btn-larges">Subscribe</a></li>
+		              <li class="price">&#x20b9; {{amount}} <!-- <p>{{duration}}</p> --><p></p></li>
+		              <li>Get {{points}} to use</li>
+		              <li>Rent {{noOfToys}} Toy(s) at a time<p></p> with duration of {{rentDuration}} Days</li>
+		              <li>With Deposite of &#x20b9; {{deposit}} <p></p></li>
+		              <li class="foot"><a href="/rechargeConfirmation?type={{@../index}}&plan={{@index}}" class="btn btn-green btn-larges" >Recharge Account</a></li>
 		            </ul>
+                    <!-- </form> -->
 		        </div>
-			
         {{/each}}
             </div>
         {{/each}}
