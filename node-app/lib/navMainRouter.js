@@ -1,6 +1,7 @@
 var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
+    navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js")
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navLogicalException = require("node-exceptions").LogicalException,
@@ -18,9 +19,11 @@ module.exports = class navMainRouter extends navBaseRouter {
         this.router.get('/about', this.getAbout.bind(this));
         this.router.get('/contact',this.getContact.bind(this) );
         this.router.get('/pricing', this.getPricing.bind(this) );
-        this.router.get('/rechargeConfirmation', this.getRechargeConfirmation.bind(this) );
-        this.router.post('/subscribePlan', this.ensureVerified, 
-                        this.ensureAuthenticated, 
+        this.router.get('/rechargeConfirmation',  
+                        this.ensureAuthenticated, this.ensureVerified,
+                        this.isSessionAvailable,this.getRechargeConfirmation.bind(this) );
+        this.router.post('/subscribePlan', 
+                        this.ensureAuthenticated, this.ensureVerified, 
                         this.isSessionAvailable, 
                         this.subscribePlan.bind(this));
         return this;
@@ -125,22 +128,85 @@ module.exports = class navMainRouter extends navBaseRouter {
         var p=plans[type][plan];
 
         var user = req.user;
-        new navUserDAO().updatePlan(user._id,type + "::" + plan ,p.points, p.deposit, p.balance)
-        .done((result) => {if(result) {deferred.resolve()} else {deferred.reject(new navLogicalException("Can't Subscribe morea than once"))}},(error) => {deferred.reject(error);});
+        var uDAO = new navUserDAO();
+
+        uDAO.getClient()
+            .then((_client) => {
+                uDAO.providedClient = _client;
+                return uDAO.startTx();
+            })
+            .then(() => {
+                return uDAO.updatePlan(user._id,type + "::" + plan ,p.points, p.deposit, p.amount);
+            })
+            .then((result) => {
+                console.log(result);
+                if(result) {
+                    var pDAO = new navPaymentsDAO(uDAO.providedClient);
+                    return pDAO.insertPaymentDetails(user._id, p.deposit, pDAO.REASON.DEPOSIT, pDAO.STATUS.PENDING);       
+                } else {
+                    return Q.reject(new navLogicalException("Account Already Recharged"));
+                }
+            })
+            .then(() => {
+                var pDAO = new navPaymentsDAO(uDAO.providedClient);
+                return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON["RECH"+p.amount], pDAO.STATUS.PENDING);
+            })
+            .then(() => {
+                uDAO.commitTx();
+            })
+            .catch(function (error) {
+                //logg error
+                navLogUtil.instance().log.call(self,'[/subscribePlan]', 'Error while doing payment' + error, "error");
+                return uDAO.rollBackTx()
+                .then(function () {
+                    return Q.reject(error);
+                    //res.status(500).send("Internal Server Error");
+                })
+                .catch(function (err) {
+                    //log error
+                    return Q.reject(err)
+                })
+            })
+            .finally(function () {
+                if (uDAO.providedClient) {
+                    uDAO.providedClient.release();
+                    uDAO.providedClient = undefined;
+                }
+            })
+            .done(() => {
+                return deferred.resolve();
+
+                //res.redirect("/login");
+            },(error) => {
+                return deferred.reject(error);
+            });
 
         
     }
-    getNoOfMonths(value){
-        switch(value.toLowerCase()) {
-            case "monthly" : return 1;
-            case "quarterly" : return 3;
-            case "half-yearly" : return 6;
-            case "yearly" : return 12;
-            default : return 0;
-        }
-    }
 
     getRechargeConfirmation(req, res) {
+        var deferred = Q.defer(), self = this;
+        var respUtil =  new navResponseUtil();
+        deferred.promise
+            .done(function(){
+                res.render('rechargeConfirmation', {
+                    user : req.user,
+                    plan : p,
+                    q_type : type,
+                    q_plan : plan,
+                    isLoggedIn : req.user ? true : false,
+                    layout : 'nav_bar_layout'
+                });
+            },function(error){
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+        });
         req.assert("type","Type is Required").notEmpty();
         req.assert("plan","Plan is  Required").notEmpty();
         req.assert("type","Type is not a number").isInt();
@@ -155,15 +221,7 @@ module.exports = class navMainRouter extends navBaseRouter {
             return deferred.reject(new navLogicalException(validationErrors));
         }
         var p=plans[type][plan];
-        
-        res.render('rechargeConfirmation', {
-            user : req.user,
-            plan : p,
-            q_type : type,
-            q_plan : plan,
-            isLoggedIn : req.user ? true : false,
-            layout : 'nav_bar_layout'
-        });
+        return deferred.resolve(); 
 
     }
 }

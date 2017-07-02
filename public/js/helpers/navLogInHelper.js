@@ -48,3 +48,29 @@ navLogInHelper.prototype.showError = function(message) {
     $("#_nav_login_error .alert").text(message);
     $("#_nav_login_error").removeClass("hidden");
 }
+
+registerLogInHandlers();
+
+function registerLogInHandlers(){
+    $("#_nav_forgotpassword").click(resetPassword);
+    $("#_nav_createanaccount").click(createAccount);
+	$("#_nav_login_div > form").submit(function(event) { new navLogInHelper().logInHandler(event, this)});
+	$("#_nav_register_div > form").submit(function(event) { new navRegistrationHelper().registrationHandler(event, this)});
+}
+function createAccount()
+{
+    $("#_nav_login_div").toggleClass("hidden-xs");
+    //toggle($("#_nav_register_div"));
+    $("#_nav_register_div").toggleClass("hidden-xs");
+}
+
+function resetPassword()
+{
+    toggle($("#_nav_login_div"));
+    toggle($("#_nav_forgot_password_div"));
+}
+
+function toggle(element)
+{
+    $(element).toggleClass("hidden");
+}

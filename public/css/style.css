@@ -2443,3 +2443,22 @@ blockquote {
 	color: #ffffff;
 }
 
+.sidebar-menu-item {
+    text-align: center;
+    padding: 28px 26px 15px;
+    background: rgb(245, 245, 245) none repeat scroll 0% 0% !important;
+    color: #333 !important;
+}
+.sidebar-menu-item > a {
+    font-size: 22px;
+}
+.sidebar-menu-item > a:hover {
+    color : #1ABC9C !important; 
+}
+.sidebar-menu-item  p {
+    font-size: 13px;
+}
+.sidebar-container {
+width:100%;
+padding-left:0px;
+}

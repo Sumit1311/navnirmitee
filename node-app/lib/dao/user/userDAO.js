@@ -188,7 +188,7 @@ UserDAO.prototype.clearVerificationCode = function (_id) {
  */
 UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
     var self = this;
-    return this.dbQuery("SELECT _id, email_address,email_verification,mobile_no" +
+    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type" +
     " FROM " + tableName +
     " WHERE email_verification=$1", [verifCode])
         .then(function (result) {
@@ -210,7 +210,37 @@ UserDAO.prototype.updatePlan = function (userId, plan, points, deposit, balance)
         })
         .catch(function (error) {
             new navLogUtil().log.call(self, "updatePlan", error.message, "error");
-            return Q.reject(navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+}
+
+UserDAO.prototype.getUserDetails = function(userId) {
+    var self = this;
+    
+    return this.dbQuery("SELECT subscribed_plan, points" +
+    " FROM " + tableName +
+    " WHERE _id=$1", [userId])
+        .then(function (result) {
+            return result.rows;
+        })
+        .catch(function (error) {
+            navLogUtil.instance().log.call(self, "getUserDetails", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+        })
+
+}
+UserDAO.prototype.updatePoints = function (userId, points){
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET points = $1 WHERE _id = $2 ;",
+    [points, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "updatePoints", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
 
         });
 }

@@ -4,6 +4,8 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js')
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     navLogicalException = require("node-exceptions").LogicalException;
+    navNoSubScriptionException = require(process.cwd() + "/lib/exceptions/navNoSubscriptionException.js"),
+    navNoBalanceException = require(process.cwd() + "/lib/exceptions/navNoBalanceException.js"),
     repeatHelper = require('handlebars-helper-repeat'),
     helpers = require('handlebars-helpers')(),
     passport = require('passport'),
@@ -24,6 +26,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         this.router.use(this.ensureAuthenticated, this.ensureVerified, this.isSessionAvailable);
         this.router.get('/detail', function(req,res,next){self.getToysDetails(req,res,next)});
         this.router.get('/order', function(req,res,next){self.getOrder(req,res,next)});
+        this.router.get('/orderPlaced', function(req,res,next){self.getOrderPlaced(req,res,next)});
         this.router.post('/placeOrder',(req, res, next) => {self.placeOrder(req,res,next)});
         return this;
     }
@@ -151,15 +154,11 @@ module.exports = class navToysRouter extends navBaseRouter {
     placeOrder(req, res){
         var id = req.query.id, dbClient; 
         var deferred = Q.defer();
+        var respUtil =  new navResponseUtil();
         deferred.promise
             .done((result) => {
-                res.render('orderPlaced',{
-                    user : req.user,
-                    isLoggedIn : req.user ? true : false,
-                    layout : 'nav_bar_layout'
-                });
+                respUtil.redirect(req, res, '/toys/orderPlaced');
             },(error) => {
-                var respUtil =  new navResponseUtil();
                 var response = respUtil.generateErrorResponse(error);
                 respUtil.renderErrorPage(req, res, {
                     errorResponse : response,
@@ -183,28 +182,68 @@ module.exports = class navToysRouter extends navBaseRouter {
 
         var validationErrors = req.validationErrors();
         //console.log(validationErrors);
-        var response;
+        var response, user = req.user;
         if(validationErrors)
         {
             return deferred.reject(new navValidationError(validationErrors));
         }
         var rDAO = new navRentalsDAO();
+        var userDetails, toyDetails;
         rDAO.getClient()
             .then(function(client){
                 rDAO.providedClient = client;
                 return rDAO.startTx();
             })
-        .then(function(){
-            return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(15,'days').unix());
+        .then(() => {
+            var uDAO = new navUserDAO(rDAO.providedClient);
+            return uDAO.getUserDetails(user._id);
+        })
+        .then((_userDetails) => {
+            userDetails = _userDetails[0];
+            if(userDetails.subscribed_plan == null) {
+                return Q.reject(new navNoSubScriptionException());
+            }
+            return new navToysDAO(rDAO.providedClient).getToyDetailById(id);
+        })
+        .then((_toyDetails) => {
+            toyDetails =  _toyDetails[0];
+            if(toyDetails.points > userDetails.points) {
+                return Q.reject(new navNoBalanceException());
+            }
+            var splittedPlan = userDetails.subscribed_plan.split('::');
+            console.log(userDetails.subscribed_plan);
+            var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
+            return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(plan.rentDuration,'days').unix());
         })
         .then(function(){
+
+            console.log("Updating Points");
+            return new navUserDAO(rDAO.providedClient).updatePoints(user._id, (userDetails.points) - (toyDetails.points));
+        })
+        .then(function(){
+            console.log("Commit");
             return rDAO.commitTx();
         })
         .catch(function(error){
+
             return rDAO.rollBackTx()
                 .then(function () {
-                    return Q.reject(error);
+                    /*switch(error.name) {
+                        case "navNoBalanceException" :
+                            return Q.resolve({
+                                redirect : "/"
+                            })
+                            break;
+                        case "navNoSubscriptionException" :
+                            return Q.resolve({
+                                redirect : "/"
+                            })
+                            break;
+                        default:
+                            return Q.reject(error);
+                    }*/
                     //res.status(500).send("Internal Server Error");
+                    return Q.reject(error);
                 })
                 .catch(function (err) {
                     //log error
@@ -218,9 +257,17 @@ module.exports = class navToysRouter extends navBaseRouter {
             }
         })
         .done(() => {
+            console.log("Resolve");
             deferred.resolve();
         },(error) => {
             deferred.reject(error);
         });
-    }        
+    }
+    getOrderPlaced(req,res) {
+                res.render('orderPlaced',{
+                    user : req.user,
+                    isLoggedIn : req.user ? true : false,
+                    layout : 'nav_bar_layout'
+                });
+    }    
 }

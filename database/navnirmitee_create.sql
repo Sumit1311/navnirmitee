@@ -65,10 +65,12 @@ WITH (OIDS=FALSE);
 -- object:  nav_payments | type: TABLE -- 
 CREATE TABLE  nav_payments(
 	_id varchar(36),
-	last_payment_date bigint,
 	user_id varchar(36),
-	balance_points integer,
-	balance_amount integer,
+    amount_payable integer,
+    reason VARCHAR(10),
+    credit_date bigint,
+    paid_date bigint,
+    status VARCHAR(10),
 	CONSTRAINT nav_payments_id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);

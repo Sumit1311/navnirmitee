@@ -161,7 +161,7 @@ module.exports = class navRegistration extends navBaseRouter {
         var deferred = Q.defer();
         deferred.promise
             .done(() => {
-                new navResponseUtil().redirect(req, res, "/login?redirect=/pricing");
+                new navResponseUtil().redirect(req, res, "/pricing");
             },(error) => {
                 var respUtil =  new navResponseUtil();
                 var response = respUtil.generateErrorResponse(error);
@@ -184,6 +184,7 @@ module.exports = class navRegistration extends navBaseRouter {
         req.assert("email","Email is Required").notEmpty();
         req.assert("email","Valid Email is Required").isEmail();
         req.assert("firstName","First Name is Required").notEmpty();
+        req.assert("firstName","Max length of First name is 10").len(1,10);
         req.assert("lastName","First Name is Required").notEmpty();
         req.assert("shippingAddress","First Name is Required").notEmpty();
         req.assert("code","Code is Required").notEmpty();
@@ -247,9 +248,13 @@ module.exports = class navRegistration extends navBaseRouter {
             }
         })
         .done(() => {
-            return deferred.resolve();
-
-            //res.redirect("/login");
+            req.logIn(user, err => {
+                if (err) {
+                    return deferred.reject(err);
+                }
+                // Redirect to homepage
+                return deferred.resolve();
+            }) 
         },(error) => {
             return deferred.reject(error);
         });
