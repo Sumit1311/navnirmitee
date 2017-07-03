@@ -36,7 +36,12 @@
                 "rentDuration" : 7
             }
         ]
-    ]
+    ],
+    "membership" : [
+    {
+        "id" : "membership" ,
+        "amount" : 200 
 
-
+    }
+        ]
 }

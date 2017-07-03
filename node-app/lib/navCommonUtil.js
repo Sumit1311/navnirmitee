@@ -20,5 +20,14 @@ module.exports = class navCommonUtils {
         }
     }
 
+    getCurrentTime() {
+        return moment().valueOf();
+    }
+
+    getDateString(timeInMilis) {
+        return moment(timeInMilis).format("ddd, MMM Do YYYY");
+    }
+
+    
 }
 

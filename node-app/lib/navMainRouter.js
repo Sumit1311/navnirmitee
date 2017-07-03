@@ -149,7 +149,7 @@ module.exports = class navMainRouter extends navBaseRouter {
             })
             .then(() => {
                 var pDAO = new navPaymentsDAO(uDAO.providedClient);
-                return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON["RECH"+p.amount], pDAO.STATUS.PENDING);
+                return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING);
             })
             .then(() => {
                 uDAO.commitTx();
@@ -217,6 +217,9 @@ module.exports = class navMainRouter extends navBaseRouter {
             return deferred.reject(new navValidationException(validationErrors));
         }
         var plans = navMembershipParser.instance().getConfig("plans",[]), type = req.query.type, plan = req.query.plan;
+        if(type == "membership") {
+            plans =  navMembershipParser.instance().getConfig("membership",[])
+        }
         if(plans[type][plan] == undefined) {
             return deferred.reject(new navLogicalException(validationErrors));
         }

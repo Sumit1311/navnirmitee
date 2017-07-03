@@ -29,7 +29,7 @@ CREATE TABLE  nav_user(
 	address text,
 	city varchar(50),
 	state varchar(30),
-	is_active smallint,
+	membership_expiry bigint,
 	CONSTRAINT nav_user_id_pk PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
@@ -56,6 +56,7 @@ CREATE TABLE  nav_rentals(
 	user_id varchar(36),
 	toys_id varchar(36),
     shipping_address TEXT,
+    transaction_date bigint,
 	lease_start_date bigint,
 	lease_end_date bigint,
 	CONSTRAINT nav_rentals_id_pk PRIMARY KEY (_id)

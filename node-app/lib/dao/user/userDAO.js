@@ -145,14 +145,16 @@ UserDAO.prototype.insertRegistrationData = function (email, phone, password, ver
  * @param userType
  * @returns {*}
  */
-UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address) {
+UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address, membershipExpiry, enrollmentDate) {
     var self = this;
     return this.dbQuery("UPDATE " + tableName +
     " SET " +
     " first_name=$1," +
     " last_name=$2," +
-    " address = $3" +
-    " WHERE _id=$4", [ firstName, lastName, address, pkey])
+    " address = $3," +
+    " membership_expiry = $4," +
+    " enrollment_date = $5" +
+    " WHERE _id=$6", [ firstName, lastName, address, membershipExpiry, enrollmentDate, pkey])
         .catch(function (error) {
             navLogUtil.instance().log.call(self, "updateUserDetails", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
@@ -218,7 +220,7 @@ UserDAO.prototype.updatePlan = function (userId, plan, points, deposit, balance)
 UserDAO.prototype.getUserDetails = function(userId) {
     var self = this;
     
-    return this.dbQuery("SELECT subscribed_plan, points" +
+    return this.dbQuery("SELECT subscribed_plan, points, balance, membership_expiry, enrollment_date, deposit" +
     " FROM " + tableName +
     " WHERE _id=$1", [userId])
         .then(function (result) {
@@ -230,11 +232,22 @@ UserDAO.prototype.getUserDetails = function(userId) {
         })
 
 }
-UserDAO.prototype.updatePoints = function (userId, points){
+UserDAO.prototype.updatePoints = function (userId, points, membershipExpiry){
+    var i = 1;
+    var query = "UPDATE " + tableName +
+        " SET balance = $" + i;
+    i++;
+    var params = [points];
+    if(membershipExpiry) {
+        query += ", membership_expiry = $" + i;
+        i++;
+        params.push(membershipExpiry);
+    }
+    query += " WHERE _id = $" + i;
+    params.push(userId);
+    console.log(query, params);
     var self = this;
-    return this.dbQuery("UPDATE " + tableName + 
-    " SET points = $1 WHERE _id = $2 ;",
-    [points, userId])
+    return this.dbQuery(query, params)
         .then(function (result) {
             return result.rowCount;
         })

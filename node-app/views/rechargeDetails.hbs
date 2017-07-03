@@ -11,6 +11,7 @@
 
 <div class="page-content">
 <div class="container">
+
 <div class="row">
 <div class="col-md-12">
 <ol class="breadcrumb">
@@ -22,26 +23,42 @@
 
 <div class="row confirm">
 <div class="col-md-12">
-<form class="form-horizontal" role="form" action="/subscribePlan?type={{q_type}}&plan={{q_plan}}" method="post">
 <h3 class="">Account Summary</h3>
+</div>
+</div>
 <hr>
 
 
 <div class="row">
 <div class="col-md-6">
 <dl class="dl-horizontal">
-  <dt>Date of Enrollment</dt>
-  <dd>...</dd>
+  <dt>Enrollment Date</dt>
+  <dd>{{userDetails.enrollmentDate}}</dd>
 </dl>
 </div>
 <div class="col-md-6">
 <dl class="dl-horizontal">
   <dt>Membership Status</dt>
-  <dd></dd>
+  <dd>{{#if userDetails.membershipStatus}}<span class="label label-success">Active</span>{{else}}<span class="label label-danger">Expired</span>{{/if}}<dd>
 </dl>
 </div>
 </div>
 
+
+<div class="row">
+<div class="col-md-6">
+<dl class="dl-horizontal">
+  <dt>Membership Expiry Date</dt>
+  <dd>{{#if userDetails.membershipExpiryDate}}{{userDetails.membershipExpiryDate}}{{else}}Lifetime{{/if}}</dd>
+</dl>
+</div>
+<div class="col-md-6">
+<dl class="dl-horizontal">
+  <dt>Deposit</dt>
+  <dd>{{userDetails.deposit}}</dd>
+</dl>
+</div>
+</div>
 
 <div class="row">
 <div class="col-md-12">
@@ -55,19 +72,21 @@
       </tr>
     </thead>
 <tbody >
+    {{#each transactions}}
       <tr>
-        <td></td>
-        <td>e</td>
-        <td>xample.com</td>
-        <td>xample.com</td>
+        <td>{{transactionDate}}</td>
+        <td>{{summary}}</td>
+        <td>{{#if amountDeducted}}{{amountDeducted}}{{/if}}</td>
+        <td>{{#if amountPaid}}{{amountPaid}}{{/if}}</td>
       </tr>
+    {{/each}}
 </tbody>
 <tfoot>
       <tr class=" table-bordered" style="border-right-width: 0px; border-left-width: 0px;" >
         <th></th>
         <th></th>
         <th>Balance</th>
-        <th>xample.com</th>
+        <th>{{userDetails.balance}}</th>
       </tr>
 </tfoot>
 </table>
@@ -76,9 +95,52 @@
 
 <hr>
 
+<div class="row padd20-top-btm">
+    <div class="col-md-12 text-center">
+		<h2>Membership Plans</h2>
+	</div>
+</div>
 
-</form>
+<div class="row">
+{{#each membershipPlans}}
+<div class="col-md-3 col-sm-6 col-xs-12 pricing-table">
+<ul class="list-unstyled">
+<li class="head"></li>
+<li class="price">&#x20b9; {{amount}} <!-- <p>{{duration}}</p> --><p></p></li>
+<li>With lifetime validity</li>
+<li class="foot"><a href="/rechargeConfirmation?type=id&plan={{@index}}" class="btn btn-green btn-larges" >Recharge Account</a></li>
+</ul>
+<!-- </form> -->
 </div>
+
+{{/each}}
 </div>
+{{#each plans}}
+<div class="row padd20-top-btm">
+    <div class="col-md-12 text-center">
+		<h2>Basic Recharges</h2>
+	</div>
+</div>
+
+<div class="row">
+{{#each this}} 
+<div class="col-md-3 col-sm-6 col-xs-12 pricing-table">
+<!--<form method="post" action="/subscribePlan?type={{@../index}}&plan={{@index}}">-->
+<ul class="list-unstyled">
+<li class="head"></li>
+<li class="price">&#x20b9; {{amount}} <!-- <p>{{duration}}</p> --><p></p></li>
+<!-- <li>Get {{points}} points to use</li> -->
+<li>Rent {{noOfToys}} Toy(s) at a time<p></p> with duration of {{rentDuration}} Days</li>
+{{#if userDetail.deposit}}
+ <li>With Deposit of &#x20b9; {{deposit}} <p></p></li>
+{{/if}}
+<li class="foot"><a href="/rechargeConfirmation?type={{@../index}}&plan={{@index}}" class="btn btn-green btn-larges" >Recharge Account</a></li>
+</ul>
+<!-- </form> -->
+</div>
+{{/each}}
+</div>
+{{/each}}
+
 </div>
 </div>

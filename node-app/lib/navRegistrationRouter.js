@@ -1,11 +1,13 @@
 var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     Q = require('q'),
+    moment = require('moment'),
     navResponseUtil = require(process.cwd() + '/lib/navResponseUtil.js'),
     navValidationException = require(process.cwd() + '/lib/exceptions/navValidationException.js'),
     navUserExistsException = require(process.cwd() + "/lib/exceptions/navUserExistsException.js"),
     navLogicalException = require("node-exceptions").LogicalException,
     navEmailVerification= require(process.cwd() + "/lib/navEmailVerification.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navPasswordUtil = require(process.cwd() + "/lib/navPasswordUtil.js"),
     navUserDAO= require(process.cwd() + '/lib/dao/user/userDAO.js');
 
@@ -222,7 +224,8 @@ module.exports = class navRegistration extends navBaseRouter {
             }
         })
         .then(function () {
-            return userDAO.updateUserDetails(user._id, firstName, lastName, address);
+            var time = new navCommonUtil().getCurrentTime();
+            return userDAO.updateUserDetails(user._id, firstName, lastName, address, moment().add(30, "days").valueOf(), time);
         })
         .then(function () {
             return userDAO.commitTx();

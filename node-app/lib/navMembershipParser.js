@@ -5,10 +5,11 @@ module.exports = class navMembershipConfigParser extends navConfigParser {
     constructor(){
         try {
             super("data/membership-plan.json");
-            console.log(this.config);
+            //console.log(this.config);
         } catch(e) {
             this.config = {
-                "plans" :[]
+                "plans" :[],
+                "membership":[]
             }
         }
     }

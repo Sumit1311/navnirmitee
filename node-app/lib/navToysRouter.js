@@ -2,7 +2,9 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js')
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navSystemUtil = require(process.cwd() + "/lib/navSystemUtil.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
+    navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
+    navMembershipExpirationException =  require(process.cwd() + "/lib/exceptions/navMembershipExpirationException.js"),
     navLogicalException = require("node-exceptions").LogicalException;
     navNoSubScriptionException = require(process.cwd() + "/lib/exceptions/navNoSubscriptionException.js"),
     navNoBalanceException = require(process.cwd() + "/lib/exceptions/navNoBalanceException.js"),
@@ -200,28 +202,32 @@ module.exports = class navToysRouter extends navBaseRouter {
         })
         .then((_userDetails) => {
             userDetails = _userDetails[0];
-            if(userDetails.subscribed_plan == null) {
+            if(userDetails.subscribed_plan == null || userDetails.deposit == null) {
                 return Q.reject(new navNoSubScriptionException());
+            }
+            if(userDetails.membership_expiry != null && userDetails.membership_expiry < new navCommonUtil().getCurrentTime()) {
+                return Q.reject(new navMembershipExpirationException());
             }
             return new navToysDAO(rDAO.providedClient).getToyDetailById(id);
         })
         .then((_toyDetails) => {
             toyDetails =  _toyDetails[0];
-            if(toyDetails.points > userDetails.points) {
+            if(toyDetails.price > userDetails.balance) {
                 return Q.reject(new navNoBalanceException());
             }
             var splittedPlan = userDetails.subscribed_plan.split('::');
-            console.log(userDetails.subscribed_plan);
+            //console.log(userDetails.subscribed_plan);
             var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
             return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(plan.rentDuration,'days').unix());
         })
         .then(function(){
-
-            console.log("Updating Points");
-            return new navUserDAO(rDAO.providedClient).updatePoints(user._id, (userDetails.points) - (toyDetails.points));
+            var membershipExpiry;
+            if(userDetails.membership_expiry != null) {
+                 membershipExpiry = new navCommonUtil().getCurrentTime();
+            }
+            return new navUserDAO(rDAO.providedClient).updatePoints(user._id, (userDetails.balance) - (toyDetails.price), membershipExpiry);
         })
         .then(function(){
-            console.log("Commit");
             return rDAO.commitTx();
         })
         .catch(function(error){
