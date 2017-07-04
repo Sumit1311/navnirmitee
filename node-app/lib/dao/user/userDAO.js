@@ -256,4 +256,21 @@ UserDAO.prototype.updatePoints = function (userId, points, membershipExpiry){
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
 
         });
+
+}
+
+UserDAO.prototype.updateMembershipExpiry =function (userId, membershipExpiry) {
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET membership_expiry = $4  WHERE _id = $5 AND subscribed_plan IS NULL;",
+    [plan, points, deposit, balance, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "updatePlan", error.message, "error");
+            return Q.reject(navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+	
 }

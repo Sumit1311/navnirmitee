@@ -25,12 +25,12 @@
 <h3 class="text-center">Recharge Summary</h3>
 <hr>
 
-
+{{#compare user.deposit, "!=", plan.deposit}} 
 <div class="row">
 <div style="text-align: right;" class="col-md-6"><h5 style="font-weight: bold;">Deposit Amount :</h5></div>
 <div class="col-md-6"><h5>&#x20b9; {{plan.deposit}}</h5></div>
 </div>
-
+{{/compare}}
 
 <div class="row">
 <div style="text-align: right;" class="col-md-6"><h5 style="font-weight: bold;">Recharge Amount :</h5></div>
