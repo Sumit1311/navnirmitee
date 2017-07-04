@@ -205,7 +205,7 @@ UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
 UserDAO.prototype.updatePlan = function (userId, plan, points, deposit, balance){
     var self = this;
     return this.dbQuery("UPDATE " + tableName + 
-    " SET subscribed_plan = $1, points = $2, deposit = $3, balance = $4  WHERE _id = $5 AND subscribed_plan IS NULL;",
+    " SET subscribed_plan = $1, points = $2, deposit = $3, balance = $4  WHERE _id = $5;",
     [plan, points, deposit, balance, userId])
         .then(function (result) {
             return result.rowCount;
