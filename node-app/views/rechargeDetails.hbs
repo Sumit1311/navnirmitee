@@ -68,7 +68,8 @@
         <th>Date</th>
         <th>Particular</th>
         <th>Amount Deducted</th>
-        <th>Amount Paid</th>
+        <th>Amount paid</th>
+        <th>Payment Status</th>
       </tr>
     </thead>
 <tbody >
@@ -78,6 +79,7 @@
         <td>{{summary}}</td>
         <td>{{#if amountDeducted}}{{amountDeducted}}{{/if}}</td>
         <td>{{#if amountPaid}}{{amountPaid}}{{/if}}</td>
+        <td>Payment Status</td>
       </tr>
     {{/each}}
 </tbody>

@@ -59,6 +59,9 @@ CREATE TABLE  nav_rentals(
     transaction_date bigint,
 	lease_start_date bigint,
 	lease_end_date bigint,
+    status VARCHAR(30),
+    delivery_date bigint,
+    returned_date bigint,
 	CONSTRAINT nav_rentals_id_pk PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);

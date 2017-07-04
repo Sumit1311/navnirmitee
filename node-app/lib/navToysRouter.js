@@ -8,6 +8,7 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js')
     navLogicalException = require("node-exceptions").LogicalException;
     navNoSubScriptionException = require(process.cwd() + "/lib/exceptions/navNoSubscriptionException.js"),
     navNoBalanceException = require(process.cwd() + "/lib/exceptions/navNoBalanceException.js"),
+    navPendingReturnException = require(process.cwd() + "/lib/exceptions/navPendingReturnException.js"),
     repeatHelper = require('handlebars-helper-repeat'),
     helpers = require('handlebars-helpers')(),
     passport = require('passport'),
@@ -208,6 +209,13 @@ module.exports = class navToysRouter extends navBaseRouter {
             if(userDetails.membership_expiry != null && userDetails.membership_expiry < new navCommonUtil().getCurrentTime()) {
                 return Q.reject(new navMembershipExpirationException());
             }
+            return rDAO.getOrdersByUserId(userId);
+            //TODO : check what to do with the order where lease date is ended but toy is not delivered
+        })
+        .then((_orders) => {
+            if(_orders.length != 0) {
+                return Q.reject(new navPendingReturnException());
+            }
             return new navToysDAO(rDAO.providedClient).getToyDetailById(id);
         })
         .then((_toyDetails) => {
@@ -215,10 +223,10 @@ module.exports = class navToysRouter extends navBaseRouter {
             if(toyDetails.price > userDetails.balance) {
                 return Q.reject(new navNoBalanceException());
             }
-            var splittedPlan = userDetails.subscribed_plan.split('::');
+            //var splittedPlan = userDetails.subscribed_plan.split('::');
             //console.log(userDetails.subscribed_plan);
-            var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
-            return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(plan.rentDuration,'days').unix());
+            //var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
+            return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(15,'days').unix(), rDAO.STATUS.PLACED);
         })
         .then(function(){
             var membershipExpiry;

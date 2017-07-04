@@ -5,6 +5,7 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navTransactions = require(process.cwd() + "/lib/navTransactions.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
     navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
+    navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     Q = require('q');
@@ -17,7 +18,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
         var self = this;
         this.router.use(this.isSessionAvailable, this.ensureAuthenticated, this.ensureVerified)
         this.router.get('/rechargeDetails', function(req,res, next) {self.getRechargeDetails(req,res,next)});
-        this.router.get('/orderDetails', function(req,res, next) {self.doOrderDetails(req,res,next)}); 
+        this.router.get('/orderDetails', function(req,res, next) {self.getOrderDetails(req,res,next)}); 
         this.router.get("/accountDetails", function(req,res, next) {self.getAccountDetails(req,res,next)});
         return this;
     }
@@ -85,5 +86,36 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
     
     }
 
+    getOrderDetails(req, res, next){
+        var deferred = Q.defer(), self = this;
+        var respUtil =  new navResponseUtil();
+        var user = req.user;
+        deferred.promise
+            .done(function(orders){
+                res.render("orderDetails",{
+                    user : req.user,
+                    isLoggedIn : req.user ? true : false,
+                    layout : 'nav_bar_layout',
+                    orders : orders
+                });
+        },function(error){
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+        });
+        return new navRentalsDAO().getAllOrders(user._id)
+            .done((_orders) => {
+
+                deferred.resolve(_orders);
+            },(error) => {
+                deferred.reject(error);
+            });
+    
+    }
 
 }
