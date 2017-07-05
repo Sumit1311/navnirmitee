@@ -44,7 +44,7 @@ var tableName = "nav_user",
  */
 UserDAO.prototype.getLoginDetails = function (loginName) {
     var self = this;
-    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type" +
+    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type, deposit" +
     " FROM " + tableName + " WHERE email_address=$1", [loginName])
         .then(function (result) {
             return result.rows;
@@ -204,8 +204,9 @@ UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
 
 UserDAO.prototype.updatePlan = function (userId, plan, points, deposit, balance){
     var self = this;
+    console.log(deposit, balance);
     return this.dbQuery("UPDATE " + tableName + 
-    " SET subscribed_plan = $1, points = $2, deposit = $3, balance = $4  WHERE _id = $5;",
+    " SET subscribed_plan = $1, points = $2, deposit = deposit + $3, balance = balance + $4  WHERE _id = $5;",
     [plan, points, deposit, balance, userId])
         .then(function (result) {
             return result.rowCount;

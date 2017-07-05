@@ -1,6 +1,11 @@
 module.exports = class navResponseUtils {
     generateErrorResponse(error) {
         switch(error.name){
+            case "navPGFailureException" :
+                return this.generateResponse(error.code, {
+                    message : "Internal Server Error", 
+                    subMessage: error.message
+                }, error.status);
             case "navDatabaseException" :
                 return this.generateResponse(error.code, {
                     message : "Internal Server Error", 

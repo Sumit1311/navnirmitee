@@ -209,7 +209,7 @@ module.exports = class navToysRouter extends navBaseRouter {
             if(userDetails.membership_expiry != null && userDetails.membership_expiry < new navCommonUtil().getCurrentTime()) {
                 return Q.reject(new navMembershipExpirationException());
             }
-            return rDAO.getOrdersByUserId(userId);
+            return rDAO.getOrdersByUserId(user._id);
             //TODO : check what to do with the order where lease date is ended but toy is not delivered
         })
         .then((_orders) => {

@@ -16,6 +16,11 @@ var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     util = require("util");
 
 var tableName = "nav_payments";
+var STATUS = {
+            PENDING : "PENDING",
+	    COMPLETED : "COMPLETED",
+	    CANCELLED : "CANCELLED"
+        }
 
 module.exports = class navPaymentsDAO extends BaseDAO{
     constructor(client, persistence) {
@@ -35,15 +40,17 @@ module.exports = class navPaymentsDAO extends BaseDAO{
                 this.REASON.PLANS[i][j] = "RECH_"+ i + "::" + plans[i][j].id;
             }
         }
-        this.STATUS = {
-            PENDING : "PENDING"
-        }
+        this.STATUS = STATUS;
     }
 
-    insertPaymentDetails(userId, amount, reason, paymentStatus) {
+    static getStatus(){
+	return STATUS;	
+    }
+
+    insertPaymentDetails(userId, amount, reason, paymentStatus, orderId) {
         var self = this;
-        return this.dbQuery("INSERT INTO "+ tableName + " (_id, user_id,amount_payable, reason, credit_date, status) VALUES($1, $2, $3, $4, $5, $6)",
-                [new navCommonUtil().generateUuid(), userId, amount, reason, new Date().getTime(), paymentStatus])
+        return this.dbQuery("INSERT INTO "+ tableName + " (_id, user_id,amount_payable, reason, credit_date, status, transaction_id) VALUES($1, $2, $3, $4, $5, $6, $7)",
+                [new navCommonUtil().generateUuid(), userId, amount, reason, new Date().getTime(), paymentStatus, orderId])
             .then(function (result) {
                 return result.rowCount;
             })
@@ -56,7 +63,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
 
      getAllPaymentTransactions(userId) {
         var self = this;
-        return this.dbQuery("SELECT reason, paid_date, amount_payable from " + tableName + " WHERE user_id = $1 AND status = $2 AND reason != $3 AND reason != $4", [userId, this.STATUS.PENDING, this.REASON.DEPOSIT, this.REASON.REGISTRATION])
+        return this.dbQuery("SELECT reason, paid_date, amount_payable, status from " + tableName + " WHERE user_id = $1 AND reason != $2 AND reason != $3", [userId, this.REASON.DEPOSIT, this.REASON.REGISTRATION])
             .then(function (result) {
                 return result.rows;
             })
@@ -65,7 +72,16 @@ module.exports = class navPaymentsDAO extends BaseDAO{
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
         });
      }
-
+     updatePaymentDetails(orderId, summary, status) {
+	return this.dbQuery("UPDATE "+tableName + " SET status = $1, transaction_summary = $2 WHERE transaction_id = $3",[status, summary, orderId])
+		.then(function (result) {
+		     return result.rows;
+		})
+		.catch(function (error) {
+		    navLogUtil.instance().log.call(self, "updatePaymentDetails", error.message, "error");
+		    return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
+		});
+     }
 }
 
 

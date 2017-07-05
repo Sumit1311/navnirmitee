@@ -6,16 +6,20 @@ var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     Q = require("q"),
     util = require("util");
 
+var STATUS = {
+        DELIVERED : "DELIVERED",
+        RETURNED : "RETURNED",
+        PLACED : "PLACED",
+	CANCELLED : "CANCELLED"
+    };
+
+
 function navRentalsDAO(client, persistence) {
     if (persistence) {
         BaseDAO.call(this, persistence);
     }
     this.providedClient = client ? client : undefined;
-    this.STATUS = {
-        DELIVERED : "DELIVERED",
-        RETURNED : "RETURNED",
-        PLACED : "PLACED"
-    }
+    this.STATUS = STATUS;
     return this;
 }
 
@@ -63,4 +67,8 @@ navRentalsDAO.prototype.getAllOrders = function(userId) {
             return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
       });
 
+}
+
+navRentalsDAO.getStatus= function(){
+	return STATUS;
 }

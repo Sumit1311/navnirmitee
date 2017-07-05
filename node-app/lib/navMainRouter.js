@@ -1,9 +1,11 @@
 var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
+    navPGRouter = require(process.cwd() + "/lib/navPGRouter.js"),
     navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
-    navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js")
+    navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
+    navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navLogicalException = require("node-exceptions").LogicalException,
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     helpers = require('handlebars-helpers')(),
@@ -99,8 +101,9 @@ module.exports = class navMainRouter extends navBaseRouter {
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil();
         deferred.promise
-            .done(function(){
-                respUtil.redirect(req, res, "/");
+            .done(function(result){
+		res.render(result.pageToRender, {data : result.context, redirectURL : result.redirectURL});
+                //respUtil.redirect(req, res, "/");
             },function(error){
                 var response = respUtil.generateErrorResponse(error);
                 respUtil.renderErrorPage(req, res, {
@@ -112,7 +115,7 @@ module.exports = class navMainRouter extends navBaseRouter {
                 });
         });
 
-        req.assert("type","Type is Required").notEmpty();
+        req.assert("type","type is required").notEmpty();
         req.assert("plan","Plan is  Required").notEmpty();
         req.assert("type","Type is not a number").isInt();
         req.assert("plan","Plan is not a number").isInt();
@@ -129,31 +132,40 @@ module.exports = class navMainRouter extends navBaseRouter {
 
         var user = req.user;
         var uDAO = new navUserDAO();
-
+	var deposit, orderId, result;
         uDAO.getClient()
             .then((_client) => {
                 uDAO.providedClient = _client;
                 return uDAO.startTx();
             })
-            .then(() => {
-                return uDAO.updatePlan(user._id,type + "::" + plan ,p.points, p.deposit, p.amount);
-            })
+            /*.then(() => {
+                return uDAO.updatePlan(user._id,type + "::" + plan ,p.points, deposit > 0 ? deposit : 0 , p.amount);
+            })*/
             .then((result) => {
-                console.log(result);
-                if(result) {
+		orderId = new navCommonUtil().generateUuid();
+		console.log(p.deposit, user.deposit);
+		deposit = parseInt(p.deposit) - user.deposit;
+                if(result && deposit > 0) {
                     var pDAO = new navPaymentsDAO(uDAO.providedClient);
-                    return pDAO.insertPaymentDetails(user._id, p.deposit, pDAO.REASON.DEPOSIT, pDAO.STATUS.PENDING);       
+                    return pDAO.insertPaymentDetails(user._id, deposit, pDAO.REASON.DEPOSIT, pDAO.STATUS.PENDING, orderId);       
                 } else {
-                    return Q.reject(new navLogicalException("Account Already Recharged"));
+		    return Q.resolve();
+                    //return Q.reject(new navLogicalException("Account Already Recharged"));
                 }
             })
             .then(() => {
                 var pDAO = new navPaymentsDAO(uDAO.providedClient);
-                return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING);
+                return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING, orderId);
             })
-            .then(() => {
-                uDAO.commitTx();
+	    .then(() => {
+		console.log(p.amount, deposit);
+		return navPGRouter.initiate(user._id, (parseInt(p.amount) + deposit) + "", orderId);
+	    })
+            .then((_result) => {
+		result = _result;
+                return uDAO.commitTx();
             })
+
             .catch(function (error) {
                 //logg error
                 navLogUtil.instance().log.call(self,'[/subscribePlan]', 'Error while doing payment' + error, "error");
@@ -174,7 +186,7 @@ module.exports = class navMainRouter extends navBaseRouter {
                 }
             })
             .done(() => {
-                return deferred.resolve();
+                return deferred.resolve(result);
 
                 //res.redirect("/login");
             },(error) => {

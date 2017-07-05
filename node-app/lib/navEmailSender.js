@@ -9,7 +9,14 @@ var Q = require('q'),
 
 module.exports = class navEmailSender {
     constructor(smtpServerURL) {
-        this.transporter = nodemailer.createTransport('smtps://postmaster%40sandboxc22cd49475a84fb084112d1ae7fc171e.mailgun.org:7d79211555e00c458bd6ca5bea33f527@smtp.mailgun.org');
+        //this.transporter = nodemailer.createTransport('smtps://postmaster%40sandboxc22cd49475a84fb084112d1ae7fc171e.mailgun.org:7d79211555e00c458bd6ca5bea33f527@smtp.mailgun.org');
+        this.transporter = nodemailer.createTransport({
+		sendmail : true,
+		newline:'unix',
+		path:'/usr/sbin/sendmail',
+		args :["-f", "sumittoshniwal92@gmail.com"],
+		debug:true
+	});
 
         this.transporter.use('compile', handleBars({
             viewEngine: exphbs({
@@ -41,7 +48,7 @@ module.exports = class navEmailSender {
         }
         var def = Q.defer();
         var mailOptions = {
-            from: 'postmaster@sandboxc22cd49475a84fb084112d1ae7fc171e.mailgun.org', // sender address
+            from: 'sumittoshniwal92@gmail.com', // sender address
             to: to, // list of receivers
             subject: subject, // Subject line
             //text: htmlToText(htmlText), // plaintext body

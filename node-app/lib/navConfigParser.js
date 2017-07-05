@@ -23,7 +23,17 @@ module.exports = class navConfigParser {
                         DatabaseName: process.env.DB_NAME || "navnirmitee",
                         DatabasePort: process.env.DB_PORT || "5433",
                         RedisServerURL: process.env.REDISCLOUD_URL,
-                        ListeningPort : process.env.PORT
+                        ListeningPort : process.env.PORT,
+			PaymentGateway : {
+			   Domain : "https://pguat.paytm.com",
+			   MerchantID : "WorldP64425807474247",
+			   MerchantKey : "kbzk1DSbJiV_O3p5",
+			   Website : "worldpressplg",
+			   ChannelID : "WEB",
+			   IndustryType : "Retail",
+			   CallbackURLPath : "/paytmCallback", 
+			   TransactionURLPath : "/oltp-web/processTransaction"
+			} 
                     }
                 }
             }

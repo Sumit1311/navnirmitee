@@ -49,7 +49,33 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
                     plans : plans,
-                    membershipPlans : membershipPlans
+                    membershipPlans : membershipPlans,
+		    helpers : {
+			getClass : function(status, options) {
+				var lableClass;
+				switch(status) {
+				    case navPaymentsDAO.getStatus().PENDING :
+					lableClass = "warning";
+				        break;
+				    case navRentalsDAO.getStatus().DELIVERED:
+				    case navRentalsDAO.getStatus().PLACED:
+				    case navRentalsDAO.getStatus().RETURNED:
+				    case navPaymentsDAO.getStatus().COMPLETED :
+					lableClass = "success";
+				        break;
+				    case navRentalsDAO.getStatus().CANCELLED:
+				    case navPaymentsDAO.getStatus().CANCELLED :
+					lableClass = "danger";
+				        break;
+				
+				    default :
+					lableClass = "default";
+				        break;
+				     
+				}
+				return lableClass;
+			}
+		    }
                 
                 });
         },function(error){
@@ -92,11 +118,40 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
         var user = req.user;
         deferred.promise
             .done(function(orders){
+		for(var i = 0; i < orders.length; i++) {
+		    orders[i].delivery_date = new navCommonUtil().getDateString(parseInt(orders[i].delivery_date));
+		    orders[i].returned_date = new navCommonUtil().getDateString(parseInt(orders[i].returned_date));
+		    orders[i].lease_start_date = new navCommonUtil().getDateString(parseInt(orders[i].lease_start_date));
+		}
                 res.render("orderDetails",{
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
-                    orders : orders
+                    orders : orders,		    helpers : {
+			getClass : function(status, options) {
+				var lableClass;
+				console.log(status);
+				switch(status) {
+				    case navRentalsDAO.getStatus().DELIVERED:
+					lableClass = "success";
+					break;
+				    case navRentalsDAO.getStatus().PLACED:
+					lableClass = "info";
+					break;
+				    case navRentalsDAO.getStatus().RETURNED:
+					lableClass = "warning";
+					break;
+				    case navRentalsDAO.getStatus().CANCELLED:
+					lableClass = "danger";
+				        break;
+				    default :
+					lableClass = "default";
+				        break;
+				}
+				return lableClass;
+			}
+		    }
+
                 });
         },function(error){
                 var response = respUtil.generateErrorResponse(error);

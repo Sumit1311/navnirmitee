@@ -13,14 +13,17 @@ module.exports = class navTransactions {
             return {
                 transactionDate : context.transaction_date,
                 summary : "Rented Toy : "+context.name,
-                amountDeducted : context.price
+                amountDeducted : context.price,
+		transactionStatus : context.status
             };
         }
         else if(type == TYPE.PAYMENTS) {
             return {
                 transactionDate : context.paid_date,
                 summary : context.reason,
-                amountPaid : context.amount_payable
+                amountPaid : context.amount_payable,
+		transactionStatus : context.status
+		
             };
         }
     }

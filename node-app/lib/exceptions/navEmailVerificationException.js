@@ -6,4 +6,4 @@ class navEmailVerificationException extends NE.LogicalException {
 
 }
  
-module.exports = navUserNotFoundException; 
+module.exports = navEmailVerificationException; 

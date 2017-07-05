@@ -25,7 +25,11 @@ module.exports = class navCommonUtils {
     }
 
     getDateString(timeInMilis) {
-        return moment(timeInMilis).format("ddd, MMM Do YYYY");
+	if(timeInMilis) {
+		return moment(timeInMilis).format("ddd, MMM Do YYYY");
+	} else {
+		return "";
+	}
     }
 
     

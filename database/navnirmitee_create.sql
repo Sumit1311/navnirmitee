@@ -75,6 +75,8 @@ CREATE TABLE  nav_payments(
     credit_date bigint,
     paid_date bigint,
     status VARCHAR(10),
+	transaction_id varchar(36),
+	transaction_summary TEXT,
 	CONSTRAINT nav_payments_id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
