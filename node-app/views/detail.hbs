@@ -1,0 +1,209 @@
+<!-- begin:heading -->
+<div class="heads" style="background: url(/img/toys/{{toyDetail._id}}_1.jpg) center center;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2><span>//</span> {{toyDetail.name}}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end:heading -->
+
+<!-- begin:content -->
+<div class="page-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="#">Home</a></li>
+                    <li class="active">{{toyDetail.name}}</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- begin:product-content -->
+            <div class="col-md-9 col-sm-9 single-item">
+                <div class="row">
+                    <div class="col-md-5 col-sm-5">
+                        <div id="itemsingle" class="carousel slide clearfix">
+
+                            <div class="carousel-inner">
+                                {{#repeat imageCount}}
+                                <div class="item {{#compare @index "==" 0}}active{{/compare}}">
+                                    <img src="/img/toys/{{toyDetail._id}}_{{#add @index 1}}{{/add}}.jpg" alt="slider detail dodolan manuk">
+                                </div>
+                                {{/repeat}}
+                                <!-- <div class="item">
+                                    <img src="/img/toys/{{toyDetail._id}}_2.jpg" alt="slider detail dodolan manuk">
+                                </div>
+                                <div class="item">
+                                    <img src="/img/toys/{{toyDetail._id}}_3.jpg" alt="slider detail dodolan manuk">
+                                </div> -->
+                            </div>
+
+                            <ol class="carousel-indicators">
+                                {{#repeat imageCount}}
+                                <li data-target="#itemsingle" data-slide-to="0" class="{{#compare @index "==" 0}}active{{/compare}}"><img src="/img/toys/{{toyDetail._id}}_1.jpg" class="img-responsive" alt="slider detail dodolan manuk"></li>
+                                {{/repeat}}
+                                <!-- <li data-target="#itemsingle" data-slide-to="0" class="active"><img src="/img/toys/{{toyDetail._id}}_1.jpg" class="img-responsive" alt="slider detail dodolan manuk"></li>
+                                <li data-target="#itemsingle" data-slide-to="1" class=""><img src="/img/toys/{{toyDetail._id}}_2.jpg" class="img-responsive" alt="slider detail dodolan manuk"></li>
+                                <li data-target="#itemsingle" data-slide-to="2" class=""><img src="/img/toys/{{toyDetail._id}}_3.jpg" class="img-responsive" alt="slider detail dodolan manuk"></li> -->
+                            </ol>
+
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-sm-7">
+                        <h3>{{toyDetail.name}}</h3>
+                        <p>{{toyDetail.short_description}}</p>
+                        <p>In Stock : {{#if toyDetail.stock}}<span class="label label-success">Yes<span></p>{{else}}<span class="label label-failure">No<span></p>{{/if}}
+                        <h3>Price : &#x20b9; {{toyDetail.price}}</h3>
+                        <p><a href="/toys/order?id={{toyDetail._id}}" class="btn btn-green btn-large"><i class="icon-shopping-cart"></i> Place An Order</a></p>
+                        
+                    </div>
+                </div>
+
+                <!-- begin:tab -->
+                 <div class="row">
+                    <div class="col-md-12 product-tabs">
+                        <ul id="myTab" class="nav nav-tabs">
+                            <li class="active"><a href="#info" data-toggle="tab">More Info</a></li>
+                            <li class=""><a href="#review" data-toggle="tab">Review</a></li>
+                            <li class=""><a href="#related" data-toggle="tab">Related Items</a></li>
+                        </ul>
+                        <div id="myTabContent" class="tab-content">
+                            <div class="tab-pane fade active in" id="info">
+                                <p>{{toyDetail.long_description}}</p>
+                            </div>
+                            <div class="tab-pane fade" id="review">
+                                <p>No Reviews For This</p>
+                                <!--<p>Howdy, I'm in Section 2. Etiam luctus, tellus sed varius facilisis, turpis nisl mollis metus, adipiscing scelerisque felis dui ac lacus.
+                                Etiam luctus, tellus sed varius facilisis, turpis nisl mollis metus, adipiscing scelerisque felis dui ac lacus.</p>-->
+                            </div>  
+                            <div class="tab-pane fade" id="related">
+                                <div class="row">
+                                    <ul class="thumbnails list-unstyled">
+                                        <li class="col-md-4 col-sm-4">
+                                        <div class="thumbnail">
+                                            <a href="/detail"><img src="/img/manuk.jpg" class="img-responsive" alt="detail dodolan manuk"></a>
+                                            <div class="caption-details">
+                                                <h5>Border Canary</h5>
+                                                <span class="price">$200</span>
+                                            </div>
+                                        </div>
+                                        </li>
+                                        <li class="col-md-4 col-sm-4">
+                                        <div class="thumbnail">
+                                            <a href="/detail"><img src="/img/manuk.jpg" class="img-responsive" alt="detail dodolan manuk"></a>
+                                            <div class="caption-details">
+                                                <h5>Border Canary</h5>
+                                                <span class="price">$200</span>
+                                            </div>
+                                        </div>
+                                        </li>
+                                        <li class="col-md-4 col-sm-4">
+                                        <div class="thumbnail">
+                                            <a href="/detail"><img src="/img/manuk.jpg" class="img-responsive" alt="detail dodolan manuk"></a>
+                                            <div class="caption-details">
+                                                <h5>Border Canary</h5>
+                                                <span class="price">$200</span>
+                                            </div>
+                                        </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div> 
+                <!-- end:tab -->
+            </div>
+            <!-- end:product-content -->
+
+            <!-- begin:product-sidebar -->
+            <div class="col-md-3 col-sm-3">
+                <div class="row sidebar">
+                    <div class="col-md-12">
+                        <h3>Quick Search</h3>
+                        <div class="quick-search">
+                            <h5>Select Category</h5>
+                            <select name="cat" class="form-control">
+                                <option value="Canary">Canary</option>
+                                <option value="Emprit">Emprit</option>
+                                <option value="Parkit">Parkit</option>
+                                <option value="Doro">Doro</option>
+                                <option value="Pitik">Pitik</option>
+                                <option value="Jalak">Jalak</option>
+                                <option value="Cucak Rowo">Cucak Rowo</option>
+                                <option value="Gemak">Gemak</option>
+                                <option value="Deruk">Deruk</option>
+                                <option value="Kutut">Kutut</option>
+                                <option value="Tilang">Tilang</option>
+                            </select>
+                            <h5>Select Color</h5>
+                            <select name="cat" class="form-control">
+                                <option value="Yellow">Yellow</option>
+                                <option value="Blue">Blue</option>
+                                <option value="Green">Green</option>
+                                <option value="Red">Red</option>
+                                <option value="Orange">Orange</option>
+                                <option value="Black">Black</option>
+                                <option value="Grey">Grey</option>
+                            </select>
+                            <h5>Select Min - Max Price</h5>
+                            <div class="col-md-6">
+                                <select name="cat" class="form-control">
+                                    <option value="Yellow">$10</option>
+                                    <option value="Blue">$45</option>
+                                    <option value="Green">$70</option>
+                                    <option value="Red">$125</option>
+                                    <option value="Orange">$200</option>
+                                    <option value="Black">$235</option>
+                                    <option value="Grey">$300</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <select name="cat" class="form-control">
+                                    <option value="Yellow">$15</option>
+                                    <option value="Blue">$45</option>
+                                    <option value="Green">$70</option>
+                                    <option value="Red">$125</option>
+                                    <option value="Orange">$200</option>
+                                    <option value="Black">$235</option>
+                                    <option value="Grey">$300</option>
+                                </select>
+                            </div>
+                            <input type="submit" class="btn btn-green btn-block" name="submit" value="Search">
+                        </div>
+
+                        <h3>Categories</h3>
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a href="/product">Canary</a></li>
+                            <li><a href="/product">Emprit</a></li>
+                            <li><a href="/product">Parkit</a></li>
+                            <li><a href="/product">Doro</a></li>
+                            <li><a href="/product">Pitik</a></li>
+                            <li><a href="/product">Gemak</a></li>
+                        </ul>
+
+                        <h3>Information</h3>
+                        <ul class="nav nav-pills nav-stacked">
+                            <li><a href="/confirm">Payment Confirmation</a></li>
+                            <li><a href="#">Delivery</a></li>
+                            <li><a href="#">Secure Payment</a></li>
+                            <li><a href="#">Our Stores</a></li>
+                            <li><a href="/about">About Us</a></li>
+                            <li><a href="/contact">Contact Us</a></li>
+                            <li><a href="/testimoni">Testimony</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- end:product-sidebar -->
+
+        </div>
+    </div>
+</div>
+

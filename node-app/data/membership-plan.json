@@ -1,0 +1,47 @@
+{
+    "plans" : [
+        [
+            {
+                "id" : 0 ,
+                "noOfToys" : 1,
+                "amount" : 100,
+                "deposit" : 1000 ,
+                "points" : 25 ,
+                "rentDuration" : 7
+
+            },
+            {
+                "id" : 1 ,
+                "noOfToys" : 1,
+                "amount" : 200 ,
+                "deposit" : 1000 ,
+                "points" : 55,
+                "rentDuration" : 7
+
+            },
+            {
+                "id" : 2 ,
+                "noOfToys" : 1,
+                "amount" : 300 ,
+                "deposit" : 1000 ,
+                "points" : 85,
+                "rentDuration" : 7
+            },
+            {
+                "id" : 3 ,
+                "noOfToys" : 1,
+                "amount" : 400 ,
+                "deposit" : 1000 ,
+                "points" : 120,
+                "rentDuration" : 7
+            }
+        ]
+    ],
+    "membership" : [
+    {
+        "id" : "membership" ,
+        "amount" : 200 
+
+    }
+        ]
+}

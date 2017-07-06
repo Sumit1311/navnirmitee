@@ -1,0 +1,5 @@
+**/*.log*
+**/*.key
+**/*.sw*
+**/node_modules/**
+**/*.bak

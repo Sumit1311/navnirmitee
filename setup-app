@@ -1,0 +1,133 @@
+#!/bin/bash
+
+HOSTNAME=`hostname -I | xargs`
+PRESENT_DIR=`pwd`
+LOGFILE="$PRESENT_DIR/.setup-navnirmitee.log"
+TOMCAT_PACKAGE="tomcat7"
+
+
+touch $LOGFILE
+echo "" > $LOGFILE
+echo "Starting Tomcat installation"
+
+AVAILABLE=` apt-cache search ^$TOMCAT_PACKAGE$`
+
+if [ -z "$AVAILABLE" ]
+then
+    echo "Error Tomcat 7 not found int repos. Please add it to repo"
+    exit
+fi
+
+ apt-get install $TOMCAT_PACKAGE >> $LOGFILE 2>&1
+ service $TOMCAT_PACKAGE start>> $LOGFILE
+RC=$?
+if [ $RC == 3 ]
+then
+    echo "Error : Installing Tomcat Please Check... Logs : $LOGFILE"
+    exit
+fi
+
+echo "Please visit : http://$HOSTNAME:8080"
+echo "Press any key to continue..."
+
+read
+
+echo 'Proceeding with Node js installation'
+NODE_PACKAGE='nodejs'
+wget https://deb.nodesource.com/setup_6.x -O nodesource_setup.sh >> $LOGFILE 2>&1
+chmod +x nodesource_setup.sh
+
+ ./nodesource_setup.sh >> $LOGFILE 2>&1
+
+rm -rf ./nodesource_setup.sh
+ apt-get install $NODE_PACKAGE >> $LOGFILE 2>&1
+ apt-get install build-essential >> $LOGFILE 2>&1
+
+echo "Done Node.js"
+echo "Proceeding with nginx installation..."
+SIGN_KEY="nginx_signing.key"
+wget -O $SIGN_KEY http://nginx.org/keys/nginx_signing.key >> $LOGFILE 2>&1
+if [ $RC != 0 ]
+then
+    echo "Error downloading nginx key.."
+    echo "Please check your internet connection or Check Logs : $LOGFILE"
+fi
+
+apt-key add $SIGN_KEY >> $LOGFILE 2>&1
+
+rm -rf $SIGN_KEY
+
+UBUNTU_RELEASE=`lsb_release -sc`
+NGINX_PACKAGE_REPO="deb http://nginx.org/packages/mainline/ubuntu/ $UBUNTU_RELEASE nginx"
+NGINX_SRC_REPO="deb-src http://nginx.org/packages/mainline/ubuntu/ $UBUNTU_RELEASE nginx"
+
+echo $NGINX_PACKAGE_REPO > /etc/apt/sources.list.d/nginx.list
+echo $NGINX_SRC_REPO >> /etc/apt/sources.list.d/nginx.list
+
+ apt-get update >> $LOGFILE 2>&1
+ apt-get install nginx >> $LOGFILE 2>&1
+nginx -v >> $LOGFILE 2>&1
+RC=$?
+if [ $RC != 0 ]
+then
+    echo "Error installing nginx ... Please check Log : $LOGFILE"
+fi
+
+ nginx -t
+
+RC=$?
+if [ $RC != 0 ]
+then
+    echo "Error installing nginx ... Please check Log : $LOGFILE"
+fi
+
+echo "Please visit http://$HOSTNAME"
+echo "Press any key to continue..."
+
+read
+
+echo "Proceeding with proxy setup.."
+
+ mv /etc/nginx/conf.d/navnirmitee.conf /etc/nginx/conf.d/navnirmitee.conf.backup >> $LOGFILE 2>&1
+
+PROXY_CONF_FILE="navnirmitee.conf"
+cat << END > "$PROXY_CONF_FILE"
+server {
+  listen 80;
+  server_name 127.0.0.1;
+  location /tomcat {
+     proxy_pass http://127.0.0.1:8080/;
+  }
+  location /node {
+     proxy_pass http://127.0.0.1:8081/;
+  }
+  location /public {
+     root $PRESENT_DIR;
+     sendfile on;
+     sendfile_max_chunk 1m;
+     tcp_nopush on;
+     tcp_nodelay on;
+     keepalive_timeout 65;
+  }
+}
+END
+ mv navnirmitee.conf /etc/nginx/conf.d >> $LOGFILE 2>&1
+
+ nginx -t >> $LOGFILE 2>&1
+
+RC=$?
+if [ $RC != 0 ]
+then
+    echo "Error configuring nginx ... Please check Log : $LOGFILE"
+ 
+fi
+
+
+ nginx -s reload >> $LOGFILE 2>&1
+echo "Please visit http://$HOSTNAME/tomcat For accessing java application"
+echo "Press any key to continue..."
+
+read
+
+echo "Please visit http://$HOSTNAME/node For accessing node.js application"
+echo "Press any key to continue..."

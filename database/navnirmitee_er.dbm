@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel>
+<database name="navnirmitee" encoding="UTF8">
+</database>
+
+<table name="nav_user" oids="false">
+	<schema name="public"/>
+	<position x="127" y="13"/>
+	<column name="_id" not-null="true">
+		<type name="varchar" length="36" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="first_name">
+		<type name="text" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="last_name">
+		<type name="text" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="email_address">
+		<type name="varchar" length="30" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="mobile_no">
+		<type name="varchar" length="15" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="password">
+		<type name="text" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="emai_verification">
+		<type name="smallint" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="address">
+		<type name="text" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="city">
+		<type name="varchar" length="50" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="state">
+		<type name="varchar" length="30" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="is_active">
+		<type name="smallint" spatial-type="POINT" variation="0"/>
+	</column>
+	<constraint name="nav_user_id_pk" type="pk-constr" factor="10" table="public.nav_user">
+		<columns names="_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="nav_toys" oids="false">
+	<schema name="public"/>
+	<position x="135" y="246"/>
+	<column name="_id">
+		<type name="varchar" length="36" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="name">
+		<type name="varchar" length="50" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="stock">
+		<type name="integer" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="price">
+		<type name="varchar" length="20" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="points">
+		<type name="integer" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="age_group">
+		<type name="smallint" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="category">
+		<type name="smallint" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="parent_toys_id">
+		<type name="varchar" length="36" spatial-type="POINT" variation="0"/>
+	</column>
+	<constraint name="_id" type="pk-constr" factor="10" table="public.nav_toys">
+		<columns names="_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="nav_rentals" oids="false">
+	<schema name="public"/>
+	<position x="696" y="117"/>
+	<column name="user_id">
+		<type name="varchar" length="36" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="toys_id">
+		<type name="varchar" length="36" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="lease_start_date">
+		<type name="bigint" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="lease_end_date">
+		<type name="bigint" spatial-type="POINT" variation="0"/>
+	</column>
+	<constraint name="nav_rental_id_pk" type="pk-constr" factor="10" table="public.nav_rentals">
+		<columns names="user_id,toys_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="nav_rentals_user_id_fk" type="fk-constr"	 comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.nav_user" table="public.nav_rentals">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="nav_rentals_toys_id_fk" type="fk-constr"	 comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.nav_toys" table="public.nav_rentals">
+	<columns names="toys_id" ref-type="src-columns"/>
+	<columns names="_id" ref-type="dst-columns"/>
+</constraint>
+<relationship name="rel_nav_rentals_nav_user"
+	 type="relfk"
+	 src-required="false" dst-required="false"
+	 src-table="public.nav_rentals"
+	 dst-table="public.nav_user"/>
+
+<relationship name="rel_nav_rentals_nav_toys"
+	 type="relfk"
+	 src-required="false" dst-required="false"
+	 src-table="public.nav_rentals"
+	 dst-table="public.nav_toys"/>
+
+<table name="nav_payments" oids="false">
+	<schema name="public"/>
+	<position x="690" y="0"/>
+	<column name="_id">
+		<type name="varchar" length="36" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="last_payment_date">
+		<type name="bigint" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="user_id">
+		<type name="varchar" length="36" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="balance_points">
+		<type name="integer" spatial-type="POINT" variation="0"/>
+	</column>
+	<column name="balance_amount">
+		<type name="integer" spatial-type="POINT" variation="0"/>
+	</column>
+	<constraint name="nav_payments_id" type="pk-constr" factor="10" table="public.nav_payments">
+		<columns names="_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="nav_payments_user_id" type="fk-constr"	 comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.nav_user" table="public.nav_payments">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="_id" ref-type="dst-columns"/>
+</constraint>
+<relationship name="rel_nav_payments_nav_user"
+	 type="relfk"
+	 src-required="false" dst-required="false"
+	 src-table="public.nav_payments"
+	 dst-table="public.nav_user"/>
+
+<constraint name="nav_toys_parent_toys_id_fk" type="fk-constr"	 comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.nav_toys" table="public.nav_toys">
+	<columns names="parent_toys_id" ref-type="src-columns"/>
+	<columns names="_id" ref-type="dst-columns"/>
+</constraint>
+<relationship name="rel_nav_toys_nav_toys"
+	 type="relfk"
+	 src-required="false" dst-required="false"
+	 src-table="public.nav_toys"
+	 dst-table="public.nav_toys">
+	<line>
+		<position x="362.859" y="296.56"/>
+	<position x="362.859" y="236"/>
+	<position x="280.24" y="236"/>
+	</line>
+</relationship>
+
+</dbmodel>
