@@ -33,8 +33,8 @@ var tableName = "nav_rentals",
 
 navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, startDate, endDate, status) {
     var self = this;
-   return this.dbQuery("INSERT INTO "+tableName+" (_id, user_id,toys_id,shipping_address,lease_start_date, lease_end_date, status) VALUES($1,$2,$3,$4,$5,$6, $7)",
-           [new navCommonUtils().generateUuid(), userId, toyId, shippingAddress, startDate, endDate, status])
+   return this.dbQuery("INSERT INTO "+tableName+" (_id, user_id,toys_id,shipping_address,lease_start_date, lease_end_date, status, transaction_date) VALUES($1,$2,$3,$4,$5,$6, $7, $8)",
+           [new navCommonUtils().generateUuid(), userId, toyId, shippingAddress, startDate, endDate, status, startDate])
       .then(function(result){
          return result.rowCount;
       })

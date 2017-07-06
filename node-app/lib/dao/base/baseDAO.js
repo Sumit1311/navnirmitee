@@ -16,10 +16,9 @@ var navDbConnection = require("./pg-conn.js"),
 
 function BaseDAO(persistence) {
     //if some custom persistence provided use it other wise use the default postgres persistence
-
-    db = new navDbConnection(persistence).persistence;
+    
     if (!db) {
-        db = new navDbConnection().persistence;
+        db = persistence ? new navDbConnection(persistence).persistence : new navDbConnection().persistence;
     }
 }
 

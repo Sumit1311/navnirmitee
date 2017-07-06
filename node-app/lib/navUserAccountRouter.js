@@ -31,7 +31,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
             .done(function(){
                 var transactions = debitTransactions.concat(creditTransactions);
                 transactions.sort(function(a, b){
-                    if(parseInt(a.transactionDate) < parseInt(b.transactionDate)) {
+                    if(a.dateMilis < b.dateMilis) {
                         return true;
                     }
                     return false;

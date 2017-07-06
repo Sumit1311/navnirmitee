@@ -31,7 +31,7 @@ module.exports = class navConfigParser {
 			   Website : "worldpressplg",
 			   ChannelID : "WEB",
 			   IndustryType : "Retail",
-			   CallbackURLPath : "/paytmCallback", 
+			   CallbackURLPath : "/response", 
 			   TransactionURLPath : "/oltp-web/processTransaction"
 			} 
                     }

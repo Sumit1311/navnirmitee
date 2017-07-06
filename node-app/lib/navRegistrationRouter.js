@@ -75,8 +75,10 @@ module.exports = class navRegistration extends navBaseRouter {
              }
              var emailVer = new navEmailVerification();
              verificationCode = emailVer.generateCode();
-
-             var verificationLink = req.protocol + "://" + req.get("host") + "/verify?id=" + verificationCode;
+	     var base = new navCommonUtil().getBaseURL(req);
+	     base.pathname = "/verify";
+	     base.search = "?id=" + verificationCode;
+             var verificationLink = base.format();
              //return userDAO.insertRegistrationData(email, contactNo, password,verificationCode);
              //todo : uncomment when want to send verification email
              return emailVer.sendVerificationEmail(email, null, verificationLink)

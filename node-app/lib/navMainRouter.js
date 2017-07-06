@@ -23,7 +23,7 @@ module.exports = class navMainRouter extends navBaseRouter {
         this.router.get('/contact',this.getContact.bind(this) );
         this.router.get('/pricing', this.getPricing.bind(this) );
         this.router.get('/rechargeConfirmation', this.getRechargeConfirmation.bind(this) );
-        this.router.get('/subscribeMemebership', this.subscribeMembership.bind(this) );
+        this.router.get('/subscribeMembership', this.subscribeMembership.bind(this) );
         this.router.post('/subscribePlan', this.ensureVerified, 
                         this.ensureAuthenticated, 
                         this.isSessionAvailable, 
@@ -138,12 +138,11 @@ module.exports = class navMainRouter extends navBaseRouter {
                 uDAO.providedClient = _client;
                 return uDAO.startTx();
             })
-            /*.then(() => {
-                return uDAO.updatePlan(user._id,type + "::" + plan ,p.points, deposit > 0 ? deposit : 0 , p.amount);
-            })*/
+            .then(() => {
+                return uDAO.updatePlan(user._id,type + "::" + plan);
+            })
             .then((result) => {
 		orderId = new navCommonUtil().generateUuid();
-		console.log(p.deposit, user.deposit);
 		deposit = parseInt(p.deposit) - user.deposit;
                 if(result && deposit > 0) {
                     var pDAO = new navPaymentsDAO(uDAO.providedClient);
@@ -158,8 +157,7 @@ module.exports = class navMainRouter extends navBaseRouter {
                 return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING, orderId);
             })
 	    .then(() => {
-		console.log(p.amount, deposit);
-		return navPGRouter.initiate(user._id, (parseInt(p.amount) + deposit) + "", orderId);
+		return navPGRouter.initiate(user._id, (parseInt(p.amount) + deposit) + "", orderId, new navCommonUtil().getBaseURL(req));
 	    })
             .then((_result) => {
 		result = _result;
@@ -245,10 +243,11 @@ module.exports = class navMainRouter extends navBaseRouter {
 
     subscribeMembership(req, res) {
         var deferred = Q.defer(), self = this;
-        var respUtil =  new navResponseUtil();
+        var respUtil =  new navResponseUtil(), result;
         deferred.promise
             .done(function(){
-                respUtil.redirect(req, res, "/user/rechargeDetails");
+		res.render(result.pageToRender, {data : result.context, redirectURL : result.redirectURL});
+                //respUtil.redirect(req, res, "/user/rechargeDetails");
             },function(error){
                 var response = respUtil.generateErrorResponse(error);
                 respUtil.renderErrorPage(req, res, {
@@ -272,25 +271,29 @@ module.exports = class navMainRouter extends navBaseRouter {
         }
         var p=plans[plan];
 
-        var user = req.user, uDAO = new navUserDAO();
+        var user = req.user, uDAO = new navUserDAO(), orderId;
         uDAO.getClient()
             .then((_client) => {
                 uDAO.providedClient = _client;
                 return uDAO.startTx();
             })
-            .then(() => {
+            /*.then(() => {
                 return uDAO.updateMembershipExpiry(user._id, null);
-            })
+            })*/
             .then((result) => {
-                console.log(result);
+		orderId = new navCommonUtil().generateUuid();
                 if(result) {
                     var pDAO = new navPaymentsDAO(uDAO.providedClient);
-                    return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.REGISTRATION, pDAO.STATUS.PENDING);       
+                    return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.REGISTRATION, pDAO.STATUS.PENDING, orderId);       
                 } else {
                     return Q.reject(new navLogicalException("Account Already Recharged"));
                 }
             })
-            .then(() => {
+	    .then(() => {
+		return navPGRouter.initiate(user._id, parseInt(p.amount) + "", orderId, new navCommonUtil().getBaseURL(req));
+	    })
+            .then((_result) => {
+		result = _result;
                 uDAO.commitTx();
             })
             .catch(function (error) {

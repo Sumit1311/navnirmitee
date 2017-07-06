@@ -202,12 +202,11 @@ UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
         })
 };
 
-UserDAO.prototype.updatePlan = function (userId, plan, points, deposit, balance){
+UserDAO.prototype.updatePlan = function (userId, plan){
     var self = this;
-    console.log(deposit, balance);
     return this.dbQuery("UPDATE " + tableName + 
-    " SET subscribed_plan = $1, points = $2, deposit = deposit + $3, balance = balance + $4  WHERE _id = $5;",
-    [plan, points, deposit, balance, userId])
+    " SET subscribed_plan = $1 WHERE _id = $2;",
+    [plan, userId])
         .then(function (result) {
             return result.rowCount;
         })
@@ -263,8 +262,8 @@ UserDAO.prototype.updatePoints = function (userId, points, membershipExpiry){
 UserDAO.prototype.updateMembershipExpiry =function (userId, membershipExpiry) {
     var self = this;
     return this.dbQuery("UPDATE " + tableName + 
-    " SET membership_expiry = $4  WHERE _id = $5 AND subscribed_plan IS NULL;",
-    [plan, points, deposit, balance, userId])
+    " SET membership_expiry = $1  WHERE _id = $2 AND subscribed_plan IS NULL;",
+    [membershipExpiry, userId])
         .then(function (result) {
             return result.rowCount;
         })
@@ -274,4 +273,32 @@ UserDAO.prototype.updateMembershipExpiry =function (userId, membershipExpiry) {
 
         });
 	
+}
+UserDAO.prototype.updateBalance = function (userId, amount){
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET balance = balance + $1 WHERE _id = $2;",
+    [amount, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "updatePlan", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+}
+UserDAO.prototype.updateDeposit = function (userId, amount){
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET deposit = deposit + $1 WHERE _id = $2;",
+    [amount, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "updatePlan", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
 }

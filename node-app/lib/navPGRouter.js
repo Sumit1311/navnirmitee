@@ -27,7 +27,7 @@ module.exports = class navPGRouter extends navBaseRouter {
 	this.router.post(gatewayDetails.callbackURL, this.callback.bind(this));	
 	return this;
      }
-    static initiate(userId, amount, orderId) {
+    static initiate(userId, amount, orderId, urlObj) {
 	var deferred = Q.defer();
 	var requestData = {};
 	requestData["ORDER_ID"] = orderId;		
@@ -37,7 +37,9 @@ module.exports = class navPGRouter extends navBaseRouter {
 	requestData["TXN_AMOUNT"] = amount;		
 	requestData["MID"] = gatewayDetails.merchantId;
 	requestData["WEBSITE"] = gatewayDetails.website;
-	//requestData["CALLBACK"] = gatewayDetails.callbackURL;		
+	urlObj.pathname = "/pg" + gatewayDetails.callbackURL;
+	//console.log(urlObj.format());
+	requestData["CALLBACK_URL"] = urlObj.format(); 
 	navPaytm.genchecksum(requestData, gatewayDetails.merchantKey, function(err, result){
 	    if(err) {
 		return deferred.reject(err);
@@ -53,7 +55,7 @@ module.exports = class navPGRouter extends navBaseRouter {
 
     callback(req, res) {
 	var body =req.body;
-	var paymentStatus = navPaytm.verifychecksum();
+	var paymentStatus = navPaytm.verifychecksum(body, gatewayDetails.merchantKey);
 	var helper =new navPGHelper();
 	var promise;
 	var response = {
@@ -61,13 +63,13 @@ module.exports = class navPGRouter extends navBaseRouter {
 	    message : body.RESPMSG,
 	    status : body.STATUS,
 	    transactionAmount : body.TXNAMOUNT,
-	    orderId : ORDERID
+	    orderId : body.ORDERID
 	}	
 	if(paymentStatus && response.code == "01") {
-	     helper.paymentSuccessHandler(req, res, body)
+	     helper.paymentSuccessHandler(req, res, response)
 	}
 	else {
-	     helper.paymentFailuerHandler(req, res, body);
+	     helper.paymentFailureHandler(req, res, response);
 	}
     }
 }

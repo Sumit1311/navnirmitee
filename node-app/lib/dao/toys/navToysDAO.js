@@ -52,7 +52,7 @@ navToysDAO.prototype.getToyDetailById = function (toyId) {
 
 navToysDAO.prototype.getAllRentalTransactions = function(userId) {
     var self = this;
-    return this.dbQuery("SELECT t.name, t.price, r.transaction_date FROM nav_toys t INNER JOIN nav_rentals r ON (t._id = r.toys_id) WHERE r.user_id = $1",[userId])
+    return this.dbQuery("SELECT t.name, t.price, r.transaction_date, r.status FROM nav_toys t INNER JOIN nav_rentals r ON (t._id = r.toys_id) WHERE r.user_id = $1",[userId])
         .then(function (result) {
             return result.rows;
         })

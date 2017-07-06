@@ -1,4 +1,5 @@
 var uuid = require('node-uuid');
+const url = require('url');
 
 module.exports = class navCommonUtils {
     constructor() {
@@ -32,6 +33,11 @@ module.exports = class navCommonUtils {
 	}
     }
 
-    
+    getBaseURL(req) {
+	var base = new url.Url();
+	base.protocol = req.protocol;
+	base.host = req.get("host");
+	return base;
+    }    
 }
 

@@ -19,34 +19,40 @@ var tableName = "nav_payments";
 var STATUS = {
             PENDING : "PENDING",
 	    COMPLETED : "COMPLETED",
-	    CANCELLED : "CANCELLED"
+	    CANCELLED : "CANCELLED",
+	    FAILED : "FAILED",
+	    TRANSACTION_FAILED : "TXN_FAILED"
         }
-
-module.exports = class navPaymentsDAO extends BaseDAO{
-    constructor(client, persistence) {
-        super(persistence);
-        this.providedClient = client;
-        var plans = navMembershipParser.instance().getConfig('plans');
-        this.REASON = {
+var REASON = {
             DEPOSIT : "DEPOSIT",
             REGISTRATION :"REGISTRATION_FEES",
             PLANS : []
-        }
+        };
+
+module.exports = class navPaymentsDAO extends BaseDAO{
+    constructor(client, persistence) {
+	super(persistence);
+        this.providedClient = client;
+        var plans = navMembershipParser.instance().getConfig('plans');
         for(var i = 0; i < plans.length; i++)
         {
-            this.REASON.PLANS[i] = [];
+            REASON.PLANS[i] = [];
             for(var j = 0; j < plans[0].length; j++)
             {
-                this.REASON.PLANS[i][j] = "RECH_"+ i + "::" + plans[i][j].id;
+                REASON.PLANS[i][j] = "RECH_"+ i + "::" + plans[i][j].id;
             }
         }
         this.STATUS = STATUS;
+	this.REASON = REASON;
     }
 
     static getStatus(){
 	return STATUS;	
     }
 
+    static getReason(){
+	return REASON;
+    }
     insertPaymentDetails(userId, amount, reason, paymentStatus, orderId) {
         var self = this;
         return this.dbQuery("INSERT INTO "+ tableName + " (_id, user_id,amount_payable, reason, credit_date, status, transaction_id) VALUES($1, $2, $3, $4, $5, $6, $7)",
@@ -72,8 +78,10 @@ module.exports = class navPaymentsDAO extends BaseDAO{
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
         });
      }
-     updatePaymentDetails(orderId, summary, status) {
-	return this.dbQuery("UPDATE "+tableName + " SET status = $1, transaction_summary = $2 WHERE transaction_id = $3",[status, summary, orderId])
+     updatePaymentDetails(orderId, summary, status, paid_date) {
+	var self = this;
+//	console.log(summary, status, orderId);
+	return this.dbQuery("UPDATE "+tableName + " SET status = $1, transaction_summary = $2, paid_date = $3 WHERE transaction_id = $4",[status, summary, paid_date, orderId])
 		.then(function (result) {
 		     return result.rows;
 		})
@@ -81,6 +89,17 @@ module.exports = class navPaymentsDAO extends BaseDAO{
 		    navLogUtil.instance().log.call(self, "updatePaymentDetails", error.message, "error");
 		    return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
 		});
+     }
+     getPaymentsByTransactionId(orderId) {        
+	var self = this;
+        return this.dbQuery("SELECT reason, amount_payable, user_id from " + tableName + " WHERE transaction_id = $1 AND (status = $2 OR status = $3)", [orderId, this.STATUS.FAILED, this.STATUS.PENDING])
+            .then(function (result) {
+                return result.rows;
+            })
+        .catch(function (error) {
+            navLogUtil.instance().log.call(self, "getAllRentTransactions", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
+        });
      }
 }
 
