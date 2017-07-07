@@ -97,12 +97,13 @@
 
 <hr>
 
+{{#if userDetails.membershipExpiryDate}}
 <div class="row padd20-top-btm">
     <div class="col-md-12 text-center">
 		<h2>Membership Plans</h2>
 	</div>
 </div>
-
+{{/if}}
 {{#if userDetails.membershipExpiryDate}}
 <div class="row">
 {{#each membershipPlans}}

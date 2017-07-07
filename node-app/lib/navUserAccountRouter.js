@@ -43,7 +43,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                         membershipExpiryDate : userDetails.membership_expiry != null ? new navCommonUtil().getDateString(parseInt(userDetails.membership_expiry)) : false,
                         deposit : userDetails.deposit,
                         balance : userDetails.balance,
-                        membershipStatus :   (userDetails.membership_expiry != null  && userDetails.membership_expiry > new navCommonUtil().getCurrentTime()) ? true : false,
+                        membershipStatus :   (userDetails.membership_expiry == null ? true : ( parseInt(userDetails.membership_expiry > new navCommonUtil().getCurrentTime()) ? true : false)),
                     },
                     transactions : transactions,
                     isLoggedIn : req.user ? true : false,
