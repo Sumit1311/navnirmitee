@@ -1,0 +1,185 @@
+
+<!-- <div class="heads" style="background: url(/img/img02.jpg) center center;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2><span>//</span> Recharge Confirmation</h2>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="page-content">
+    <div class="container" style="margin-top : 40px;">
+        
+        <!-- <div class="row confirm">
+            <div class="col-md-2">
+                <h3 style="margin-top: 6px;">Search</h3>
+            </div>
+            <div class="col-md-9">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-green" style="width : 100%" type="button">Go!</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <hr>
+                </div>
+            </div>
+        </div> -->
+        <!-- <div class="row confirm">
+            <hr>
+        </div> -->
+        <div class="row confirm">
+            <div class="col-md-2">
+                <div class="row">
+                <h6 style="font-weight : bold;"> Age Group </h6>
+                <form id="_nav_age_group_form">
+                    {{#each toysData.filters.ageGroups}}
+                    <fieldset>
+                        <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
+                            <input type="checkbox" name="ageGroup" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeAge @index}}checked{{/inArray}}><span>{{this}}</span>
+
+                        </label>
+                    </fieldset>
+                    {{/each}}
+                </form>
+                <h6 style="font-weight : bold;"> Categories </h6>
+                <form id="_nav_category_form">
+                    {{#each toysData.filters.categories}}
+                    <fieldset>
+                        <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
+                            <input type="checkbox" name="category" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeCategories @index}}checked{{/inArray}}><span>{{this}}</span>
+                        </label>
+                    </fieldset>
+                {{/each}}
+                </form>
+                </div>
+            </div>
+            <div class="col-md-10">
+                <div class="row">
+                    {{#compare toysData.toysList.length "!=" 0}}
+                    <ul style="margin-top : 0px" class="pagination pull-right">
+                        <li class="disabled"><a href="#">Page {{toysData.currentPage}} of {{toysData.noOfPages}}</a></li>
+                        <li class="{{#compare toysData.currentPage "==" 1}}disabled{{/compare}}"><a href="/toys/search?{{queryParameters}}offset={{multiply (subtract toysData.currentPage 2) toysData.perPageLimit }}">«</a></li>
+                            {{#if toysData.noOfPages}} 
+                                {{#repeat toysData.noOfPages}}
+                                    <li class="{{#compare (add @index 1) "==" toysData.currentPage}}active{{/compare}}"><a href="/toys/search?{{queryParameters}}offset={{multiply @index  toysData.perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" toysData.currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
+                                {{/repeat}}
+
+                                <li class="{{#compare toysData.currentPage "==" toysData.noOfPages }}disabled{{/compare}}"> <a href="/toys/search?{{queryParameters}}offset={{multiply toysData.currentPage toysData.perPageLimit}}">»</a></li>
+                            {{else}}
+                                <li class="active"><a href="/toys/serach?q={{query}}offset=1">1 <span class="sr-only">(current)</span></a></li>
+                                <li class="disabled"> <a href="#">»</a></li>
+                            {{/if}}
+                        <!-- <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li><a href="#">»</a></li> -->
+                    </ul>
+                    {{/compare}}
+
+                </div>
+                <div class="row search-results">
+                    {{#compare toysData.toysList.length "==" 0}}
+                        <h2>No Toys Found </h2>
+                    {{/compare}}
+                    {{#each toysData.toysList}}
+                        <div class="col-md-3 col-sm-4 col-xs-12">
+                            <div class="thumbnail">
+                                <div class="caption-img" style="background: url(/img/toys/{{_id}}_1.jpg);"></div>
+                                <div class="caption-details">
+                                    <h3>{{name}}</h3>
+                                    <span class="price">₹ {{price}}</span>
+                                </div>
+                                <a href="/toys/detail?id={{_id}}"><div class="caption-link"><i class="fa fa-plus"></i><h3>{{short_description}}</h3></div></a>
+                            </div>
+                        </div>
+                    {{/each}}
+                        <!-- <div class="col-md-3 col-sm-4 col-xs-12">
+                            <div class="thumbnail">
+                                <div class="caption-img" style="background: url(/img/toys/T2_1.jpg);"></div>
+                                <div class="caption-details">
+                                    <h3>Toy 2</h3>
+                                    <span class="price">₹ 123</span>
+                                </div>
+                                <a href="/toys/detail?id=T2"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-12">
+                            <div class="thumbnail">
+                                <div class="caption-img" style="background: url(/img/toys/T3_1.jpg);"></div>
+                                <div class="caption-details">
+                                    <h3>Toy 3</h3>
+                                    <span class="price">₹ 123</span>
+                                </div>
+                                <a href="/toys/detail?id=T3"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-12">
+                            <div class="thumbnail">
+                                <div class="caption-img" style="background: url(/img/toys/T4_1.jpg);"></div>
+                                <div class="caption-details">
+                                    <h3>Toy 4</h3>
+                                    <span class="price">₹ 123</span>
+                                </div>
+                                <a href="/toys/detail?id=T4"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-12">
+                            <div class="thumbnail">
+                                <div class="caption-img" style="background: url(/img/toys/T5_1.jpg);"></div>
+                                <div class="caption-details">
+                                    <h3>Toy 5</h3>
+                                    <span class="price">₹ 123</span>
+                                </div>
+                                <a href="/toys/detail?id=T5"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-12">
+                            <div class="thumbnail">
+                                <div class="caption-img" style="background: url(/img/toys/T6_1.jpg);"></div>
+                                <div class="caption-details">
+                                    <h3>Toy 6</h3>
+                                    <span class="price">₹ 123</span>
+                                </div>
+                                <a href="/toys/detail?id=T6"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="row">
+                    {{#compare toysData.toysList.length "!=" 0}}
+                    <ul style="margin-top : 0px" class="pagination pull-right">
+                        <li class="disabled"><a href="#">Page {{toysData.currentPage}} of {{toysData.noOfPages}}</a></li>
+                        <li class="{{#compare toysData.currentPage "==" 1}}disabled{{/compare}}"><a href="/toys/search?{{queryParameters}}offset={{multiply (subtract toysData.currentPage 2) toysData.perPageLimit }}">«</a></li>
+                            {{#if toysData.noOfPages}} 
+                                {{#repeat toysData.noOfPages}}
+                                    <li class="{{#compare (add @index 1) "==" toysData.currentPage}}active{{/compare}}"><a href="/toys/search?{{queryParameters}}offset={{multiply @index toysData.perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" toysData.currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
+                                {{/repeat}}<li>
+
+                                <li class="{{#compare toysData.currentPage "==" toysData.noOfPages }}disabled{{/compare}}"> <a href="#">»</a></li>
+                            {{else}}
+                                <li class="active"><a href="/toys/serach?q={{queryParameters}}offset=1">1 <span class="sr-only">(current)</span></a></li>
+                                <li class="disabled"> <a href="#">»</a></li>
+                            {{/if}}
+                        <!-- <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li><a href="#">»</a></li> -->
+                    </ul>
+                {{/compare}}
+                </div>
+            </div>
+        </div>
+</div>
+</div>

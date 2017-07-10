@@ -46,16 +46,28 @@
                                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                                     <ul class="nav navbar-nav nav-left">
                                         <!-- <li class="active"><a href="/">Home</a></li> -->
-                                        <li><a href="/howitworks">How It Works</a></li>
-                                        <li><a href="/search">Search</a></li>
+                                        <li><a href="/">Home</a></li>
+                                        <li><a href="/hoowitworks">How It Works</a></li>
+                                        <li style="width: 600px;">    <div class="row"><div style="padding-right: 0px;" class="col-md-10">
+                                                <form _lpchecked="1" class="navbar-search navbar-form" id="_nav_search_form" method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}">
+                                                    <input style="width: 100%;" class="form-control" placeholder="Search" name="q" type="text" value={{query}}>
+                                                </form>
+                                            </div>
+                                            <div style="padding-left: 0px;" class="col-md-2">
+                                                <button class="btn btn-green navbar-btn" style="width : 100%" type="button" id="_nav_search_button">Go!</button>    
+                                            </div>
+                                        </div>
+                                        </li>
+
+
                                         {{#if isLoggedIn}}
                                         {{else}}
                                             <li><a href="/pricing">Plans</a></li>
                                         {{/if}}
                                     </ul>
-                                    <a href="/" class="logo visible-lg visible-md" style="{{#and isLoggedIn showSideBar}}left:55%;{{/and}}"><img src="/img/logo.jpg" alt="dodolan manuk responsive catalog themes"></a>
-                                        <div id="brand" class="visible-lg visible-md">&nbsp;</div>
-                                        <ul class="nav navbar-nav nav-right">
+                                    <!-- <a href="/" class="logo visible-lg visible-md" style="{{#and isLoggedIn showSideBar}}left:55%;{{/and}}"><img src="/img/logo.jpg" alt="dodolan manuk responsive catalog themes"></a>
+   <div id="brand" class="visible-lg visible-md">&nbsp;</div> -->
+                                        <ul class="nav navbar-nav nav-right" style="margin-left : 0px;">
                                             <li><a href="/about">About Us</a></li> 
                                             <!-- <li><a href="/profile">Profile</a></li>-->
                                             <li><a href="/contact">Contact</a></li>
@@ -177,6 +189,7 @@ var Q;
             <script src="/js/helpers/navLogInHelper.js"></script>
             <script src="/js/helpers/navRegistrationHelper.js"></script>
             <script src="/js/helpers/navOrderHelper.js"></script>
+            <script src="/js/helpers/navSearchHelper.js"></script>
             <script src="/js/script.js"></script>
     </body>
 </html>
