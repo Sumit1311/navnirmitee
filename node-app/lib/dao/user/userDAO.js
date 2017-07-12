@@ -262,7 +262,7 @@ UserDAO.prototype.updatePoints = function (userId, points, membershipExpiry){
 UserDAO.prototype.updateMembershipExpiry =function (userId, membershipExpiry) {
     var self = this;
     return this.dbQuery("UPDATE " + tableName + 
-    " SET membership_expiry = $1  WHERE _id = $2 AND subscribed_plan IS NULL;",
+    " SET membership_expiry = $1  WHERE _id = $2;",
     [membershipExpiry, userId])
         .then(function (result) {
             return result.rowCount;

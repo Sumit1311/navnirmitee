@@ -17,12 +17,12 @@ var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
 
 var tableName = "nav_payments";
 var STATUS = {
-            PENDING : "PENDING",
-	    COMPLETED : "COMPLETED",
-	    CANCELLED : "CANCELLED",
-	    FAILED : "FAILED",
-	    TRANSACTION_FAILED : "TXN_FAILED"
-        }
+    PENDING : "PENDING",
+    COMPLETED : "COMPLETED",
+    CANCELLED : "CANCELLED",
+    FAILED : "FAILED",
+    TRANSACTION_FAILED : "TXN_FAILED"
+}
 var REASON = {
             DEPOSIT : "DEPOSIT",
             REGISTRATION :"REGISTRATION_FEES",
@@ -92,7 +92,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
      }
      getPaymentsByTransactionId(orderId) {        
 	var self = this;
-        return this.dbQuery("SELECT reason, amount_payable, user_id from " + tableName + " WHERE transaction_id = $1 AND (status = $2 OR status = $3)", [orderId, this.STATUS.FAILED, this.STATUS.PENDING])
+        return this.dbQuery("SELECT reason, amount_payable, user_id from " + tableName + " WHERE transaction_id = $1 AND (status != $2 OR status != $3)", [orderId, this.STATUS.PENDING, this.STATUS.COMPLETED])
             .then(function (result) {
                 return result.rows;
             })

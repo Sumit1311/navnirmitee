@@ -1,5 +1,7 @@
 var uuid = require('node-uuid');
 const url = require('url');
+var AGE_GROUPS = ['0 - 5 Years', '6 - 7 Years', '8 - 10 Years', '11 - 13 Years', '13 - 15 Years'];
+var CATEGORIES = ['Educational', 'Scientific', 'Fun', 'Motor Skills'];
 
 module.exports = class navCommonUtils {
     constructor() {
@@ -39,5 +41,13 @@ module.exports = class navCommonUtils {
 	base.host = req.get("host");
 	return base;
     }    
+
+    static getAgeGroups() {
+        return AGE_GROUPS;        
+    }
+
+    static getCategories() {
+        return CATEGORIES;
+    }
 }
 

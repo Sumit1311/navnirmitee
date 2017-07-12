@@ -5,4 +5,4 @@ class navPendingReturnException extends NE.LogicalException {
     }
 }
  
-module.exports = navValidationException; 
+module.exports = navPendingReturnException; 

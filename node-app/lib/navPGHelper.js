@@ -1,6 +1,7 @@
 var navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
     navPGFailureException = require(process.cwd() + "/lib/exceptions/navPGFailureException.js"),
+    navPaymentDoneException = require(process.cwd() + "/lib/exceptions/navPaymentDoneException.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js");
 
 
@@ -37,6 +38,10 @@ module.exports = class navPGHelper {
 	})
 	.then((transactions) => {
 	    var promises = [];
+        if(transactions.length == 0)
+        {
+            promisses.push(Q.reject(new navPaymentDoneException()));
+        }
 	    userDAO = new navUserDAO(paymentDAO.providedClient);
 	    for(var i = 0; i < transactions.length; i++) {
 		console.log(transactions[i].user_id,transactions[i].amount_payable)
