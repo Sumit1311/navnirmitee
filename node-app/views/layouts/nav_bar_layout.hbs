@@ -48,9 +48,13 @@
                                         <!-- <li class="active"><a href="/">Home</a></li> -->
                                         <li><a href="/">Home</a></li>
                                         <li><a href="/hoowitworks">How It Works</a></li>
-                                        <li style="width: 600px;">    <div class="row"><div style="padding-right: 0px;" class="col-md-10">
+                                        {{#if isLoggedIn}}
+                                        {{else}}
+                                            <li><a href="/pricing">Plans</a></li>
+                                        {{/if}}
+                                        <li style="{{#if isLoggedIn}}width: 600px;{{else}} width : 564px{{/if}}">    <div class="row"><div style="padding-right: 0px;" class="col-md-10">
                                                 <form _lpchecked="1" class="navbar-search navbar-form" id="_nav_search_form" method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}">
-                                                    <input style="width: 100%;" class="form-control" placeholder="Search" name="q" type="text" value={{query}}>
+                                                   <input style="width: 100%;" class="form-control" placeholder="Search" name="q" type="text" value="{{query}}">
                                                 </form>
                                             </div>
                                             <div style="padding-left: 0px;" class="col-md-2">
@@ -60,10 +64,6 @@
                                         </li>
 
 
-                                        {{#if isLoggedIn}}
-                                        {{else}}
-                                            <li><a href="/pricing">Plans</a></li>
-                                        {{/if}}
                                     </ul>
                                     <!-- <a href="/" class="logo visible-lg visible-md" style="{{#and isLoggedIn showSideBar}}left:55%;{{/and}}"><img src="/img/logo.jpg" alt="dodolan manuk responsive catalog themes"></a>
    <div id="brand" class="visible-lg visible-md">&nbsp;</div> -->

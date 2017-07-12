@@ -17,6 +17,7 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     url = require("url"),
     Q = require('q'),
+    querystring = require("querystring"),
     moment = require('moment');
 
 module.exports = class navToysRouter extends navBaseRouter {
@@ -77,7 +78,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         var response;
         if(validationErrors)
         {
-            return deferred.reject(new navValidationError(validationErrors));
+            return deferred.reject(new navValidationException(validationErrors));
         }
         var navTDAO = new navToysDAO();
         navTDAO.getToyDetailById(id)
@@ -132,7 +133,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         var response;
         if(validationErrors)
         {
-            return deferred.reject(new navValidationError(validationErrors));
+            return deferred.reject(new navValidationException(validationErrors));
         }
         var userDAO = new navUserDAO();
         userDAO.getAddress(user._id)
@@ -189,7 +190,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         var response, user = req.user;
         if(validationErrors)
         {
-            return deferred.reject(new navValidationError(validationErrors));
+            return deferred.reject(new navValidationException(validationErrors));
         }
         var rDAO = new navRentalsDAO();
         var userDetails, toyDetails;
@@ -294,14 +295,18 @@ module.exports = class navToysRouter extends navBaseRouter {
         
         for(var key in req.query) {
             if((key == "category") && req.query.hasOwnProperty(key)) {
-                activeCategories.push(parseInt(req.query[key]) - 1);
+                for(var index in req.query[key]) {
+                activeCategories.push(parseInt(req.query[key][index]) - 1);
+                }
             }
             if((key == "ageGroup") && req.query.hasOwnProperty(key)) {
-                activeAgeGroups.push(parseInt(req.query[key]) - 1);
+                for(var index in req.query[key]) {
+                activeAgeGroups.push(parseInt(req.query[key][index]) - 1);
+                }
             }
         }
         
-        //req.assert("q"," Bad Request").notEmpty();
+        req.assert("q"," Bad Request").isByteLength({min :0, max :128});
         //req.assert("shippingAddress","Bad Request").notEmpty();
         var deferred = Q.defer();
         var respUtil =  new navResponseUtil(), toyList, categories, ageGroups, noOfPages, perPageToys = 4;
@@ -317,14 +322,17 @@ module.exports = class navToysRouter extends navBaseRouter {
                         }
                     }
                     //val.charAt[val.length -1] = "";
+                console.log(val);
                     return val;
                 }
+                delete req.query.offset;
+                console.log(querystring.stringify(req.query));
                 res.render('searchToys', {
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
                     query : q,
-                    queryParameters : genQueryParams(req.query),
+                    queryParameters : querystring.stringify(req.query),
                     toysData : {
                         toysList : toyList,
                         filters : {
@@ -368,11 +376,11 @@ module.exports = class navToysRouter extends navBaseRouter {
         var response, user = req.user;
         if(validationErrors)
         {
-            return deferred.reject(new navValidationError(validationErrors));
+            return deferred.reject(new navValidationException(validationErrors));
         }
         ageGroups = navCommonUtil.getAgeGroups();
         categories = navCommonUtil.getCategories();
-        new navToysDAO().getAllToys(null, null, activeAgeGroups, activeCategories, q)
+        new navToysDAO().getAllToys(null, null, activeAgeGroups, activeCategories, q.split(" "))
             .then((toys) => {
                 toyList = [];
                 /*var temp = [];

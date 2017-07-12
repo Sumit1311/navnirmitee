@@ -66,13 +66,13 @@
                     {{#compare toysData.toysList.length "!=" 0}}
                     <ul style="margin-top : 0px" class="pagination pull-right">
                         <li class="disabled"><a href="#">Page {{toysData.currentPage}} of {{toysData.noOfPages}}</a></li>
-                        <li class="{{#compare toysData.currentPage "==" 1}}disabled{{/compare}}"><a href="/toys/search?{{queryParameters}}offset={{multiply (subtract toysData.currentPage 2) toysData.perPageLimit }}">«</a></li>
+                        <li class="{{#compare toysData.currentPage "==" 1}}disabled{{/compare}}"><a href="/toys/search?{{queryParameters}}&offset={{multiply (subtract toysData.currentPage 2) toysData.perPageLimit }}">«</a></li>
                             {{#if toysData.noOfPages}} 
                                 {{#repeat toysData.noOfPages}}
-                                    <li class="{{#compare (add @index 1) "==" toysData.currentPage}}active{{/compare}}"><a href="/toys/search?{{queryParameters}}offset={{multiply @index  toysData.perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" toysData.currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
+                                    <li class="{{#compare (add @index 1) "==" toysData.currentPage}}active{{/compare}}"><a href="/toys/search?{{queryParameters}}&offset={{multiply @index  toysData.perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" toysData.currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
                                 {{/repeat}}
 
-                                <li class="{{#compare toysData.currentPage "==" toysData.noOfPages }}disabled{{/compare}}"> <a href="/toys/search?{{queryParameters}}offset={{multiply toysData.currentPage toysData.perPageLimit}}">»</a></li>
+                                <li class="{{#compare toysData.currentPage "==" toysData.noOfPages }}disabled{{/compare}}"> <a href="/toys/search?{{queryParameters}}&offset={{multiply toysData.currentPage toysData.perPageLimit}}">»</a></li>
                             {{else}}
                                 <li class="active"><a href="/toys/serach?q={{query}}offset=1">1 <span class="sr-only">(current)</span></a></li>
                                 <li class="disabled"> <a href="#">»</a></li>
@@ -159,15 +159,15 @@
                     {{#compare toysData.toysList.length "!=" 0}}
                     <ul style="margin-top : 0px" class="pagination pull-right">
                         <li class="disabled"><a href="#">Page {{toysData.currentPage}} of {{toysData.noOfPages}}</a></li>
-                        <li class="{{#compare toysData.currentPage "==" 1}}disabled{{/compare}}"><a href="/toys/search?{{queryParameters}}offset={{multiply (subtract toysData.currentPage 2) toysData.perPageLimit }}">«</a></li>
+                        <li class="{{#compare toysData.currentPage "==" 1}}disabled{{/compare}}"><a href="/toys/search?{{queryParameters}}&offset={{multiply (subtract toysData.currentPage 2) toysData.perPageLimit }}">«</a></li>
                             {{#if toysData.noOfPages}} 
                                 {{#repeat toysData.noOfPages}}
-                                    <li class="{{#compare (add @index 1) "==" toysData.currentPage}}active{{/compare}}"><a href="/toys/search?{{queryParameters}}offset={{multiply @index toysData.perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" toysData.currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
+                                    <li class="{{#compare (add @index 1) "==" toysData.currentPage}}active{{/compare}}"><a href="/toys/search?{{queryParameters}}&offset={{multiply @index toysData.perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" toysData.currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
                                 {{/repeat}}<li>
 
                                 <li class="{{#compare toysData.currentPage "==" toysData.noOfPages }}disabled{{/compare}}"> <a href="#">»</a></li>
                             {{else}}
-                                <li class="active"><a href="/toys/serach?q={{queryParameters}}offset=1">1 <span class="sr-only">(current)</span></a></li>
+                                <li class="active"><a href="/toys/serach?q={{queryParameters}}&offset=1">1 <span class="sr-only">(current)</span></a></li>
                                 <li class="disabled"> <a href="#">»</a></li>
                             {{/if}}
                         <!-- <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>

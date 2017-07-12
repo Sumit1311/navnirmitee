@@ -74,10 +74,21 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
         if(count != 0) {
             queryString += " AND "
         }
-        queryString += " ( name ~ $"+ (++count) + " ";
-        queryString += " OR long_description ~ $"+count + " ";
-        queryString += " OR short_description ~ $" + count + ") ";
-        params.push(query); 
+        if(query.length > 0) {
+            queryString += " ( "
+        }
+        for(var w in query) {
+            queryString += " ( name ~ $"+ (++count) + " ";
+            queryString += " OR long_description ~ $"+count + " ";
+            queryString += " OR short_description ~ $" + count + ") ";
+            params.push(query[w]); 
+            if(w != query.length - 1) {
+                queryString += " OR ";
+            }
+        }
+        if(query.length > 0) {
+            queryString += " ) "
+        }
     }
 
     if(limit)
