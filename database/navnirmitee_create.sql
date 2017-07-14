@@ -77,6 +77,9 @@ CREATE TABLE  nav_payments(
     status VARCHAR(10),
 	transaction_id varchar(36),
 	transaction_summary TEXT,
+    transaction_date bigint,
+    next_retry_date bigint,
+    expiration_date bigint,
 	CONSTRAINT nav_payments_id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
