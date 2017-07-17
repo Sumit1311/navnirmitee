@@ -68,19 +68,27 @@ module.exports = class navPGRouter extends navBaseRouter {
         var paymentStatus = navPaytm.verifychecksum(body, gatewayDetails.merchantKey);
         var helper =new navPGHelper();
         var promise;
-        var response = {
+        var intResponse = {
             code : body.RESPCODE,
             message : body.RESPMSG,
             status : body.STATUS,
             transactionAmount : body.TXNAMOUNT,
             orderId : body.ORDERID
-        }	
-        if(paymentStatus && response.code == "01" && response.status == GATEWAY_STATUS.SUCCESS) {
-            helper.paymentSuccessHandler(req, res, response)
         }
-        else {
-            helper.paymentFailureHandler(req, res, response);
-        }
+        navPGRouter.checkStatus(intResponse.orderId)
+            .done((response) => {
+                if(paymentStatus && response.code == "01" && response.status == GATEWAY_STATUS.SUCCESS) {
+                    helper.paymentSuccessHandler(req, res, response)
+                }
+                else if(paymentStatus && (response.status == GATEWAY_STATUS.PENDING || response.status == GATEWAY_STATUS.OPEN)) {
+                    helper.paymentPartialSuccessHandler(req, res, response);
+                }
+                else {
+                    helper.paymentFailureHandler(req, res, response);
+                }
+            }, (error) => {
+                    helper.handleServerError(req, res, error); 
+            })
     }
 
     static checkStatus(orderId) {
@@ -88,35 +96,53 @@ module.exports = class navPGRouter extends navBaseRouter {
         var requestData = {};
         requestData["ORDER_ID"] = orderId;      
         requestData["MID"] = gatewayDetails.merchantId;
+        var response;
+        var paymentStatus;
         navPaytm.genchecksum(requestData, gatewayDetails.merchantKey, function(err, result){
             if(err) {
                 return deferred.reject(err);
             }
-            new navRequester().setHref(gatewayDetails.domain + gatewayDetails.statusAPIPath).doRequest({
-                body : result
-            })
-            .then((body) => {
-                var response = {
-                    orderId : body.ORDERID,
-                    amount : body.TXNAMOUNT,
-                    status : body.STATUS,
-                    message : body.RESPMSG
-                };
-                if(response.status == GATEWAY_STATUS.SUCCESS) {
-                    deferred.resolve(response);
-                }
-                else {
+            //require('request').debug = true;
 
+            new navRequester().setHref(gatewayDetails.domain + gatewayDetails.statusAPIPath).doRequest({
+                body : {JsonData : JSON.stringify(result)}
+            })
+            .then((_response) => {
+                var body = _response.body
+                var helper =new navPGHelper();
+                if(_response.status == 200) {
+                    body = JSON.parse(body);
+                    if(body.ErrorCode) {
+                        return Q.reject(new Error(body.ErrorMsg));
+                    }
+                    //paymentStatus = navPaytm.verifychecksum(body, gatewayDetails.merchantKey);
+                    response = {
+                        orderId : body.ORDERID,
+                        amount : body.TXNAMOUNT,
+                        status : body.STATUS,
+                        message : body.RESPMSG,
+                        code : body.RESPCODE
+                    };
+                    var promise;
+                    if(response.code == "01" && response.status == GATEWAY_STATUS.SUCCESS) {
+                        promise = helper.processSuccess(response.orderId, null, response.status, response.message);
+                    }
+                    else if((response.status == GATEWAY_STATUS.PENDING || response.status == GATEWAY_STATUS.OPEN)) {
+                        promise = helper.processPartialSuccess(response.orderId, null, response.status, response.message);
+                    }
+                    else {
+                        promise = helper.processFailure(response.orderId, null, response.status, response.message);
+                    }
+                    return promise;
+                } else {
+                   return helper.paymentFailureHandler(orderId, 500, 500, "Internal Error");
                 }
             })
-            .catch((error) => {
+            .done(() => {
+                deferred.resolve(response);
+            },(error) => {
                 deferred.reject(error);
             })
-            deferred.resolve({
-                pageToRender : "pg/redirect",
-                   redirectURL : gatewayDetails.domain + gatewayDetails.transactionURLPath, 
-                   context : result
-            });
         });
         return deferred.promise;
 

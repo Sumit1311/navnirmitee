@@ -113,7 +113,6 @@ BaseDAO.prototype.dbQuery = function (sql, params) {
 }
 
 function query(dbClient, sql, params) {
-        var logUtil = new navLogUtil();
         return dbClient.query(sql, params)
             .then(function () {
                 var results = dbClient.results();

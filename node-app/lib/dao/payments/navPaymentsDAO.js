@@ -79,33 +79,33 @@ module.exports = class navPaymentsDAO extends BaseDAO{
         });
      }
      updatePaymentDetails(orderId, summary, status, paid_date, retryDate, expirationDate) {
-	var self = this;
-    var count = 0;
-//	console.log(summary, status, orderId);
-    var queryString = "UPDATE "+tableName + " SET status = $1, transaction_summary = $2, paid_date = $3";
-    var params = [status, summary, paid_date];
-    count = 4;
-    if(retryDate) {
-        queryString += " next_retry_date = $" + (count);
-        params.push(retryDate);
-        count++;
-    }
-    if(expirationDate) {
-        queryString += " expiration_date = $" + (count);
-        params.push(expirationDate);
-        count++;
-    }
-    queryString += " WHERE transaction_id = $" + (count);
-    params.push(orderId);
-    count++;
-	return this.dbQuery(queryString, params)
-		.then(function (result) {
-		     return result.rows;
-		})
-		.catch(function (error) {
-		    navLogUtil.instance().log.call(self, "updatePaymentDetails", error.message, "error");
-		    return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
-		});
+         var self = this;
+         var count = 0;
+         //	console.log(summary, status, orderId);
+         var queryString = "UPDATE "+tableName + " SET status = $1, transaction_summary = $2, paid_date = $3";
+         var params = [status, summary, paid_date];
+         count = 4;
+         if(retryDate) {
+             queryString += " next_retry_date = $" + (count);
+             params.push(retryDate);
+             count++;
+         }
+         if(expirationDate) {
+             queryString += " expiration_date = $" + (count);
+             params.push(expirationDate);
+             count++;
+         }
+         queryString += " WHERE transaction_id = $" + (count);
+         params.push(orderId);
+         count++;
+         return this.dbQuery(queryString, params)
+             .then(function (result) {
+                 return result.rows;
+             })
+         .catch(function (error) {
+             navLogUtil.instance().log.call(self, "updatePaymentDetails", error.message, "error");
+             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
+         });
      }
      getPaymentsByTransactionId(orderId) {        
          var self = this;
@@ -118,6 +118,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
         });
      }
+
      getNextPendingTransaction() {
          var self = this;
          return this.dbQuery("SELECT amount_payable, transaction_id, user_id from " + tableName + " WHERE status = $1 AND next_retry_date <= $2 AND expiration_date > $2 ORDER BY next_retry_date LIMIT 1;", [this.STATUS.PENDING, new Date().getTime()])
@@ -125,7 +126,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
                  return result.rows;
              })
          .catch(function (error) {
-             navLogUtil.instance().log.call(self, "getAllRentTransactions", error.message, "error");
+             navLogUtil.instance().log.call(self, "getNextPendingTransaction", error.message, "error");
              return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
          });
         

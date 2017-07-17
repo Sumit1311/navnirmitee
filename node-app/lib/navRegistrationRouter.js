@@ -98,6 +98,7 @@ module.exports = class navRegistration extends navBaseRouter {
     saveRegistrationData(req, email, contactNo, password, deferred) {
     }
     doEmailVerification(req, res, next) {
+        var self = this;
         var code = req.query.id;
         var deferred = Q.defer();
         deferred.promise
@@ -153,6 +154,7 @@ module.exports = class navRegistration extends navBaseRouter {
         
     }
     saveAdditionalDetails(req,res) {
+        var self = this;
         var body = req.body;
         var loginEmailId = body.email,
             firstName = body.firstName,

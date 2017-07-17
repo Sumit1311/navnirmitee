@@ -24,7 +24,7 @@ module.exports = class navConfigParser {
                         DatabasePort: process.env.DB_PORT || "5433",
                         RedisServerURL: process.env.REDISCLOUD_URL,
                         ListeningPort : process.env.PORT,
-                        HostName : process.env.HOST_NAME || "localhost"
+                        HostName : process.env.HOST_NAME || "localhost",
                         PaymentGateway : {
                             Domain : "https://pguat.paytm.com",
                             MerchantID : "WorldP64425807474247",
@@ -34,7 +34,7 @@ module.exports = class navConfigParser {
                             IndustryType : "Retail",
                             CallbackURLPath : "/response", 
                             TransactionURLPath : "/oltp-web/processTransaction",
-                            StatusAPIPath : "/oltp/getTxnStatus"
+                            StatusAPIPath : "/oltp/HANDLER_INTERNAL/getTxnStatus",
                             RetryInterval : 8, //hours
                             ExpirationInterval : 72 //hours
                         }

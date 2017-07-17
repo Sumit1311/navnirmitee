@@ -48,7 +48,7 @@ module.exports = class navResponseUtils {
                        subMessage : error.message ? error.message : "",
                 }, 400);
             default :
-                console.log(error);
+                //console.log(error);
                 return this.generateResponse("UNKNOWN", {
                     message : "Internal Server Error",
                        subMessage : "Something Went Wrong, Please try again"

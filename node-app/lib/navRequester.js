@@ -1,8 +1,8 @@
 var request = require('request');
 const url = require('url');
 var Q = require('q');
-var navRequestHandlerException = require(processs.cwd() + "/lib/exceptions/navRequestHandlerException.js"),
-    navHTTPException = require(processs.cwd() + "/lib/exceptions/navHTTPException.js");
+var navRequestHandlerException = require(process.cwd() + "/lib/exceptions/navRequestHandlerException.js"),
+    navHTTPException = require(process.cwd() + "/lib/exceptions/navHTTPException.js");
 
 
 
@@ -16,6 +16,7 @@ module.exports = class navRequester {
 
     setHref(href) {
         this.urlObj.href = href;
+        return this;
     } 
 
     setHostName(host) {
@@ -40,11 +41,16 @@ module.exports = class navRequester {
 
     doRequest(options) {
         var requestOptions = {}, deferred = Q.defer();
-        this.urlObj.hostname || this.urlObj.href || (return Q.reject());
-        requestOptions.uri = this.urlObj.format();
-        var requestOptions.method = options.method || "GET";
+        if(!this.urlObj.hostname && !this.urlObj.href) { return Q.reject(new Error()) };
+        if(this.urlObj.href) {
+            requestOptions.uri = this.urlObj.href;
+        } else {
+            requestOptions.uri = this.urlObj.format();
+
+        }
+        requestOptions.method = options.method || "GET";
         var body = options.body;
-        if(method == "GET") {
+        if(requestOptions.method == "GET") {
             if(body) {
                 requestOptions.qs = body;
                 requestOptions.useQuerystring = true;
@@ -52,7 +58,7 @@ module.exports = class navRequester {
 
         }
 
-        if(method == "POST" || method == "PUT" || method == "PATCH") {
+        if(requestOptions.method == "POST" || requestOptions.method == "PUT" || requestOptions.method == "PATCH") {
             requestOptions.body = body;
         }
         request(requestOptions, function(error, response, body) {
