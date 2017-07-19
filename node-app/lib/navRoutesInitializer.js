@@ -2,6 +2,7 @@ var navMainRouter = require(process.cwd() + "/lib/navMainRouter.js"),
     navSignInRouter = require(process.cwd() + "/lib/navSignInRouter.js"),
     navRegistrationRouter = require(process.cwd() + "/lib/navRegistrationRouter.js"),
     navUserAccountRouter = require(process.cwd() + "/lib/navUserAccountRouter.js"),
+    navAdminRouter = require(process.cwd() + "/lib/navAdminRouter.js"),
     navPGRouter = require(process.cwd() + "/lib/navPGRouter.js"),
     navToysRouter = require(process.cwd() + "/lib/navToysRouter.js");
 
@@ -27,6 +28,7 @@ module.exports = class navRoutesInitializer {
             app.use('/toys',new navToysRouter().setup().getRouter());
             app.use('/user',new navUserAccountRouter().setup().getRouter());
             app.use('/pg',new navPGRouter().setup().getRouter());
+            app.use('/admin',new navAdminRouter().setup().getRouter());
         
     }
 }

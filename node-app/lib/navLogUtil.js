@@ -11,7 +11,7 @@ module.exports = class navLogUtil {
     log (functionName, message, level){
         logger[level]("["+ this.constructor.name +"] ["+ functionName  +"] " + message );
     }
-    static log (level, functionName, message){
+    static log_s (level, functionName, message){
         logger[level]("["+ this.constructor.name +"] ["+ functionName  +"] " + message );
     }
     getLogger() {

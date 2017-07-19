@@ -1,23 +1,24 @@
 #!/usr/bin/env node
 var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     navProcessTransactions = require(process.cwd() + "/lib/navProcessTransactions.js");
 
 
 function start() {
     var self = this;
-            navLogUtil.log("info", "start", "Sleeping"); 
+    navLogUtil.instance().log.call(self,"start", "Sleeping", "info"); 
     setTimeout(function() {
         var pt = new navProcessTransactions();
-        navLogUtil.log.call(self,"info", "start", "Starting the pending transaction processing"); 
+        navLogUtil.instance().log.call(self,"start", "Starting the pending transaction processing", "info"); 
         pt.processPendingTransactions()
         .done(() => {
-            navLogUtil.log.call(self, "info", "start", "Done transaction processing"); 
+            navLogUtil.instance().log.call(self, "start", "Done transaction processing", "info"); 
             start();
         }, (error) => {
             navLogUtil.instance().log.call(self,"start", "FATAL ERROR : "+error, "error")
             process.exit(-1);
         })
-    }, 1000);
+    }, navConfigParser.instance().getConfig("BackgroundTransaction").ProcessingInterval || 1000);
 }
 
 

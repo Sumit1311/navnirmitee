@@ -302,3 +302,18 @@ UserDAO.prototype.updateDeposit = function (userId, amount){
 
         });
 }
+
+UserDAO.prototype.getAllUsers = function() {
+    var self = this;
+    
+    return this.dbQuery("SELECT _id,email_address" +
+    " FROM " + tableName)
+        .then(function (result) {
+            return result.rows;
+        })
+        .catch(function (error) {
+            navLogUtil.instance().log.call(self, "getAllUsers", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+        })
+
+}

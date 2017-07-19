@@ -69,6 +69,33 @@ navRentalsDAO.prototype.getAllOrders = function(userId) {
 
 }
 
+navRentalsDAO.prototype.getOrdersFullList = function(offset, limit, sortBy, sortType) {
+    var self = this;
+    var sort = sortType ? sortType : "ASC", sortCol = sortBy ? sortBy : "email_address", p_offset = offset ? offset : 0, p_limit = limit ? limit : 5;
+    var params = [sortCol,  p_limit, p_offset];
+   var queryString = "SELECT r._id, user_id, lease_start_date, lease_end_date, status, delivery_date, returned_date, name , toys_id, email_address, shipping_address FROM "+ tableName + " r INNER JOIN nav_toys t ON r.toys_id = t._id INNER JOIN nav_user u ON r.user_id = u._id ORDER BY $1 " + sort +" LIMIT $2 OFFSET $3" 
+    return this.dbQuery(queryString , params)
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "getOrdersFullList",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
+
+}
 navRentalsDAO.getStatus= function(){
 	return STATUS;
+}
+navRentalsDAO.prototype.getOrdersCount = function() {
+    var self = this;
+    return this.dbQuery("select count(_id) AS count FROM "+tableName)
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "getOrdersFullList",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
+
 }

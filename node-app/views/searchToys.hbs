@@ -69,7 +69,7 @@
                         <li class="{{#compare toysData.currentPage "==" 1}}disabled{{/compare}}"><a href="/toys/search?{{queryParameters}}&offset={{multiply (subtract toysData.currentPage 2) toysData.perPageLimit }}">«</a></li>
                             {{#if toysData.noOfPages}} 
                                 {{#repeat toysData.noOfPages}}
-                                    <li class="{{#compare (add @index 1) "==" toysData.currentPage}}active{{/compare}}"><a href="/toys/search?{{queryParameters}}&offset={{multiply @index  toysData.perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" toysData.currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
+                                    <li class="{{#compare (add @index 1) "==" ../toysData/currentPage}}active{{/compare}}"><a href="/toys/search?{{queryParameters}}&offset={{multiply @index  ../toysData/perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" ../toysData/currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
                                 {{/repeat}}
 
                                 <li class="{{#compare toysData.currentPage "==" toysData.noOfPages }}disabled{{/compare}}"> <a href="/toys/search?{{queryParameters}}&offset={{multiply toysData.currentPage toysData.perPageLimit}}">»</a></li>

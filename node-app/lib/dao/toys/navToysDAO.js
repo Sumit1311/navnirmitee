@@ -139,3 +139,15 @@ navToysDAO.prototype.getAllRentalTransactions = function(userId) {
             return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBTOYS", navDatabaseException));
     });
 }
+
+navToysDAO.prototype.getToysFullList = function() {
+    return this.dbQuery("SELECT name, _id FROM nav_toys")
+        .then(function (result) {
+            return result.rows;
+        })
+    .catch(function (error) {
+            navLogUtil.instance().log.call(self, "getToysFullList",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBTOYS", navDatabaseException));
+    });
+    
+}

@@ -1,0 +1,102 @@
+<div class="page-header">
+    <h2>Orders</h2>
+</div>
+<table class="table table-hover table-responsive">
+    <thead>
+        <tr> 
+            <th><a>Customer Name</a></th>
+            <th><a>Toy Name</a></th>
+            <th><a>Order Placement Date</a></th>
+            <th><a>Delivery Date</a></th>
+            <th><a>Return Date</a></th>
+            <th><a>Lease End Date</a></th>
+            <th><a>Shipping Address</a></th>
+            <th><a>Order Status</a></th>
+        </tr>
+    </thead>
+    {{#each context.orderList}}
+        <tr> 
+            <td><select class="selectpicker" data-width="fit">
+                    {{#each ../context.customerList}}
+                        <option value="{{_id}}" {{#compare _id "==" ../user_id}}selected{{/compare}}>{{email_address}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+                <td><select class="selectpicker" data-width="fit">
+                        {{#each ../context.toysList}}
+                            <option value="{{_id}}" {{#compare _id "==" ../toys_id}}selected{{/compare}}>{{name}}</option>
+                            {{/each}}
+                        </select>
+                    </td>
+                    <td><div class="row">
+                            <div class='col-md-12 col-sm-6'>
+                                <input type='text' class="form-control datetimepicker" value="{{lease_start_date}}"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td><div class="row">
+                            <div class='col-md-12 col-sm-6'>
+                                <input type='text' class="form-control datetimepicker" value="{{delivery_date}}"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td><div class="row">
+                            <div class='col-md-12 col-sm-6'>
+                                <input type='text' class="form-control datetimepicker" value="{{return_date}}"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td><div class="row">
+                            <div class='col-md-12 col-sm-6'>
+                                <input type='text' class="form-control datetimepicker" value="{{lease_end_date}}"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td><textarea class="form-control">{{shipping_address}}</textarea></td>
+                    <td><div class="row">
+                            <div class='col-md-12 col-sm-6'><select class="selectpicker" data-width="fit">
+                                    {{#each ../context.statusList}}
+                                        <option value="{{@index}}" {{#compare this "==" ../status}}selected{{/compare}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {{/each}}
+            </table>
+            <div class="col-md-2">
+                <button class="btn btn-primary">
+                    Add
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <button class="btn btn-primary">
+                    Save
+                    <span class="glyphicon glyphicon-floppy-save"></span>
+                </button>
+            </div>
+            <div class="col-md-offset-6 col-md-4">
+                    {{#compare context.orderList.length "!=" 0}}
+                    <ul style="margin-top : 0px" class="pagination pull-right">
+                        <li class="disabled"><a href="#">Page {{context.currentPage}} of {{context.noOfPages}}</a></li>
+                        <li class="{{#compare context.currentPage "==" 1}}disabled{{/compare}}"><a href="/admin/orders?{{queryParameters}}&offset={{multiply (subtract context.currentPage 2) context.perPageLimit }}">«</a></li>
+                            {{#if context.noOfPages}} 
+                                {{#repeat context.noOfPages}}
+                                    <li class="{{#compare (add @index 1) "==" ../context/currentPage}}active{{/compare}}"><a href="/admin/orders?{{queryParameters}}&offset={{multiply @index  ../context/perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" ../context/currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
+                                {{/repeat}}
+
+                                <li class="{{#compare context.currentPage "==" context.noOfPages }}disabled{{/compare}}"> <a href="/admin/orders?{{queryParameters}}&offset={{multiply context.currentPage context.perPageLimit}}">»</a></li>
+                            {{else}}
+                                <li class="active"><a href="/admin/orders?{{queryParameters}}offset=1">1 <span class="sr-only">(current)</span></a></li>
+                                <li class="disabled"> <a href="#">»</a></li>
+                            {{/if}}
+                        <!-- <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li><a href="#">»</a></li> -->
+                    </ul>
+                    {{/compare}}
+                        </div>

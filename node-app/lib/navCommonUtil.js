@@ -36,6 +36,10 @@ module.exports = class navCommonUtils {
 	}
     }
 
+    static getDateFormat() {
+        return "ddd, MMM Do YYYY";
+    }
+
     getBaseURL(req) {
 	var base = new url.Url();
 	base.protocol = req.protocol;

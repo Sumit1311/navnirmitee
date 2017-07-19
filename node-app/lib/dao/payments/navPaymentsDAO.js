@@ -86,12 +86,12 @@ module.exports = class navPaymentsDAO extends BaseDAO{
          var params = [status, summary, paid_date];
          count = 4;
          if(retryDate) {
-             queryString += " next_retry_date = $" + (count);
+             queryString += ", next_retry_date = $" + (count);
              params.push(retryDate);
              count++;
          }
          if(expirationDate) {
-             queryString += " expiration_date = $" + (count);
+             queryString += ", expiration_date = $" + (count);
              params.push(expirationDate);
              count++;
          }

@@ -2,7 +2,7 @@ var navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.j
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
     navPGFailureException = require(process.cwd() + "/lib/exceptions/navPGFailureException.js"),
     navTransactionPendingException = require(process.cwd() + "/lib/exceptions/navTransactionPendingException.js"),
-    navPaymentDoneException = require(process.cwd() + "/lib/exceptions/navPaymentDoneException.js"),
+    navPaymentFailureException = require(process.cwd() + "/lib/exceptions/navPaymentFailureException.js"),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
@@ -14,93 +14,23 @@ var navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.j
 
 module.exports = class navPGHelper {
     paymentSuccessHandler(req, res, response) {
-        var deferred = Q.defer(), self = this;
-        var respUtil =  new navResponseUtil();
-        deferred.promise
-            .done(function(result){
-                res.render("pg/paymentSuccess", {
-                    user : req.user,
-                    isLoggedIn : req.user ? true : false,
-                    layout : 'nav_bar_layout'
-                })	
-                //respUtil.redirect(req, res, "/");
-            },function(error){
-                var response = respUtil.generateErrorResponse(error);
-                respUtil.renderErrorPage(req, res, {
-                    errorResponse : response,
-                    user : req.user,
-                    isLoggedIn : false,
-                    layout : 'nav_bar_layout',
-
-                });
-            });
-        
-        this.processSuccess(response.orderId, response.code, response.status, response.message)
-            .done(function(){
-                deferred.resolve();
-            },(error) => {
-                deferred.reject(error);
-            });
+        res.render("pg/paymentSuccess", {
+            user : req.user,
+            isLoggedIn : req.user ? true : false,
+            layout : 'nav_bar_layout'
+        })	
 
     }
-    paymentFailureHandler(req, res, response) {
-        var deferred = Q.defer(), self = this;
+    paymentFailureHandler(req, res, error) {
         var respUtil =  new navResponseUtil();
-        deferred.promise
-            .done(function(result){
-                res.render("pg/paymentFailure", {
-                    user : req.user,
-                    isLoggedIn : req.user ? true : false,
-                    layout : 'nav_bar_layout'
-                })	
-                //respUtil.redirect(req, res, "/");
-            },function(error){
-                var response = respUtil.generateErrorResponse(error);
-                respUtil.renderErrorPage(req, res, {
-                    errorResponse : response,
-                    user : req.user,
-                    isLoggedIn : false,
-                    layout : 'nav_bar_layout',
+        var response = respUtil.generateErrorResponse(error);
+        respUtil.renderErrorPage(req, res, {
+            errorResponse : response,
+            user : req.user,
+            isLoggedIn : false,
+            layout : 'nav_bar_layout',
 
-                });
-            });
-            self.processFailure(response.orderId, response.code, response.status, response.message)
-            .done(function(){
-                deferred.reject(new navPGFailureException());
-            },(error) => {
-                deferred.reject(error);
-            });
-    }
-
-    paymentPartialSuccessHandler(req, res, response) {
-        var deferred = Q.defer(), self = this;
-        var respUtil =  new navResponseUtil();
-        deferred.promise
-            .done(function(result){
-                res.render("pg/paymentFailure", {
-                    user : req.user,
-                    isLoggedIn : req.user ? true : false,
-                    layout : 'nav_bar_layout'
-                })	
-                //respUtil.redirect(req, res, "/");
-            },function(error){
-                var response = respUtil.generateErrorResponse(error);
-                respUtil.renderErrorPage(req, res, {
-                    errorResponse : response,
-                    user : req.user,
-                    isLoggedIn : false,
-                    layout : 'nav_bar_layout',
-
-                });
-            });
-
-            processPartialSuccess(response.orderId, response.code, response.status, response.message)
-            .done(function(){
-                deferred.reject(new navTransactionPendingException());
-            },(error) => {
-                deferred.reject(error);
-            });
-    
+        });
     }
     
     processSuccess(orderId, code, status, message) {
@@ -116,7 +46,7 @@ module.exports = class navPGHelper {
         .then((transactions) => {
             var promises = [];
             if(transactions.length == 0) {
-                //promises.push(Q.reject(new navPaymentDoneException()));
+                //promises.push(Q.reject(new navPaymentFailureException()));
                 return Q.allSettled(promises);
             }
             userDAO = new navUserDAO(paymentDAO.providedClient);
@@ -180,25 +110,25 @@ module.exports = class navPGHelper {
 
     processFailure(orderId, code, status, message) {
         return new navPaymentsDAO().updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().FAILED, new Date().getTime()/*, moment().add(navConfigParser.getConfig("PaymentGateway")["RetryInterval"], "hours").valueOf(), moment().add(navConfigParser.getConfig("PaymentGateway")["ExpirationInterval"], "hours").valueOf()*/ )
-
+            .then(() => {
+                return Q.reject(new navPaymentFailureException());
+            })
+            .catch((error) => {
+                return Q.reject(error);
+            })
     }
 
     processPartialSuccess(orderId, code, status, message) {
-        return new navPaymentsDAO().updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().PENDING, new Date().getTime(), moment().add(navConfigParser.getConfig("PaymentGateway")["RetryInterval"], "hours").valueOf(), moment().add(navConfigParser.getConfig("PaymentGateway")["ExpirationInterval"], "hours").valueOf() )
+        return new navPaymentsDAO().updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().PENDING, new Date().getTime(), moment().add(navConfigParser.instance().getConfig("PaymentGateway")["RetryInterval"], "hours").valueOf(), moment().add(navConfigParser.instance().getConfig("PaymentGateway")["ExpirationInterval"], "hours").valueOf() )
+            .then(() => {
+                return Q.reject(new navPaymentFailureException());
+            })
+            .catch((error) => {
+                return Q.reject(error);
+            })
 
     }
 
-    handleServerError(req, res, error) {
-        var respUtil =  new navResponseUtil();
-        var response = respUtil.generateErrorResponse(error);
-        respUtil.renderErrorPage(req, res, {
-            errorResponse : response,
-            user : req.user,
-            isLoggedIn : false,
-            layout : 'nav_bar_layout',
-
-        });
-    }
 
 }
 

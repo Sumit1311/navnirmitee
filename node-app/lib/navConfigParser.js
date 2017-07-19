@@ -37,8 +37,10 @@ module.exports = class navConfigParser {
                             StatusAPIPath : "/oltp/HANDLER_INTERNAL/getTxnStatus",
                             RetryInterval : 8, //hours
                             ExpirationInterval : 72 //hours
+                        },
+                        BackgroundTransaction : {
+                            ProcessingInterval : 1000 // ms
                         }
-
                     }
                 }
             }

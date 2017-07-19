@@ -75,20 +75,25 @@ module.exports = class navPGRouter extends navBaseRouter {
             transactionAmount : body.TXNAMOUNT,
             orderId : body.ORDERID
         }
-        navPGRouter.checkStatus(intResponse.orderId)
-            .done((response) => {
-                if(paymentStatus && response.code == "01" && response.status == GATEWAY_STATUS.SUCCESS) {
-                    helper.paymentSuccessHandler(req, res, response)
-                }
-                else if(paymentStatus && (response.status == GATEWAY_STATUS.PENDING || response.status == GATEWAY_STATUS.OPEN)) {
-                    helper.paymentPartialSuccessHandler(req, res, response);
-                }
-                else {
-                    helper.paymentFailureHandler(req, res, response);
-                }
-            }, (error) => {
-                    helper.handleServerError(req, res, error); 
-            })
+        if(paymentStatus && intResponse.orderId) {
+            navPGRouter.checkStatus(intResponse.orderId)
+                .done((response) => {
+                    helper.paymentSuccessHandler(req, res, response);
+                }, (error) => {
+                    helper.paymentFailureHandler(req, res, error); 
+                })
+        }
+        else {
+            var promise = Q.reject(new LogicalException("Checksum Mismatch"));
+            if(response.orderId) {
+                promise = helper.processFailure(response.orderId, response.code, response.status, response.message);
+            }
+            promise
+                .done(null, (error) => {
+                    helper.paymentFailureHandler(req, res, error); 
+                })
+        }
+
     }
 
     static checkStatus(orderId) {
@@ -99,6 +104,7 @@ module.exports = class navPGRouter extends navBaseRouter {
         var response;
         var paymentStatus;
         navPaytm.genchecksum(requestData, gatewayDetails.merchantKey, function(err, result){
+            debugger;
             if(err) {
                 return deferred.reject(err);
             }
@@ -125,18 +131,20 @@ module.exports = class navPGRouter extends navBaseRouter {
                     };
                     var promise;
                     if(response.code == "01" && response.status == GATEWAY_STATUS.SUCCESS) {
-                        promise = helper.processSuccess(response.orderId, null, response.status, response.message);
+                        promise = helper.processSuccess(response.orderId, response.code, response.status, response.message);
                     }
                     else if((response.status == GATEWAY_STATUS.PENDING || response.status == GATEWAY_STATUS.OPEN)) {
-                        promise = helper.processPartialSuccess(response.orderId, null, response.status, response.message);
+                        promise = helper.processPartialSuccess(response.orderId, response.code, response.status, response.message);
                     }
                     else {
-                        promise = helper.processFailure(response.orderId, null, response.status, response.message);
+                        promise = helper.processFailure(response.orderId, response.code, response.status, response.message);
                     }
                     return promise;
                 } else {
-                   return helper.paymentFailureHandler(orderId, 500, 500, "Internal Error");
+                   return helper.processFailure(orderId, 500, 500, "Internal Error");
                 }
+            },(error) => {
+                   return helper.processFailure(orderId, 500, 500, "Internal Server Error")
             })
             .done(() => {
                 deferred.resolve(response);
