@@ -141,6 +141,7 @@ navToysDAO.prototype.getAllRentalTransactions = function(userId) {
 }
 
 navToysDAO.prototype.getToysFullList = function() {
+    var self = this;
     return this.dbQuery("SELECT name, _id FROM nav_toys")
         .then(function (result) {
             return result.rows;
@@ -150,4 +151,16 @@ navToysDAO.prototype.getToysFullList = function() {
             return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBTOYS", navDatabaseException));
     });
     
+}
+
+navToysDAO.prototype.updateToyStock = function(toyId, stock, increment) {
+    var self = this;
+    return this.dbQuery("UPDATE "+tableName + " SET stock " +  "= stock "+ (increment ? "+" : "-")+"$1 WHERE _id=$2", [stock, toyId])
+        .then(function (result) {
+            return result.rows;
+        })
+    .catch(function (error) {
+            navLogUtil.instance().log.call(self, "updateToyStock",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBTOYS", navDatabaseException));
+    });
 }

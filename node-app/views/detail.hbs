@@ -57,9 +57,9 @@
                     <div class="col-md-7 col-sm-7">
                         <h3>{{toyDetail.name}}</h3>
                         <p>{{toyDetail.short_description}}</p>
-                        <p>In Stock : {{#if toyDetail.stock}}<span class="label label-success">Yes<span></p>{{else}}<span class="label label-failure">No<span></p>{{/if}}
+                        <p>In Stock : {{#compare toyDetail.stock "!=" 0}}<span class="label label-success">Yes<span></p>{{else}}<span class="label label-danger">No<span></p>{{/compare}}
                         <h3>Price : &#x20b9; {{toyDetail.price}}</h3>
-                        <p><a href="/toys/order?id={{toyDetail._id}}" class="btn btn-green btn-large"><i class="icon-shopping-cart"></i> Place An Order</a></p>
+                        <p><a href="/toys/order?id={{toyDetail._id}}" class="btn btn-green btn-large"{{#compare toyDetail.stock "==" 0}}disabled{{/compare}}><i class="icon-shopping-cart"></i> Place An Order</a></p>
                         
                     </div>
                 </div>

@@ -131,6 +131,35 @@ module.exports = class navPaymentsDAO extends BaseDAO{
          });
         
      }
+     getPaymentsCount = function() {
+         var self = this;
+         return this.dbQuery("select count(_id) AS count FROM "+tableName)
+             .then(function(result){
+                 return result.rows;
+             })
+         .catch(function(error){
+             navLogUtil.instance().log.call(self, "getPaymentsCount",  error.message, "error" );
+             return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBPAYMENT", navDatabaseException));
+         });
+
+     }
+     getOrdersFullList = function(offset, limit, sortBy, sortType) {
+             //debugger;
+         var self = this;
+         var sort = sortType ? sortType : "ASC", sortCol = sortBy ? sortBy : "email_address", p_offset = offset ? offset : 0, p_limit = limit ? limit : 5;
+         var params = [p_limit, p_offset];
+         var queryString = "SELECT p.*, email_address FROM "+ tableName + " p INNER JOIN nav_user u ON p.user_id = u._id ORDER BY "+ sortCol + " " + sort +" LIMIT $1 OFFSET $2" 
+             return this.dbQuery(queryString , params)
+             .then(function(result){
+                 return result.rows;
+             })
+         .catch(function(error){
+             navLogUtil.instance().log.call(self, "getOrdersFullList",  error.message, "error" );
+             return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+         });
+
+     }
+             
 }
 
 

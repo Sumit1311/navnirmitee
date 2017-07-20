@@ -28,11 +28,11 @@
                     {{/each}}
                 </tr>
             </thead>
-            {{#each context.orderList}}
+            {{#each context.paymentList}}
                 <tr>
                     <!-- TODO : check whether this works in firefox -->
                     <form id="{{this._id}}"> 
-                        <td><select name="userId">
+                        <td><select name="userId" disabled>
                                 <option value="{{user_id}}" selected>{{email_address}}</option>
                             </select>
                         </td>
@@ -89,7 +89,7 @@
                 </button>
             </div>
             <div class="col-md-offset-6 col-md-4">
-                    {{#compare context.orderList.length "!=" 0}}
+                    {{#compare context.paymentList.length "!=" 0}}
                     <ul style="margin-top : 0px" class="pagination pull-right">
                         <li class="disabled"><a href="#">Page {{context.currentPage}} of {{context.noOfPages}}</a></li>
                         <li class="{{#compare context.currentPage "==" 1}}disabled{{/compare}}"><a href="/admin/orders?{{queryParameters}}&offset={{multiply (subtract context.currentPage 2) context.perPageLimit }}">«</a></li>

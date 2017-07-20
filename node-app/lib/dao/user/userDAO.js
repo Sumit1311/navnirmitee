@@ -44,7 +44,7 @@ var tableName = "nav_user",
  */
 UserDAO.prototype.getLoginDetails = function (loginName) {
     var self = this;
-    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type, deposit" +
+    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type, deposit, address" +
     " FROM " + tableName + " WHERE email_address=$1", [loginName])
         .then(function (result) {
             return result.rows;

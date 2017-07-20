@@ -6,6 +6,11 @@ module.exports = class navResponseUtils {
                     message : "Internal Server Error", 
                     subMessage: error.message
                 }, error.status);
+            case "navPendingReturnException" :
+                return this.generateResponse(error.code, {
+                    message : "Bad Request", 
+                    subMessage: error.message
+                }, error.status);
             case "navDatabaseException" :
                 return this.generateResponse(error.code, {
                     message : "Internal Server Error", 

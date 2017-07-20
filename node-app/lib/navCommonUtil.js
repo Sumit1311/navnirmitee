@@ -27,10 +27,12 @@ module.exports = class navCommonUtils {
     getCurrentTime() {
         return moment().valueOf();
     }
-
-    getDateString(timeInMilis) {
+    static getTimeinMillis(dateString) {
+        return dateString == "" ? null : moment(dateString).valueOf();
+    }
+    getDateString(timeInMilis, format) {
 	if(timeInMilis) {
-		return moment(timeInMilis).format("ddd, MMM Do YYYY");
+		return moment(timeInMilis).format(format ? format : "ddd, MMM Do YYYY");
 	} else {
 		return "";
 	}

@@ -2,6 +2,7 @@ registerOrderHandlers();
 
 function registerOrderHandlers () {
     $("#_nav_order_div > form").submit(function(event){new navOrderHelper().orderHandler(event, this)});
+    $(".btn-cancel-order").click(function(event){new navOrderHelper().cancelOrder(event, this);})
 }
 
 function navOrderHelper(){
@@ -33,4 +34,11 @@ navOrderHelper.prototype.placeOrder= function(form){
 navOrderHelper.prototype.showError = function(message) {
     $("#_nav_order_error .alert").html(message);
     $("#_nav_order_error").removeClass("hidden");
+}
+
+navOrderHelper.prototype.cancelOrder =function(event, that) {
+    event.preventDefault();
+    if(window.confirm("Do you want cancel order ?")) {
+        $(that).parent().siblings("form").submit();
+    }
 }

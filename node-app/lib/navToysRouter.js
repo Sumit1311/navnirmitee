@@ -1,5 +1,6 @@
 var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navOrders = require(process.cwd() + "/lib/navOrders.js"),
     navSystemUtil = require(process.cwd() + "/lib/navSystemUtil.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
@@ -8,6 +9,7 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navLogicalException = require("node-exceptions").LogicalException,
     navNoSubScriptionException = require(process.cwd() + "/lib/exceptions/navNoSubscriptionException.js"),
     navNoBalanceException = require(process.cwd() + "/lib/exceptions/navNoBalanceException.js"),
+    navNoStockException = require(process.cwd() + "/lib/exceptions/navNoStockException.js"),
     navPendingReturnException = require(process.cwd() + "/lib/exceptions/navPendingReturnException.js"),
     repeatHelper = require('handlebars-helper-repeat'),
     helpers = require('handlebars-helpers')(),
@@ -33,6 +35,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         this.router.get('/order', function(req,res,next){self.getOrder(req,res,next)});
         this.router.get('/orderPlaced', function(req,res,next){self.getOrderPlaced(req,res,next)});
         this.router.post('/placeOrder',(req, res, next) => {self.placeOrder(req,res,next)});
+        this.router.post('/cancelOrder',(req, res, next) => {self.cancelOrder(req,res,next)});
         return this;
     }
     getToysDetails(req, res) {
@@ -194,6 +197,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         }
         var rDAO = new navRentalsDAO();
         var userDetails, toyDetails;
+        debugger;
         rDAO.getClient()
             .then(function(client){
                 rDAO.providedClient = client;
@@ -221,21 +225,40 @@ module.exports = class navToysRouter extends navBaseRouter {
             return new navToysDAO(rDAO.providedClient).getToyDetailById(id);
         })
         .then((_toyDetails) => {
-            toyDetails =  _toyDetails[0];
-            if(toyDetails.price > userDetails.balance) {
-                return Q.reject(new navNoBalanceException());
+            if(_toyDetails.length != 0) {
+                toyDetails =  _toyDetails[0];
+                if(toyDetails.price > userDetails.balance) {
+                    return Q.reject(new navNoBalanceException());
+                }
+                if(toyDetails.stock == 0) {
+                    return Q.reject(new navNoStockException());
+                
+                }
+                //var splittedPlan = userDetails.subscribed_plan.split('::');
+                //console.log(userDetails.subscribed_plan);
+                //var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
+                return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(15,'days').valueOf(), rDAO.STATUS.PLACED);
+            } else {
+                return Q.resolve();
             }
-            //var splittedPlan = userDetails.subscribed_plan.split('::');
-            //console.log(userDetails.subscribed_plan);
-            //var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
-            return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(15,'days').unix(), rDAO.STATUS.PLACED);
         })
         .then(function(){
-            var membershipExpiry;
-            if(userDetails.membership_expiry != null) {
-                membershipExpiry = new navCommonUtil().getCurrentTime();
+            if(toyDetails) {
+                var membershipExpiry;
+                if(userDetails.membership_expiry != null) {
+                    membershipExpiry = new navCommonUtil().getCurrentTime();
+                }
+                return new navUserDAO(rDAO.providedClient).updatePoints(user._id, (userDetails.balance) - (toyDetails.price), membershipExpiry);
+            } else {
+                return Q.resolve();
             }
-            return new navUserDAO(rDAO.providedClient).updatePoints(user._id, (userDetails.balance) - (toyDetails.price), membershipExpiry);
+        })
+        .then(function() {
+            if(toyDetails) {
+                return new navToysDAO(rDAO.providedClient).updateToyStock(toyDetails._id, 1);
+            } else {
+                return Q.resolve();
+            }
         })
         .then(function(){
             return rDAO.commitTx();
@@ -261,10 +284,10 @@ module.exports = class navToysRouter extends navBaseRouter {
                 //res.status(500).send("Internal Server Error");
                 return Q.reject(error);
             })
-        .catch(function (err) {
-            //log error
-            return Q.reject(err);
-        })
+            .catch(function (err) {
+                //log error
+                return Q.reject(err);
+            })
         })
         .finally(function () {
             if (rDAO.providedClient) {
@@ -273,7 +296,6 @@ module.exports = class navToysRouter extends navBaseRouter {
             }
         })
         .done(() => {
-            console.log("Resolve");
             deferred.resolve();
         },(error) => {
             deferred.reject(error);
@@ -416,5 +438,51 @@ module.exports = class navToysRouter extends navBaseRouter {
             });
 
 
+    }
+
+    cancelOrder(req, res) {
+         var orderId = req.query.orderId;
+        var deferred = Q.defer();
+        var respUtil =  new navResponseUtil();
+        deferred.promise
+            .done((result) => {
+                respUtil.redirect(req, res, '/user/orderDetails');
+            },(error) => {
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+
+                });
+                /*response = new navResponseUtil().generateErrorResponse(error);
+                  res.status(response.status).render("errorDocument",{
+                  errorResponse : response,
+                  user : req.user,
+                  isLoggedIn : false,
+                  layout : 'nav_bar_layout',
+                  });*/
+
+            })
+        req.assert("orderId"," Bad Request").notEmpty();
+        req.assert("orderId","Bad Request").isUUID();
+
+
+        var validationErrors = req.validationErrors();
+        //console.log(validationErrors);
+        var response, user = req.user;
+        if(validationErrors)
+        {
+            return deferred.reject(new navValidationException(validationErrors));
+        }
+         new navOrders().updateOrder(orderId, null, null, {
+            orderStatus : navRentalsDAO.getStatus().CANCELLED
+         })
+             .done(() => {
+                deferred.resolve();
+             },(error) => {
+                deferred.reject(error);
+             })
     }
 }
