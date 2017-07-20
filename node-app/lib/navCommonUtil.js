@@ -27,8 +27,11 @@ module.exports = class navCommonUtils {
     getCurrentTime() {
         return moment().valueOf();
     }
+    static getCurrentTime_S() {
+        return moment().valueOf();
+    }
     static getTimeinMillis(dateString) {
-        return dateString == "" ? null : moment(dateString).valueOf();
+        return dateString === "" ? null : moment(dateString).valueOf();
     }
     getDateString(timeInMilis, format) {
 	if(timeInMilis) {

@@ -34,6 +34,7 @@ $(document).ready(function(){
             valuesToSearch.push($(value).find("select option:selected").text());
             valuesToSearch.push($(value).find("input").val());
             valuesToSearch.push($(value).find("textarea").text());
+            valuesToSearch.push($(value).find("p").text());
             for(var i in valuesToSearch) {
                 if(valuesToSearch[i] && valuesToSearch[i] != "") {
                     var index = valuesToSearch[i].toLowerCase().indexOf(inputContent)

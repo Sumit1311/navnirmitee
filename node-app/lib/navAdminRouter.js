@@ -10,6 +10,7 @@ var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navOrders = require(process.cwd() + "/lib/navOrders.js"),
+    navPayments = require(process.cwd() + "/lib/navPayments.js"),
     navLogicalException = require("node-exceptions").LogicalException,
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     helpers = require('handlebars-helpers')(),
@@ -28,6 +29,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
         this.router.get('/orders', this.getOrders.bind(this)); 
         this.router.get('/payments', this.getPayments.bind(this)); 
         this.router.post('/orders/save', this.saveOrders.bind(this)); 
+        this.router.post('/payments/save', this.savePayments.bind(this)); 
         //this.router.get('/', this.ensureVerified, this.getHome);
         return this;
     }
@@ -86,7 +88,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
             .then((_orderCount) => {
                 noOfOrders = parseInt(_orderCount[0].count);
 
-                if(noOfOrders % limit != 0 ) {
+                if(noOfOrders % limit !== 0 ) {
                     noOfPages = Math.floor(noOfOrders / limit) + 1;
                 } else {
                     noOfPages = Math.floor(noOfOrders / limit) ;
@@ -96,16 +98,17 @@ module.exports = class navAdminRouter extends navBaseRouter {
             .then((_rentals) => {
                 orderList = _rentals;
                 for(var i in orderList) {
-                   orderList[i].delivery_date = orderList[i].delivery_date == null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].delivery_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   orderList[i].returned_date = orderList[i].returned_date == null ? "" :new navCommonUtil().getDateString(parseInt(orderList[i].returned_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   orderList[i].lease_start_date =orderList[i].lease_start_date == null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_start_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   orderList[i].lease_end_date =orderList[i].lease_end_date == null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_end_date), "YYYY-MM-DDTHH:mm:ssZ");
+                   orderList[i].delivery_date = orderList[i].delivery_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].delivery_date), "YYYY-MM-DDTHH:mm:ssZ");
+                   orderList[i].returned_date = orderList[i].returned_date === null ? "" :new navCommonUtil().getDateString(parseInt(orderList[i].returned_date), "YYYY-MM-DDTHH:mm:ssZ");
+                   orderList[i].lease_start_date =orderList[i].lease_start_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_start_date), "YYYY-MM-DDTHH:mm:ssZ");
+                   orderList[i].lease_end_date =orderList[i].lease_end_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_end_date), "YYYY-MM-DDTHH:mm:ssZ");
                 }
                 var orderStatus = navRentalsDAO.getStatus();
                 statusList = [];
                 for(var i in orderStatus) {
-                    if(orderStatus.hasOwnProperty(i))
+                    if(orderStatus.hasOwnProperty(i)) {
                         statusList.push(orderStatus[i]);
+                    }
                 }
                 return Q.resolve();
             })
@@ -124,7 +127,6 @@ module.exports = class navAdminRouter extends navBaseRouter {
         var respUtil =  new navResponseUtil(), cancelledOrders = [];
         deferred.promise
             .done(function(result){
-                debugger;
                 respUtil.redirect(req, res, "/admin/orders");
             },function(error){
                 var response = respUtil.generateErrorResponse(error);
@@ -178,7 +180,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
         deferred.promise
             .done(function(result){
                 delete req.query.offset;
-                res.render('navAdmin/orders', {
+                res.render('navAdmin/payments', {
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_admin_layout',
@@ -214,26 +216,29 @@ module.exports = class navAdminRouter extends navBaseRouter {
             .then((_paymentCount) => {
                 noOfOrders = parseInt(_paymentCount[0].count);
 
-                if(noOfOrders % limit != 0 ) {
+                if(noOfOrders % limit !== 0 ) {
                     noOfPages = Math.floor(noOfOrders / limit) + 1;
                 } else {
                     noOfPages = Math.floor(noOfOrders / limit) ;
                 }
-                return new navPaymentsDAO().getOrdersFullList(offset, limit, columnOrdering[sortBy], sortOrdering[sortType]);
+                return new navPaymentsDAO().getPaymentsFullList(offset, limit, columnOrdering[sortBy], sortOrdering[sortType]);
             } )
             .then((_rentals) => {
                 paymentList = _rentals;
                 for(var i in paymentList) {
-                   paymentList[i].credit_date = paymentList[i].delivery_date == null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].credit_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   paymentList[i].paid_date = paymentList[i].paid_date == null ? "" :new navCommonUtil().getDateString(parseInt(paymentList[i].paid_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   paymentList[i].next_retry_date =paymentList[i].next_retry_date == null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].next_retry_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   paymentList[i].expiration_date =paymentList[i].expiration_date == null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].expiration_date), "YYYY-MM-DDTHH:mm:ssZ");
+                    if(paymentList.hasOwnProperty(i)) {
+                        paymentList[i].credit_date = paymentList[i].delivery_date === null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].credit_date), "YYYY-MM-DDTHH:mm:ssZ");
+                        paymentList[i].paid_date = paymentList[i].paid_date === null ? "" :new navCommonUtil().getDateString(parseInt(paymentList[i].paid_date), "YYYY-MM-DDTHH:mm:ssZ");
+                        paymentList[i].next_retry_date =paymentList[i].next_retry_date === null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].next_retry_date), "YYYY-MM-DDTHH:mm:ssZ");
+                        paymentList[i].expiration_date =paymentList[i].expiration_date === null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].expiration_date), "YYYY-MM-DDTHH:mm:ssZ");
+                    }
                 }
                 var paymentStatus = navPaymentsDAO.getStatus();
                 statusList = [];
                 for(var i in paymentStatus) {
-                    if(paymentStatus.hasOwnProperty(i))
+                    if(paymentStatus.hasOwnProperty(i)) {
                         statusList.push(paymentStatus[i]);
+                    }
                 }
                 return Q.resolve();
             })
@@ -243,5 +248,52 @@ module.exports = class navAdminRouter extends navBaseRouter {
                 deferred.reject(error);
             } )
     
+    }
+    savePayments(req, res) {
+        var body = req.body;
+        var updateFields = [];
+        var deferred = Q.defer(), self = this;
+        var respUtil =  new navResponseUtil();
+        deferred.promise
+            .done(function(result){
+                respUtil.redirect(req, res, "/admin/payments");
+            },function(error){
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    isAdmin : true,
+                    layout : 'nav_admin_layout',
+
+                });
+            });
+        for(var i in body) {
+            var tmp = {};
+            for(var j in body[i]){
+                tmp[body[i][j].name] = body[i][j].value;
+            }
+            updateFields.push(tmp);
+        }
+
+        var promises = [];
+        for(var i in updateFields) {
+                console.log(updateFields[i]);
+                promises.push(new navPayments().updatePayment(updateFields[i].paymentId,updateFields[i])); 
+        }
+        Q.allSettled(promises)
+            .then((result)=>{
+                for(var i in result) {
+                    if(result[i].state == 'rejected') {
+                        return Q.reject(result[i].reason)
+                    }
+                }
+                return Q.resolve();
+            })
+            .done(() => {
+                deferred.resolve();
+            }, (error) => {
+                deferred.reject(error);
+            })
     }
 }

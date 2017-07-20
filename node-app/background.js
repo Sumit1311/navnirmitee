@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     navProcessTransactions = require(process.cwd() + "/lib/navProcessTransactions.js");

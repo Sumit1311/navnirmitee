@@ -1,5 +1,5 @@
 <div class="page-header">
-    <h2>Orders</h2>
+    <h2>Payments</h2>
 </div>
 <div class="panel panel-primary filterable" style="
         border-color: #1ABC9C;
@@ -8,7 +8,7 @@
                 background-color: #1ABC9C;
                     border-color: #1ABC9C;
                     ">
-        <h3 class="panel-title">Orders</h3>
+        <h3 class="panel-title">Payments</h3>
         <div class="pull-right">
             <a class="btn-filter" href="#" style="
                    color: #FFFFFF;
@@ -24,7 +24,7 @@
             </tr>
             <tr> 
                 {{#each context.columnLabel}}
-                    <th><a href="/admin/orders?sortBy={{@index}}&{{#compare ../context.sortBy "==" @index}}sortType={{../context.sortType}}{{else}}sortType=0{{/compare}}">{{this}}</a></th>
+                    <th><a href="/admin/payments?sortBy={{@index}}&{{#compare ../context.sortBy "==" @index}}sortType={{../context.sortType}}{{else}}sortType=0{{/compare}}">{{this}}</a></th>
                     {{/each}}
                 </tr>
             </thead>
@@ -32,41 +32,28 @@
                 <tr>
                     <!-- TODO : check whether this works in firefox -->
                     <form id="{{this._id}}"> 
-                        <td><select name="userId" disabled>
+                        <td><select name="userId"  class="form-control"  disabled>
                                 <option value="{{user_id}}" selected>{{email_address}}</option>
                             </select>
                         </td>
-                        <td><select name="toyId">
-                                <option value="{{toys_id}}" selected>{{name}}</option>
-                            </select>
+                        <td><input type="text"  class="form-control" name="amount" value="{{amount_payable}}" readonly />
+                        </td>
+                        <td><input type="text" class="form-control" name="reason" value="{{reason}}" readonly />
                         </td>
                         <td><div class="row">
                                 <div class='col-md-12 col-sm-6'>
-                                    <input name="leaseStartDate" type='text' class="form-control datetimepicker" value="{{lease_start_date}}"/>
+                                    <input name="transactionDate" type='text' class="form-control datetimepicker" value="{{credit_date}}" />
                                 </div>
                             </div>
                         </td>
                         <td><div class="row">
                                 <div class='col-md-12 col-sm-6'>
-                                    <input name="deliveryDate" type='text' class="form-control datetimepicker" value="{{delivery_date}}"/>
+                                    <input name="paidDate" type='text' class="form-control datetimepicker" value="{{paid_date}}"/>
                                 </div>
                             </div>
                         </td>
                         <td><div class="row">
-                                <div class='col-md-12 col-sm-6'>
-                                    <input type='text' name="returnDate" class="form-control datetimepicker" value="{{returned_date}}"/>
-                                </div>
-                            </div>
-                        </td>
-                        <td><div class="row">
-                                <div class='col-md-12 col-sm-6'>
-                                    <input type='text' class="form-control datetimepicker" name="leaseEndDate" value="{{lease_end_date}}"/>
-                                </div>
-                            </div>
-                        </td>
-                        <td><textarea class="form-control" name="shippingAddress">{{shipping_address}}</textarea></td>
-                        <td><div class="row">
-                                <div class='col-md-12 col-sm-6'><select name="orderStatus" data-width="fit" >
+                                <div class='col-md-12 col-sm-6'><select name="paymentStatus" data-width="fit" >
                                         {{#each ../context.statusList}}
                                             <option value="{{this}}" {{#compare this "==" ../status}}selected{{/compare}}>{{this}}</option>
                                             {{/each}}
@@ -75,6 +62,20 @@
                                     </div>
                                 </div>
                             </td>
+                        <td><p name="transactionSummary">{{transaction_summary}}</p></td>
+                        <!-- <td><textarea class="form-control" name="transactionSummary">{{transaction_summary}}</textarea></td> -->
+                        <td><div class="row">
+                                <div class='col-md-12 col-sm-6'>
+                                    <input type='text' name="retryDate" class="form-control datetimepicker" value="{{next_retry_date}}"/>
+                                </div>
+                            </div>
+                        </td>
+                        <td><div class="row">
+                                <div class='col-md-12 col-sm-6'>
+                                    <input type='text' class="form-control datetimepicker" name="expirationDate" value="{{expiration_date}}"/>
+                                </div>
+                            </div>
+                        </td>
                         </form>
                     </tr>
                 {{/each}}
@@ -92,20 +93,20 @@
                     {{#compare context.paymentList.length "!=" 0}}
                     <ul style="margin-top : 0px" class="pagination pull-right">
                         <li class="disabled"><a href="#">Page {{context.currentPage}} of {{context.noOfPages}}</a></li>
-                        <li class="{{#compare context.currentPage "==" 1}}disabled{{/compare}}"><a href="/admin/orders?{{queryParameters}}&offset={{multiply (subtract context.currentPage 2) context.perPageLimit }}">«</a></li>
+                        <li class="{{#compare context.currentPage "==" 1}}disabled{{/compare}}"><a href="/admin/payments?{{queryParameters}}&offset={{multiply (subtract context.currentPage 2) context.perPageLimit }}">«</a></li>
                             {{#if context.noOfPages}} 
                                 {{#repeat context.noOfPages}}
-                                    <li class="{{#compare (add @index 1) "==" ../context/currentPage}}active{{/compare}}"><a href="/admin/orders?{{../queryParameters}}&offset={{multiply @index  ../context/perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" ../context/currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
+                                    <li class="{{#compare (add @index 1) "==" ../context/currentPage}}active{{/compare}}"><a href="/admin/payments?{{../queryParameters}}&offset={{multiply @index  ../context/perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" ../context/currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
                                 {{/repeat}}
 
-                                <li class="{{#compare context.currentPage "==" context.noOfPages }}disabled{{/compare}}"> <a href="/admin/orders?{{queryParameters}}&offset={{multiply context.currentPage context.perPageLimit}}">»</a></li>
+                                <li class="{{#compare context.currentPage "==" context.noOfPages }}disabled{{/compare}}"> <a href="/admin/payments?{{queryParameters}}&offset={{multiply context.currentPage context.perPageLimit}}">»</a></li>
                             {{else}}
-                                <li class="active"><a href="/admin/orders?{{queryParameters}}&offset=0">1 <span class="sr-only">(current)</span></a></li>
+                                <li class="active"><a href="/admin/payments?{{queryParameters}}&offset=0">1 <span class="sr-only">(current)</span></a></li>
                                 <li class="disabled"> <a href="#">»</a></li>
                             {{/if}}
                     </ul>
                     {{/compare}}
                 </div>
             <script src="/js/util.js"></script>
-            <script src="/js/helpers/navAdminOrderHelper.js"></script>
+            <script src="/js/helpers/navAdminPaymentHelper.js"></script>
             <script src="/js/helpers/filterTable.js"></script>

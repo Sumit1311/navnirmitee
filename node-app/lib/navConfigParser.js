@@ -32,7 +32,7 @@ module.exports = class navConfigParser {
                             Website : "worldpressplg",
                             ChannelID : "WEB",
                             IndustryType : "Retail",
-                            CallbackURLPath : "/response", 
+                            CallbackURLPath : "/callback", 
                             TransactionURLPath : "/oltp-web/processTransaction",
                             StatusAPIPath : "/oltp/HANDLER_INTERNAL/getTxnStatus",
                             RetryInterval : 8, //hours
@@ -41,25 +41,26 @@ module.exports = class navConfigParser {
                         BackgroundTransaction : {
                             ProcessingInterval : 1000 // ms
                         }
-                    }
+                    };
                 }
             }
     }
    
 
     getConfig(key, defaultValue) {
-        if(this.config[key] == undefined) {
+        if(this.config[key] === undefined) {
             return defaultValue;
         }
         return this.config[key];
     }
 
     static instance() {
-            if(that)
+            if(that) {
                 return that;
+            }
             else{
                 that= new navConfigParser();        
                 return that;
             }
     }
-}
+};

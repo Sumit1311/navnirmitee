@@ -45,7 +45,7 @@ module.exports = class navPGHelper {
         })
         .then((transactions) => {
             var promises = [];
-            if(transactions.length == 0) {
+            if(transactions.length === 0) {
                 //promises.push(Q.reject(new navPaymentFailureException()));
                 return Q.allSettled(promises);
             }
@@ -72,9 +72,9 @@ module.exports = class navPGHelper {
                 if(results[i].state == 'rejected') {
                     return Q.reject(results[i].reason);
                 }
-            };
-            if(results.length != 0) {
-                return paymentDAO.updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().COMPLETED, new Date().getTime());
+            }
+            if(results.length !== 0) {
+                return paymentDAO.updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().COMPLETED, new Date().getTime(), null, null);
             }
             return Q.resolve();
 
@@ -88,7 +88,7 @@ module.exports = class navPGHelper {
             navLogUtil.instance().log.call(self,'[/subscribePlan]', 'Error while doing payment' + error, "error");
             return paymentDAO.rollBackTx()
             .then(function() {
-                return paymentDAO.updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().TRANSACTION_FAILED, new Date().getTime()); 
+                return paymentDAO.updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().TRANSACTION_FAILED, null, null, null); 
             })
             .then(function () {
                 return Q.reject(error);
@@ -109,7 +109,7 @@ module.exports = class navPGHelper {
     }
 
     processFailure(orderId, code, status, message) {
-        return new navPaymentsDAO().updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().FAILED, new Date().getTime()/*, moment().add(navConfigParser.getConfig("PaymentGateway")["RetryInterval"], "hours").valueOf(), moment().add(navConfigParser.getConfig("PaymentGateway")["ExpirationInterval"], "hours").valueOf()*/ )
+        return new navPaymentsDAO().updatePaymentDetails(orderId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().FAILED, new Date().getTime())
             .then(() => {
                 return Q.reject(new navPaymentFailureException());
             })
@@ -126,7 +126,6 @@ module.exports = class navPGHelper {
             .catch((error) => {
                 return Q.reject(error);
             })
-
     }
 
 

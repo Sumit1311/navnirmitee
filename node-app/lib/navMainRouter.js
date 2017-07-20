@@ -6,6 +6,7 @@ var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navLogicalException = require("node-exceptions").LogicalException,
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     helpers = require('handlebars-helpers')(),
@@ -125,14 +126,14 @@ module.exports = class navMainRouter extends navBaseRouter {
             return deferred.reject(new navValidationException(validationErrors));
         }
         var plans = navMembershipParser.instance().getConfig("plans",[]), type = req.query.type, plan = req.query.plan;
-        if(plans[type][plan] == undefined) {
+        if(plans[type][plan] === undefined) {
             return deferred.reject(new navLogicalException(validationErrors));
         }
         var p=plans[type][plan];
 
         var user = req.user;
         var uDAO = new navUserDAO();
-	var deposit, orderId, result;
+        var deposit, orderId, result;
         uDAO.getClient()
             .then((_client) => {
                 uDAO.providedClient = _client;
@@ -142,13 +143,13 @@ module.exports = class navMainRouter extends navBaseRouter {
                 return uDAO.updatePlan(user._id,type + "::" + plan);
             })
             .then((result) => {
-		orderId = new navCommonUtil().generateUuid();
-		deposit = parseInt(p.deposit) - user.deposit;
+                orderId = new navCommonUtil().generateUuid();
+                deposit = parseInt(p.deposit) - user.deposit;
                 if(result && deposit > 0) {
                     var pDAO = new navPaymentsDAO(uDAO.providedClient);
                     return pDAO.insertPaymentDetails(user._id, deposit, pDAO.REASON.DEPOSIT, pDAO.STATUS.PENDING, orderId);       
                 } else {
-		    return Q.resolve();
+                    return Q.resolve();
                     //return Q.reject(new navLogicalException("Account Already Recharged"));
                 }
             })
@@ -156,11 +157,11 @@ module.exports = class navMainRouter extends navBaseRouter {
                 var pDAO = new navPaymentsDAO(uDAO.providedClient);
                 return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING, orderId);
             })
-	    .then(() => {
-		return navPGRouter.initiate(user._id, (parseInt(p.amount) + deposit) + "", orderId, new navCommonUtil().getBaseURL(req));
-	    })
+            .then(() => {
+                return navPGRouter.initiate(user._id, (parseInt(p.amount) + deposit) + "", orderId, new navCommonUtil().getBaseURL(req));
+            })
             .then((_result) => {
-		result = _result;
+                result = _result;
                 return uDAO.commitTx();
             })
 

@@ -30,7 +30,7 @@ module.exports = class navToysRouter extends navBaseRouter {
     setup() {
         var self = this;
         this.router.use(this.ensureAuthenticated, this.ensureVerified, this.isSessionAvailable);
-        this.router.get('/detail', function(req,res,next){self.getToysDetails(req,res,next)});
+        this.router.get('/detail', function(req,res,next){self.getToysDetails(req,res,next);});
         this.router.get('/search', function(req,res,next){self.getSearchPage(req,res,next)});
         this.router.get('/order', function(req,res,next){self.getOrder(req,res,next)});
         this.router.get('/orderPlaced', function(req,res,next){self.getOrderPlaced(req,res,next)});
@@ -86,7 +86,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         var navTDAO = new navToysDAO();
         navTDAO.getToyDetailById(id)
             .then(function(toyDetail){
-                if(toyDetail.length == 0) {
+                if(toyDetail.length === 0) {
                     return Q.reject(new navLogicalException());
                 }
                 toy = toyDetail;
@@ -148,7 +148,7 @@ module.exports = class navToysRouter extends navBaseRouter {
             })
         .then(function(toyDetail){
             //console.log(toyDetail, id);
-            if(toyDetail.length == 0) {
+            if(toyDetail.length === 0) {
                 return Q.reject(new navLogicalException());
             }
             return toyDetail;
@@ -197,7 +197,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         }
         var rDAO = new navRentalsDAO();
         var userDetails, toyDetails;
-        debugger;
+        //debugger;
         rDAO.getClient()
             .then(function(client){
                 rDAO.providedClient = client;
@@ -209,28 +209,28 @@ module.exports = class navToysRouter extends navBaseRouter {
         })
         .then((_userDetails) => {
             userDetails = _userDetails[0];
-            if(userDetails.subscribed_plan == null || userDetails.deposit == null) {
+            if(userDetails.subscribed_plan === null || userDetails.deposit === null) {
                 return Q.reject(new navNoSubScriptionException());
             }
-            if(userDetails.membership_expiry != null && userDetails.membership_expiry < new navCommonUtil().getCurrentTime()) {
+            if(userDetails.membership_expiry !== null && userDetails.membership_expiry < new navCommonUtil().getCurrentTime()) {
                 return Q.reject(new navMembershipExpirationException());
             }
             return rDAO.getOrdersByUserId(user._id);
             //TODO : check what to do with the order where lease date is ended but toy is not delivered
         })
         .then((_orders) => {
-            if(_orders.length != 0) {
+            if(_orders.length !== 0) {
                 return Q.reject(new navPendingReturnException());
             }
             return new navToysDAO(rDAO.providedClient).getToyDetailById(id);
         })
         .then((_toyDetails) => {
-            if(_toyDetails.length != 0) {
+            if(_toyDetails.length !== 0) {
                 toyDetails =  _toyDetails[0];
                 if(toyDetails.price > userDetails.balance) {
                     return Q.reject(new navNoBalanceException());
                 }
-                if(toyDetails.stock == 0) {
+                if(toyDetails.stock === 0) {
                     return Q.reject(new navNoStockException());
                 
                 }
@@ -245,7 +245,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         .then(function(){
             if(toyDetails) {
                 var membershipExpiry;
-                if(userDetails.membership_expiry != null) {
+                if(userDetails.membership_expiry !== null) {
                     membershipExpiry = new navCommonUtil().getCurrentTime();
                 }
                 return new navUserDAO(rDAO.providedClient).updatePoints(user._id, (userDetails.balance) - (toyDetails.price), membershipExpiry);
@@ -415,7 +415,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                     temp[activeCategories[i]] = true;
                 }
                 activeCategories = temp;*/
-                if(toys.length % perPageToys != 0 ) {
+                if(toys.length % perPageToys !== 0 ) {
                 noOfPages = Math.floor(toys.length / perPageToys) + 1;
                 } else {
                 noOfPages = Math.floor(toys.length / perPageToys) ;

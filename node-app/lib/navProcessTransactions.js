@@ -9,9 +9,12 @@ module.exports = class navProcessTransactions {
 
     processPendingTransactions() {
         var self = this; 
-        return new navPaymentsDAO().getNextPendingTransaction()
+        return new navPaymentsDAO().markExpiredTransactionAsFailed()
+            .then(() => {
+                return new navPaymentsDAO().getNextPendingTransaction();
+            })
             .then(function(transactionDetails){
-                if(transactionDetails.length != 0) {
+                if(transactionDetails.length !== 0) {
                     return navPGRouter.checkStatus(transactionDetails[0].transaction_id);   
                 }
                 else {

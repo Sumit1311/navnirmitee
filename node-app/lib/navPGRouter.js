@@ -32,35 +32,36 @@ module.exports = class navPGRouter extends navBaseRouter {
      setup() {
 	//this.router.use(this.isSessionAvailable, this.ensureAuthenticated, this.ensureVerfifed);
 	//this.router.get("/initiate", this.initiatePayment.bind(this))
-	this.router.post(gatewayDetails.callbackURL, this.callback.bind(this));	
-	return this;
+         this.router.post(gatewayDetails.callbackURL, this.callback.bind(this));	
+         return this;
      }
-    static initiate(userId, amount, orderId, urlObj) {
-	var deferred = Q.defer();
-	var requestData = {};
-	requestData["ORDER_ID"] = orderId;		
-	requestData["CUST_ID"] = userId;		
-	requestData["INDUSTRY_TYPE_ID"] = gatewayDetails['industryType'];		
-	requestData["CHANNEL_ID"] = gatewayDetails['channelId'];		
-	requestData["TXN_AMOUNT"] = amount;		
-	requestData["MID"] = gatewayDetails.merchantId;
-	requestData["WEBSITE"] = gatewayDetails.website;
-    if(urlObj) {
-        urlObj.pathname = "/pg" + gatewayDetails.callbackURL;
-        //console.log(urlObj.format());
-        requestData["CALLBACK_URL"] = urlObj.format(); 
-    }
-	navPaytm.genchecksum(requestData, gatewayDetails.merchantKey, function(err, result){
-	    if(err) {
-		return deferred.reject(err);
-	    }
-        return deferred.resolve({
-            pageToRender : "pg/redirect",
-            redirectURL : gatewayDetails.domain + gatewayDetails.transactionURLPath, 
-            context : result
-        });
-	});
-	return deferred.promise;
+     static initiate(userId, amount, orderId, urlObj) {
+         var deferred = Q.defer();
+         var requestData = {};
+         requestData["ORDER_ID"] = orderId;		
+         requestData["CUST_ID"] = userId;		
+         requestData["INDUSTRY_TYPE_ID"] = gatewayDetails['industryType'];		
+         requestData["CHANNEL_ID"] = gatewayDetails['channelId'];		
+         requestData["TXN_AMOUNT"] = amount;		
+         requestData["MID"] = gatewayDetails.merchantId;
+         requestData["WEBSITE"] = gatewayDetails.website;
+         if(urlObj) {
+             urlObj.pathname = "/pg" + gatewayDetails.callbackURL;
+             console.log(urlObj.format());
+             requestData["CALLBACK_URL"] = urlObj.format(); 
+         }
+         navPaytm.genchecksum(requestData, gatewayDetails.merchantKey, function(err, result){
+             if(err) {
+                 return deferred.reject(err);
+             }
+             console.log(result);
+             return deferred.resolve({
+                 pageToRender : "pg/redirect",
+                 redirectURL : gatewayDetails.domain + gatewayDetails.transactionURLPath, 
+                 context : result
+             });
+         });
+         return deferred.promise;
     }
 
     callback(req, res) {
