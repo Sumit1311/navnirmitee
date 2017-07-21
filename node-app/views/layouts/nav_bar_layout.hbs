@@ -33,13 +33,23 @@
                             <div class="container">
                                 <!-- Brand and toggle get grouped for better mobile display -->
                                 <div class="navbar-header">
-                                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                                    <button style="margin-left: 10px;" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                                         <span class="sr-only">Toggle navigation</span>
                                         <span class="icon-bar"></span>
                                         <span class="icon-bar"></span>
                                         <span class="icon-bar"></span>
                                     </button>
-                                    <a class="navbar-brand visible-xs" href="/">Navnirmitee</a>
+                                    <a class="navbar-brand visible-xs" href="/">Nav</a>
+                                    <form class="navbar-form visible-xs" role="search" style="margin-top: 12px;" id="_nav_search_form" method="get" action="/toys/search">
+                                        <div class="input-group">
+                                            <input name="q" value="" class="form-control" placeholder="Search" type="text">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default btn-green" type="button" id="_nav_search_button"><span class="glyphicon glyphicon-search"></span></button>
+
+                                            </div>
+
+
+                                        </div></form>
                                 </div>
 
                                 <!-- Collect the nav links, forms, and other content for toggling -->
@@ -52,29 +62,41 @@
                                         {{else}}
                                             <li><a href="/pricing">Plans</a></li>
                                         {{/if}}
-                                        <li style="{{#if isLoggedIn}}width: 600px;{{else}} width : 564px{{/if}}">    <div class="row"><div style="padding-right: 0px;" class="col-md-10">
+                                        <li class="navbar-search-custom hidden-xs" <!--style="{{#if isLoggedIn}}width: 600px;{{else}} width : 564px{{/if}}-->"> 
+                                                <form class="navbar-form" role="search" style="margin-top: 13px;" id="_nav_search_form" method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}">
+                                                    <div class="input-group">
+                                                        <input name="q" value="{{query}}" class="form-control" placeholder="Search" type="text">
+                                                        <div class="input-group-btn">
+                                                            <button class="btn btn-default btn-green" type="button" id="_nav_search_button"><span class="glyphicon glyphicon-search"></span></button>
+
+                                                        </div>
+
+
+                                                    </div></form>
+
+                                                <!-- <div class="row"><div style="padding-right: 0px;" class="col-md-10">
                                                 <form _lpchecked="1" class="navbar-search navbar-form" id="_nav_search_form" method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}">
                                                    <input style="width: 100%;" class="form-control" placeholder="Search" name="q" type="text" value="{{query}}">
                                                 </form>
                                             </div>
                                             <div style="padding-left: 0px;" class="col-md-2">
-                                                <button class="btn btn-green navbar-btn" style="width : 100%" type="button" id="_nav_search_button">Go!</button>    
+                                                <button class="btn btn-green navbar-btn" type="button" id="_nav_search_button">Go!</button>    
                                             </div>
-                                        </div>
+                                                </div> -->
                                         </li>
 
 
                                     </ul>
                                     <!-- <a href="/" class="logo visible-lg visible-md" style="{{#and isLoggedIn showSideBar}}left:55%;{{/and}}"><img src="/img/logo.jpg" alt="dodolan manuk responsive catalog themes"></a>
    <div id="brand" class="visible-lg visible-md">&nbsp;</div> -->
-                                        <ul class="nav navbar-nav nav-right" style="margin-left : 0px;">
+                                        <ul class="nav navbar-nav nav-right" >
                                             <li><a href="/about">About Us</a></li> 
                                             <!-- <li><a href="/profile">Profile</a></li>-->
                                             <li><a href="/contact">Contact</a></li>
                                             {{#if isLoggedIn }}
                                                 {{#if showSideBar}}
                                                 {{else}}
-                                                    <li class="dropdown"><a class="dropdown-toggle hidden-xs" data-toggle="dropdown"><span style="text-transform: capitalize;">Hi {{user.first_name}},</span><span class="caret"></span></a>
+                                                    <li class="dropdown"><a class="dropdown-toggle " data-toggle="dropdown"><span style="text-transform: capitalize;">Hi {{user.first_name}},</span><span class="caret"></span></a>
                                                         <ul style="width: 100%; margin-top: 0px;" class="dropdown-menu dropdown-menu-right" >
                                                             <li><a href="/user/rechargeDetails">My Wallet</a></li>
                                                             <li><a href="/user/orderDetails">My Orders</a></li>

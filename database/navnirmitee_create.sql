@@ -39,6 +39,7 @@ CREATE TABLE  nav_toys(
 	_id varchar(36),
 	name varchar(50),
 	stock integer,
+	rent_duration integer,
 	price varchar(20),
     short_description varchar(100),
     long_description TEXT,

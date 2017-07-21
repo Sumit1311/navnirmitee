@@ -24,7 +24,7 @@
 
         <div class="row">
             <!-- begin:product-content -->
-            <div class="col-md-9 col-sm-9 single-item">
+            <div class="col-md-offset-2 col-md-9 col-sm-9 single-item">
                 <div class="row">
                     <div class="col-md-5 col-sm-5">
                         <div id="itemsingle" class="carousel slide clearfix">
@@ -57,6 +57,7 @@
                     <div class="col-md-7 col-sm-7">
                         <h3>{{toyDetail.name}}</h3>
                         <p>{{toyDetail.short_description}}</p>
+                        <p>Can be rented for duration : {{toyDetail.rent_duration}} Days</p>
                         <p>In Stock : {{#compare toyDetail.stock "!=" 0}}<span class="label label-success">Yes<span></p>{{else}}<span class="label label-danger">No<span></p>{{/compare}}
                         <h3>Price : &#x20b9; {{toyDetail.price}}</h3>
                         <p><a href="/toys/order?id={{toyDetail._id}}" class="btn btn-green btn-large"{{#compare toyDetail.stock "==" 0}}disabled{{/compare}}><i class="icon-shopping-cart"></i> Place An Order</a></p>
@@ -123,84 +124,6 @@
             <!-- end:product-content -->
 
             <!-- begin:product-sidebar -->
-            <div class="col-md-3 col-sm-3">
-                <div class="row sidebar">
-                    <div class="col-md-12">
-                        <h3>Quick Search</h3>
-                        <div class="quick-search">
-                            <h5>Select Category</h5>
-                            <select name="cat" class="form-control">
-                                <option value="Canary">Canary</option>
-                                <option value="Emprit">Emprit</option>
-                                <option value="Parkit">Parkit</option>
-                                <option value="Doro">Doro</option>
-                                <option value="Pitik">Pitik</option>
-                                <option value="Jalak">Jalak</option>
-                                <option value="Cucak Rowo">Cucak Rowo</option>
-                                <option value="Gemak">Gemak</option>
-                                <option value="Deruk">Deruk</option>
-                                <option value="Kutut">Kutut</option>
-                                <option value="Tilang">Tilang</option>
-                            </select>
-                            <h5>Select Color</h5>
-                            <select name="cat" class="form-control">
-                                <option value="Yellow">Yellow</option>
-                                <option value="Blue">Blue</option>
-                                <option value="Green">Green</option>
-                                <option value="Red">Red</option>
-                                <option value="Orange">Orange</option>
-                                <option value="Black">Black</option>
-                                <option value="Grey">Grey</option>
-                            </select>
-                            <h5>Select Min - Max Price</h5>
-                            <div class="col-md-6">
-                                <select name="cat" class="form-control">
-                                    <option value="Yellow">$10</option>
-                                    <option value="Blue">$45</option>
-                                    <option value="Green">$70</option>
-                                    <option value="Red">$125</option>
-                                    <option value="Orange">$200</option>
-                                    <option value="Black">$235</option>
-                                    <option value="Grey">$300</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <select name="cat" class="form-control">
-                                    <option value="Yellow">$15</option>
-                                    <option value="Blue">$45</option>
-                                    <option value="Green">$70</option>
-                                    <option value="Red">$125</option>
-                                    <option value="Orange">$200</option>
-                                    <option value="Black">$235</option>
-                                    <option value="Grey">$300</option>
-                                </select>
-                            </div>
-                            <input type="submit" class="btn btn-green btn-block" name="submit" value="Search">
-                        </div>
-
-                        <h3>Categories</h3>
-                        <ul class="nav nav-pills nav-stacked">
-                            <li class="active"><a href="/product">Canary</a></li>
-                            <li><a href="/product">Emprit</a></li>
-                            <li><a href="/product">Parkit</a></li>
-                            <li><a href="/product">Doro</a></li>
-                            <li><a href="/product">Pitik</a></li>
-                            <li><a href="/product">Gemak</a></li>
-                        </ul>
-
-                        <h3>Information</h3>
-                        <ul class="nav nav-pills nav-stacked">
-                            <li><a href="/confirm">Payment Confirmation</a></li>
-                            <li><a href="#">Delivery</a></li>
-                            <li><a href="#">Secure Payment</a></li>
-                            <li><a href="#">Our Stores</a></li>
-                            <li><a href="/about">About Us</a></li>
-                            <li><a href="/contact">Contact Us</a></li>
-                            <li><a href="/testimoni">Testimony</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
             <!-- end:product-sidebar -->
 
         </div>

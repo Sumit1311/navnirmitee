@@ -30,11 +30,11 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
     " FROM " + tableName + " ";//" LIMIT $1 OFFSET $2";
     var params = [];
     var count = 0;
-    if((ageGroups && ageGroups.length != 0) || (categories && categories.length != 0) || query)
+    if((ageGroups && ageGroups.length !== 0) || (categories && categories.length !== 0) || query)
     {
         queryString += " WHERE ";
     }
-    if(ageGroups && ageGroups.length != 0) {
+    if(ageGroups && ageGroups.length !== 0) {
         queryString += "age_group IN ("        
         for(var i = 0; i < ageGroups.length; i++)
         {
@@ -50,8 +50,8 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
     }
 
     console.log(categories);
-    if(categories && categories.length != 0) {
-        if(count != 0) {
+    if(categories && categories.length !== 0) {
+        if(count !== 0) {
             queryString += " AND "
         }
         queryString += " category IN ("        
@@ -71,7 +71,7 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
 
 
     if(query) {
-        if(count != 0) {
+        if(count !== 0) {
             queryString += " AND "
         }
         if(query.length > 0) {
@@ -117,7 +117,7 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
 
 navToysDAO.prototype.getToyDetailById = function (toyId) {
     var self = this;
-    return this.dbQuery("SELECT _id, name, stock , price, points , age_group , category , parent_toys_id, short_description, long_description" +
+    return this.dbQuery("SELECT _id, name, stock , price, points , age_group , category , parent_toys_id, short_description, long_description, rent_duration" +
             " FROM " + tableName + " WHERE _id = $1",[toyId])
         .then(function (result) {
             return result.rows;

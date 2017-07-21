@@ -219,7 +219,7 @@ module.exports = class navToysRouter extends navBaseRouter {
             //TODO : check what to do with the order where lease date is ended but toy is not delivered
         })
         .then((_orders) => {
-            if(_orders.length !== 0) {
+            if(_orders.length !== 0 && _orders[0].lease_end_date >= navCommonUtil.getCurrentTime_S()) {
                 return Q.reject(new navPendingReturnException());
             }
             return new navToysDAO(rDAO.providedClient).getToyDetailById(id);
@@ -237,7 +237,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                 //var splittedPlan = userDetails.subscribed_plan.split('::');
                 //console.log(userDetails.subscribed_plan);
                 //var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
-                return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(15,'days').valueOf(), rDAO.STATUS.PLACED);
+                return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(toyDetails.rent_duration,'days').valueOf(), rDAO.STATUS.PLACED);
             } else {
                 return Q.resolve();
             }

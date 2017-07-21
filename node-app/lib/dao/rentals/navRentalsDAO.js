@@ -10,7 +10,8 @@ var STATUS = {
         DELIVERED : "DELIVERED",
         RETURNED : "RETURNED",
         PLACED : "PLACED",
-	CANCELLED : "CANCELLED"
+        CANCELLED : "CANCELLED",
+        DUE_RETURN : "DUE_RETURN"
     };
 
 
@@ -46,7 +47,7 @@ navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, sta
 
 navRentalsDAO.prototype.getOrdersByUserId = function (userId) {
     var self = this;
-    return this.dbQuery("SELECT _id FROM "+ tableName + " WHERE user_id = $1 AND (status != $2 AND status != $3 )",[userId, this.STATUS.CANCELLED, this.STATUS.RETURNED])
+    return this.dbQuery("SELECT _id, lease_end_date FROM "+ tableName + " WHERE user_id = $1 AND (status != $2 AND status != $3 AND status != $4)",[userId, this.STATUS.CANCELLED, this.STATUS.RETURNED, this.STATUS.DUE_RETURN])
       .then(function(result){
          return result.rows;
       })
@@ -150,4 +151,18 @@ navRentalsDAO.prototype.getOrderDetails = function(orderId) {
             return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
       });
 
+}
+
+navRentalsDAO.prototype.markOrdersForReturn =function() {
+    var self = this;
+    var query = "UPDATE "+tableName+" SET status = $1 WHERE lease_end_date <= $2 AND status IN ($3, $4)", 
+        params = [STATUS.DUE_RETURN, navCommonUtils.getCurrentTime_S(), STATUS.PLACED, STATUS.DELIVERED];
+    return this.dbQuery(query, params)
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "updateStatus",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
 }

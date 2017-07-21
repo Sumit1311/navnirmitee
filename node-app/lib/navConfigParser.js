@@ -38,10 +38,11 @@ module.exports = class navConfigParser {
                             RetryInterval : 8, //hours
                             ExpirationInterval : 72 //hours
                         },
-                        BackgroundTransaction : {
-                            ProcessingInterval : 1000 // ms
+                        BackgroundProcessing : {
+                            TransactionInterval : 1000, // ms,
+                            OrderInterval : 1000
                         }
-                    };
+                    }
                 }
             }
     }

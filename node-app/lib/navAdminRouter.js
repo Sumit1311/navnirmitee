@@ -52,6 +52,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
         deferred.promise
             .done(function(result){
                 delete req.query.offset;
+                debugger;
                 res.render('navAdmin/orders', {
                     user : req.user,
                     isLoggedIn : req.user ? true : false,

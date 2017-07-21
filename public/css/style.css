@@ -345,7 +345,6 @@ blockquote {
 }
 
 .navbar-default .nav-right{
-	margin-left: 170px;
 	float: right;
 }
 
@@ -2552,3 +2551,30 @@ padding-left:0px;
 .filterable .filters input[disabled]:-ms-input-placeholder {
     color: #333;
 }
+
+@media(min-width:768px) {
+li.navbar-search-custom {
+    width : 200px
+}
+}
+@media(min-width:980px) {
+li.navbar-search-custom {
+    width : 420px
+}
+}
+@media(min-width:1200px) {
+li.navbar-search-custom {
+    width : 620px
+}
+}
+
+.navbar .navbar-form {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-right: 0px;
+    margin-left: 0;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+

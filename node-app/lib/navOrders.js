@@ -14,7 +14,7 @@ module.exports = class navOrders {
         if(!toyId || !userId) {
             promise = rDAO.getOrderDetails(orderId)
                 .then((orderDetails) => {
-                    if(orderDetails.length == 0) {
+                    if(orderDetails.length === 0) {
                         return Q.reject(new navValidationException()) 
                     } else {
                         if(orderDetails[0].status != navRentalsDAO.getStatus().PLACED) {
@@ -26,7 +26,6 @@ module.exports = class navOrders {
                     }
                 })
         }
-        debugger;
         return promise
             .then(() => {
                 return rDAO.getClient()
@@ -36,7 +35,7 @@ module.exports = class navOrders {
                 return rDAO.startTx();
             })
             .then(() => {
-            if(updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED) {
+            if(updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED || updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
                 
                 return new navToysDAO(rDAO.providedClient).getToyDetailById(toyId);
             } else {
@@ -44,7 +43,7 @@ module.exports = class navOrders {
             }
             })
             .then((_toyDetails) => {
-                    if(_toyDetails && _toyDetails.length != 0) {
+                    if(_toyDetails && _toyDetails.length !== 0 && updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED) {
                         toyDetail = _toyDetails[0];
                         return new navUserDAO(rDAO.providedClient).updateBalance(userId,  parseInt(toyDetail.price));
                     } else {
@@ -52,7 +51,7 @@ module.exports = class navOrders {
                     }
 
             })
-            .then((_userDetails) => {
+            .then(() => {
                 if(toyDetail) {
                     return new navToysDAO(rDAO.providedClient).updateToyStock(toyId, 1, true);
                 } else {
@@ -60,11 +59,16 @@ module.exports = class navOrders {
                 }
             })
             .then(() => {
-                if(updateFields.deliveryDate) {
-                return rDAO.updateRentalDetails(updateFields.orderId, navCommonUtil.getTimeinMillis(updateFields.deliveryDate),navCommonUtil.getTimeinMillis( updateFields.returnDate), navCommonUtil.getTimeinMillis(updateFields.leaseStartDate), navCommonUtil.getTimeinMillis(updateFields.leaseEndDate), updateFields.shippingAddress, updateFields.orderStatus);
+                if(updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
+                    updateFields.returnDate = navCommonUtil.getCurrentTime_S();
                 } else {
-                   return rDAO.updateStatus(orderId, updateFields.orderStatus); 
+                    updateFields.returnDate = navCommonUtil.getTimeinMillis( updateFields.returnDate);
                 }
+                //if(updateFields.deliveryDate) {
+                return rDAO.updateRentalDetails(updateFields.orderId, navCommonUtil.getTimeinMillis(updateFields.deliveryDate),updateFields.returnDate, navCommonUtil.getTimeinMillis(updateFields.leaseStartDate), navCommonUtil.getTimeinMillis(updateFields.leaseEndDate), updateFields.shippingAddress, updateFields.orderStatus);
+                /*} else {
+                   return rDAO.updateStatus(orderId, updateFields.orderStatus); 
+                }*/
             })
             .then(() => {
                 return rDAO.commitTx();
