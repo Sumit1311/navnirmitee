@@ -1,15 +1,5 @@
 
-<!-- <div class="heads" style="background: url(/img/img02.jpg) center center;">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h2><span>//</span> Recharge Confirmation</h2>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<div class="page-content">
+    <div class="page-content nav_main_content">
     <div class="container" style="margin-top : 40px;">
         
         <!-- <div class="row confirm">
@@ -36,7 +26,7 @@
             <hr>
         </div> -->
         <div class="row confirm">
-            <div class="col-md-2">
+            <div class="col-md-2 col-sm-4 hidden-xs">
                 <div class="row">
                 <h6 style="font-weight : bold;"> Age Group </h6>
                 <form id="_nav_age_group_form">
@@ -61,8 +51,10 @@
                 </form>
                 </div>
             </div>
-            <div class="col-md-10">
+            <div class="col-md-10 col-sm-8">
                 <div class="row">
+                    <div class="col-xs-2">
+                        <a class="btn btn-green btn-md visible-xs pull-left" style="" href="#" id="_nav_filter_btn"><i class="glyphicon glyphicon-filter"></i></a></div>
                     {{#compare toysData.toysList.length "!=" 0}}
                     <ul style="margin-top : 0px" class="pagination pull-right">
                         <li class="disabled"><a href="#">Page {{toysData.currentPage}} of {{toysData.noOfPages}}</a></li>
@@ -89,10 +81,12 @@
                 </div>
                 <div class="row search-results">
                     {{#compare toysData.toysList.length "==" 0}}
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                         <h2>No Toys Found </h2>
+                        </div>
                     {{/compare}}
                     {{#each toysData.toysList}}
-                        <div class="col-md-3 col-sm-4 col-xs-12">
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                             <div class="thumbnail">
                                 <div class="caption-img" style="background: url(/img/toys/{{_id}}_1.jpg);"></div>
                                 <div class="caption-details">
@@ -103,56 +97,6 @@
                             </div>
                         </div>
                     {{/each}}
-                        <!-- <div class="col-md-3 col-sm-4 col-xs-12">
-                            <div class="thumbnail">
-                                <div class="caption-img" style="background: url(/img/toys/T2_1.jpg);"></div>
-                                <div class="caption-details">
-                                    <h3>Toy 2</h3>
-                                    <span class="price">₹ 123</span>
-                                </div>
-                                <a href="/toys/detail?id=T2"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-4 col-xs-12">
-                            <div class="thumbnail">
-                                <div class="caption-img" style="background: url(/img/toys/T3_1.jpg);"></div>
-                                <div class="caption-details">
-                                    <h3>Toy 3</h3>
-                                    <span class="price">₹ 123</span>
-                                </div>
-                                <a href="/toys/detail?id=T3"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-4 col-xs-12">
-                            <div class="thumbnail">
-                                <div class="caption-img" style="background: url(/img/toys/T4_1.jpg);"></div>
-                                <div class="caption-details">
-                                    <h3>Toy 4</h3>
-                                    <span class="price">₹ 123</span>
-                                </div>
-                                <a href="/toys/detail?id=T4"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-4 col-xs-12">
-                            <div class="thumbnail">
-                                <div class="caption-img" style="background: url(/img/toys/T5_1.jpg);"></div>
-                                <div class="caption-details">
-                                    <h3>Toy 5</h3>
-                                    <span class="price">₹ 123</span>
-                                </div>
-                                <a href="/toys/detail?id=T5"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-4 col-xs-12">
-                            <div class="thumbnail">
-                                <div class="caption-img" style="background: url(/img/toys/T6_1.jpg);"></div>
-                                <div class="caption-details">
-                                    <h3>Toy 6</h3>
-                                    <span class="price">₹ 123</span>
-                                </div>
-                                <a href="/toys/detail?id=T6"><div class="caption-link"><i class="fa fa-plus"></i><h3>Short Description</h3></div></a>
-                            </div>
-                        </div> -->
                     </div>
                 </div>
                 <div class="row">

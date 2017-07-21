@@ -16,6 +16,7 @@
 
         <!-- Custom styles for this template -->
         <link href="/css/style.css" rel="stylesheet">
+        <link href="/css/search.css" rel="stylesheet">
         <link href="/css/responsive.css" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -40,11 +41,11 @@
                                         <span class="icon-bar"></span>
                                     </button>
                                     <a class="navbar-brand visible-xs" href="/">Nav</a>
-                                    <form class="navbar-form visible-xs" role="search" style="margin-top: 12px;" id="_nav_search_form" method="get" action="/toys/search">
+                                    <form class="navbar-form visible-xs nav_search_form" role="search" style="margin-top: 12px;" method="get" action="/toys/search">
                                         <div class="input-group">
                                             <input name="q" value="" class="form-control" placeholder="Search" type="text">
                                             <div class="input-group-btn">
-                                                <button class="btn btn-default btn-green" type="button" id="_nav_search_button"><span class="glyphicon glyphicon-search"></span></button>
+                                                <button class="btn btn-default btn-green nav_search_button" type="button" ><span class="glyphicon glyphicon-search"></span></button>
 
                                             </div>
 
@@ -60,14 +61,14 @@
                                         <li><a href="/hoowitworks">How It Works</a></li>
                                         {{#if isLoggedIn}}
                                         {{else}}
-                                            <li><a href="/pricing">Plans</a></li>
+                                        <!-- <li><a href="/pricing">Plans</a></li> -->
                                         {{/if}}
-                                        <li class="navbar-search-custom hidden-xs" <!--style="{{#if isLoggedIn}}width: 600px;{{else}} width : 564px{{/if}}-->"> 
-                                                <form class="navbar-form" role="search" style="margin-top: 13px;" id="_nav_search_form" method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}">
+                                        <li class="navbar-search-custom hidden-xs"> 
+                                                <form class="navbar-form nav_search_form" role="search" style="margin-top: 13px;"  method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}">
                                                     <div class="input-group">
                                                         <input name="q" value="{{query}}" class="form-control" placeholder="Search" type="text">
                                                         <div class="input-group-btn">
-                                                            <button class="btn btn-default btn-green" type="button" id="_nav_search_button"><span class="glyphicon glyphicon-search"></span></button>
+                                                            <button class="btn btn-default btn-green nav_search_button" type="button" ><span class="glyphicon glyphicon-search"></span></button>
 
                                                         </div>
 
@@ -120,6 +121,32 @@
                 </div>
             </nav>
         {{/unless}}
+        <form class="hidden" role="search" id="_nav_search_form" method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}"></form>
+        <div class="sidenav page-content visible-xs" style="" id="_nav_filter_side">
+           <!-- <a data-toggle="collapse" href="#_nav_age_group_form" aria-expanded="false" aria-controls="_nav_age_group_form"> <h6 style="font-weight : bold;">Age Group</h6> 
+           </a>           --><h6 style="font-weight : bold;">Age Group</h6> 
+           <!-- <form id="_nav_age_group_form" class="collapse" > -->
+                <form id="_nav_age_group_form">
+                    {{#each toysData.filters.ageGroups}}
+                    <fieldset>
+                        <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
+                            <input type="checkbox" name="ageGroup" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeAge @index}}checked{{/inArray}}><span>{{this}}</span>
+
+                        </label>
+                    </fieldset>
+                    {{/each}}
+                </form>
+                    <h6 style="font-weight : bold;"> Categories </h6>
+                    <form id="_nav_category_form">
+                    {{#each toysData.filters.categories}}
+                    <fieldset>
+                        <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
+                            <input type="checkbox" name="category" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeCategories @index}}checked{{/inArray}}><span>{{this}}</span>
+                        </label>
+                    </fieldset>
+                {{/each}}
+                    </form>
+                </div>
         {{#and isLoggedIn showSideBar}}
             <div class="page-content">
                 <div class="container sidebar-container">
@@ -153,7 +180,7 @@
             </div>
         {{/and}}
         <!-- begin:footer -->
-        <div id="footer">
+        <div id="footer" class="nav_main_content">
             <div class="container">
                 <div class="row">
                     <div class="col-md-12">
@@ -184,7 +211,7 @@
         <!-- end:footer -->
 
         <!-- begin:copyright -->
-        <div id="copyright">
+        <div id="copyright" class="nav_main_content">
             <div class="container">
                 <div class="row">
                     <div class="col-md-12">
@@ -213,5 +240,6 @@ var Q;
             <script src="/js/helpers/navOrderHelper.js"></script>
             <script src="/js/helpers/navSearchHelper.js"></script>
             <script src="/js/script.js"></script>
+            <script src="/js/search.js"></script>
     </body>
 </html>

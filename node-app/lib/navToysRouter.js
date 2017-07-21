@@ -309,8 +309,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         });
     }    
     getSearchPage(req, res) {
-        var q = req.query.q, offset = req.query.offset, activeCategories = [], activeAgeGroups = []; 
-        console.log(req.query);
+        var q = req.query.q ? req.query.q : "", offset = req.query.offset, activeCategories = [], activeAgeGroups = []; 
         if(!offset ) {
             offset = 0;
         }
@@ -327,7 +326,6 @@ module.exports = class navToysRouter extends navBaseRouter {
                 }
             }
         }
-        
         req.assert("q"," Bad Request").isByteLength({min :0, max :128});
         //req.assert("shippingAddress","Bad Request").notEmpty();
         var deferred = Q.defer();
