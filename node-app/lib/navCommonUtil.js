@@ -3,6 +3,7 @@ const url = require('url');
 var AGE_GROUPS = ['0 - 5 Years', '6 - 7 Years', '8 - 10 Years', '11 - 13 Years', '13 - 15 Years'];
 var CATEGORIES = ['Educational', 'Scientific', 'Fun', 'Motor Skills'];
 var moment = require('moment');
+var COUNTRIES =["INDIA"], STATES = { "INDIA" : ["Maharashtra"] }, DISTRICTS = {"Maharashtra" : ["Pune"]};
 
 module.exports = class navCommonUtils {
     constructor() {
@@ -55,7 +56,16 @@ module.exports = class navCommonUtils {
     static getAgeGroups() {
         return AGE_GROUPS;        
     }
+    static getStates(country) {
+        return country ? STATES[country] : STATES;        
+    }
+    static getDistricts(state) {
+        return state ? DISTRICTS[state] : DISTRICTS;        
+    }
 
+    static getCountries() {
+        return COUNTRIES;        
+    }
     static getCategories() {
         return CATEGORIES;
     }

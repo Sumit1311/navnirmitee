@@ -1,20 +1,20 @@
 
-	<!-- begin:heading -->
-	<div class="heads" style="background: url(/img/img02.jpg) center center;">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12">
-					<h2><span>//</span>Place Your Order</h2>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end:heading -->
-	
-	<!-- begin:content -->
-    <div class="page-content">
+<!-- begin:heading -->
+<div class="heads" style="background: url(/img/img02.jpg) center center;">
     <div class="container">
-    <!--<div class="row">
+        <div class="row">
+            <div class="col-md-12">
+                <h2><span>//</span>Place Your Order</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end:heading -->
+
+<!-- begin:content -->
+<div class="page-content">
+    <div class="container">
+        <!--<div class="row">
     <div class="col-md-12">
     <ol class="breadcrumb">
     <li><a href="#">Home</a></li>
@@ -23,55 +23,61 @@
     </div>
     </div> -->
 
-    <div class="row confirm">
-    <div class="col-md-12" id="_nav_order_div">
-        <form class="form-horizontal" role="form" action="/toys/placeOrder?id={{toyDetail._id}}" method="post">
-    <h3 class="text-center">Order</h3>
-    <hr>
-    <div class="row">
+        <div class="row confirm">
+            <div class="col-md-12" id="_nav_order_div">
+                <form class="form-horizontal" role="form" action="/toys/placeOrder?id={{toyDetail._id}}" method="post">
+                    <h3 class="text-center">Order</h3>
+                    <hr>
+                    <div class="row">
 
-    <div class="col-md-offset-1 col-md-4" id="_nav_ordered_toy">
-    <div class="thumbnail">
-        <div class="caption-img" style="background: url(/img/toys/{{toyDetail._id}}_1.jpg);"></div>
-    <div class="caption-details">
-        <h3>{{toyDetail.name}}</h3>
-        <span class="price">&#x20b9; {{toyDetail.price}}</span>
-    </div>
-    <a href="/toys/detail?id={{toyDetail._id}}"><div class="caption-link"><h3 style="text-align: center;">Short Description</h3></div></a>
-    </div>
+                        <div class="col-md-offset-1 col-md-4" id="_nav_ordered_toy">
+                            <div class="thumbnail">
+                                <div class="caption-img" style="background: url(/img/toys/{{toyDetail._id}}_1.jpg);"></div>
+                                <div class="caption-details">
+                                    <h3>{{toyDetail.name}}</h3>
+                                    <span class="price">&#x20b9; {{toyDetail.price}}</span>
+                                </div>
+                                <a href="/toys/detail?id={{toyDetail._id}}"><div class="caption-link"><h3 style="text-align: center;">Short Description</h3></div></a>
+                            </div>
 
-    <!-- <input type="text" class="form-control" placeholder="Code : " required> -->
-    </div>
-    <div class="col-md-5">
-    <div class="form-group">
-    <label class="col-sm-4 col-md-12 control-label" style="text-align: left;">Name</label>
-    <div class="col-sm-8 col-md-12">
-    <input class="form-control" placeholder="Name : " value="Sumit" required="" readonly="" type="text">
-    </div>
-    </div>
+                            <!-- <input type="text" class="form-control" placeholder="Code : " required> -->
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="col-sm-4 col-md-12 control-label" style="text-align: left;">Name</label>
+                                <div class="col-sm-8 col-md-12">
+                                    <input class="form-control" placeholder="Name : " value="Sumit" required="" readonly="" type="text">
+                                </div>
+                            </div>
 
-    <div class="form-group">
-    <label class="col-md-12 col-sm-4 control-label" style="text-align: left;">Email address</label>
-    <div class="col-sm-8 col-md-12">
-        <input class="form-control" placeholder="Email address : " value="{{user.email_address}}" required="" readonly="" type="email">
-    </div>
-    </div>
+                            <div class="form-group">
+                                <label class="col-md-12 col-sm-4 control-label" style="text-align: left;">Email address</label>
+                                <div class="col-sm-8 col-md-12">
+                                    <input class="form-control" placeholder="Email address : " value="{{user.email_address}}" required="" readonly="" type="email">
+                                </div>
+                            </div>
 
-    <div class="form-group">
-    <label class="col-md-12 col-sm-4 control-label" style="text-align: left;">Phone number</label>
-    <div class="col-md-12 col-sm-8">
-        <input class="form-control" placeholder="Phone number : " value="{{user.mobile_no}}" required="" readonly="" type="text">
-    </div>
-    </div>
+                            <div class="form-group">
+                                <label class="col-md-12 col-sm-4 control-label" style="text-align: left;">Phone number</label>
+                                <div class="col-md-12 col-sm-8">
+                                    <input class="form-control" placeholder="Phone number : " value="{{user.mobile_no}}" required="" readonly="" type="text">
+                                </div>
+                            </div>
 
-    <div class="form-group">
-    <label class="col-md-12 col-sm-4 control-label" style="text-align: left;">Shipping Address</label>
-    <div class="col-md-12 col-sm-8">
-        <textarea class="form-control" rows="8" name="shippingAddress" placeholder="Shipping Address : " value="" required="">{{user.address}}</textarea>
-    </div>
-    </div>
+                            <div class="form-group">
+                                <label class="col-md-12 col-sm-4 control-label" style="text-align: left;">Shipping Address</label>
+                                <div class="col-md-12 col-sm-8">
+                                    <textarea class="form-control" rows="8" name="shippingAddress" placeholder="Shipping Address : " value="" required="">{{user.address}}</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12 col-sm-4 control-label" style="text-align: left;">Pin Code</label>
+                                <div class="col-md-12 col-sm-8">
+                                    <input class="form-control" placeholder="Pin Code " value="{{user.pinCode}}" required="" type="text">
+                                </div>
+                            </div>
 
-    <!-- <div class="form-group">
+                            <!-- <div class="form-group">
     <label class="col-sm-3 control-label">Payment Method</label>
     <div class="col-sm-4">
     <select class="form-control" required>
@@ -89,26 +95,26 @@
     </div>
     </div> -->
 
-    <div class="form-group hidden" id="_nav_order_error">
-    <div class="col-sm-offset-3 col-sm-8 col-md-offset-0 col-md-12">
-    <div class="alert alert-danger" style="padding: 7px; font-size: 11px; margin-bottom: 0px;" role="alert">
-    </div>
-    </div>
-    </div>
-    <div class="form-group">
-    <div class="col-md-12 col-sm-8 col-sm-offset-4 col-md-offset-0">
-    <button style="width: 100%;" type="submit" class="btn btn-green" id="_nav_order_button">Order Now</button>
-    </div>
-    </div>
-    </div></div>
+                            <div class="form-group hidden" id="_nav_order_error">
+                                <div class="col-sm-offset-3 col-sm-8 col-md-offset-0 col-md-12">
+                                    <div class="alert alert-danger" style="padding: 7px; font-size: 11px; margin-bottom: 0px;" role="alert">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12 col-sm-8 col-sm-offset-4 col-md-offset-0">
+                                    <button style="width: 100%;" type="submit" class="btn btn-green" id="_nav_order_button">Order Now</button>
+                                </div>
+                            </div>
+                    </div></div>
 
 
 
 
-    </form>
+                </form>
+            </div>
+        </div>
     </div>
-    </div>
-    </div>
-    </div>
-	<!-- end:content -->
-	
+</div>
+<!-- end:content -->
+

@@ -24,12 +24,14 @@ var tableName = "nav_toys",
     fileName = 'toys/navToysDAO';
 
 
-navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories, query) {
+navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories, query, sortBy, sortType) {
     var self = this;
     var queryString = "SELECT _id, name, stock , price, points , age_group , category , parent_toys_id, short_description, long_description" +
     " FROM " + tableName + " ";//" LIMIT $1 OFFSET $2";
     var params = [];
     var count = 0;
+    sortBy = sortBy ? sortBy : "name";
+    sortType = sortType ? sortType : "ASC";
     if((ageGroups && ageGroups.length !== 0) || (categories && categories.length !== 0) || query)
     {
         queryString += " WHERE ";
@@ -89,6 +91,13 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
         if(query.length > 0) {
             queryString += " ) "
         }
+    }
+
+    if(sortBy) {
+        queryString += " ORDER BY "+sortBy;
+    }
+    if(sortType) {
+        queryString += " " + sortType;
     }
 
     if(limit)

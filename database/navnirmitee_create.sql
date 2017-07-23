@@ -18,7 +18,7 @@ CREATE TABLE  nav_user(
 	_id varchar(36) NOT NULL,
 	first_name text,
 	last_name text,
-	email_address varchar(30),
+	email_address varchar(100),
 	mobile_no varchar(15),
 	password text,
 	email_verification VARCHAR(36),
@@ -29,10 +29,20 @@ CREATE TABLE  nav_user(
 	address text,
 	city varchar(50),
 	state varchar(30),
+    pin_code varchar(10),
 	membership_expiry bigint,
 	CONSTRAINT nav_user_id_pk PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
+
+CREATE TABLE nav_child (
+    _id VARCHAR(36),
+    age_group smallint,
+    hobbies TEXT,
+    user_id VARCHAR(36),
+    CONSTRAINT nav_child_id_pk PRIMARY KEY(_id),
+    CONSTRAINT nav_child_id_user_id_fk FOREIGN KEY(user_id) REFERENCES nav_user(_id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE  
+)
 
 -- object:  nav_toys | type: TABLE -- 
 CREATE TABLE  nav_toys(
@@ -81,6 +91,7 @@ CREATE TABLE  nav_payments(
     transaction_date bigint,
     next_retry_date bigint,
     expiration_date bigint,
+    transaction_type VARCHAR(20)
 	CONSTRAINT nav_payments_id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);

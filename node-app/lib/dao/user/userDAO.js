@@ -145,7 +145,7 @@ UserDAO.prototype.insertRegistrationData = function (email, phone, password, ver
  * @param userType
  * @returns {*}
  */
-UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address, membershipExpiry, enrollmentDate) {
+UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address, membershipExpiry, enrollmentDate, pinCode) {
     var self = this;
     return this.dbQuery("UPDATE " + tableName +
     " SET " +
@@ -153,8 +153,9 @@ UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, addre
     " last_name=$2," +
     " address = $3," +
     " membership_expiry = $4," +
-    " enrollment_date = $5" +
-    " WHERE _id=$6", [ firstName, lastName, address, membershipExpiry, enrollmentDate, pkey])
+    " enrollment_date = $5," +
+    " pin_code = $7" +
+    " WHERE _id=$6", [ firstName, lastName, address, membershipExpiry, enrollmentDate, pkey, pinCode])
         .catch(function (error) {
             navLogUtil.instance().log.call(self, "updateUserDetails", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
@@ -274,10 +275,10 @@ UserDAO.prototype.updateMembershipExpiry =function (userId, membershipExpiry) {
         });
 	
 }
-UserDAO.prototype.updateBalance = function (userId, amount){
+UserDAO.prototype.updateBalance = function (userId, amount, decrement){
     var self = this;
     return this.dbQuery("UPDATE " + tableName + 
-    " SET balance = balance + $1 WHERE _id = $2;",
+    " SET balance = balance"+(decrement ? "-" : "+") + "$1 WHERE _id = $2;",
     [amount, userId])
         .then(function (result) {
             return result.rowCount;
@@ -288,10 +289,10 @@ UserDAO.prototype.updateBalance = function (userId, amount){
 
         });
 }
-UserDAO.prototype.updateDeposit = function (userId, amount){
+UserDAO.prototype.updateDeposit = function (userId, amount, decrement){
     var self = this;
     return this.dbQuery("UPDATE " + tableName + 
-    " SET deposit = deposit + $1 WHERE _id = $2;",
+    " SET deposit = deposit" + (decrement ? "-" : "+") + "$1 WHERE _id = $2;",
     [amount, userId])
         .then(function (result) {
             return result.rowCount;

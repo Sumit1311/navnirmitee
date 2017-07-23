@@ -69,11 +69,21 @@ module.exports = class navResponseUtils {
             status : status
         }
     }
+    static generateResponse_S(code, body, status) {
+        return {
+            code : code,
+            body : body,
+            status : status
+        }
+    }
 
     sendAjaxResponse(res, response) {
         res.status(response.status).send(JSON.stringify(response.body));
     }
 
+    static sendAjaxResponse_S(res, response) {
+        res.status(response.status).send(JSON.stringify(response.body));
+    }
     redirect(req, res, path) {
         if(req.xhr) {
             this.sendAjaxResponse(res, {
@@ -92,6 +102,16 @@ module.exports = class navResponseUtils {
     renderErrorPage(req, res, context) {
         if(req.xhr) {
             this.sendAjaxResponse(res, context.errorResponse); 
+            return;
+        } else {    
+            res.status(context.errorResponse.status).render("errorDocument", context);
+        }
+            
+
+    }
+    static renderErrorPage_S(req, res, context) {
+        if(req.xhr) {
+            navResponseUtils.sendAjaxResponse(res, context.errorResponse); 
             return;
         } else {    
             res.status(context.errorResponse.status).render("errorDocument", context);

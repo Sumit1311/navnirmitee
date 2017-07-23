@@ -144,6 +144,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                 user.address = n_User[0].address;
                 user.city = n_User[0].city;
                 user.state = n_User[0].state;
+                user.pinCode = n_User[0].pinCode;
                 return (new navToysDAO()).getToyDetailById(id)
             })
         .then(function(toyDetail){
@@ -309,20 +310,22 @@ module.exports = class navToysRouter extends navBaseRouter {
         });
     }    
     getSearchPage(req, res) {
-        var q = req.query.q ? req.query.q : "", offset = req.query.offset, activeCategories = [], activeAgeGroups = []; 
+        var q = req.query.q ? req.query.q : "", offset = req.query.offset ? req.query.offset : 0, sortBy = req.query.sortBy ? req.query.sortBy: 0; 
+        var sortType = req.query.sortType ? req.query.sortType : 0, activeCategories = [], activeAgeGroups = []; 
         if(!offset ) {
             offset = 0;
         }
         
         for(var key in req.query) {
-            if((key == "category") && req.query.hasOwnProperty(key)) {
-                for(var index in req.query[key]) {
-                activeCategories.push(parseInt(req.query[key][index]) - 1);
+            var index;
+            if((key === "category") && req.query.hasOwnProperty(key)) {
+                for(index = 0; index < req.query[key].length; index++) {
+                    activeCategories.push(parseInt(req.query[key][index]) - 1);
                 }
             }
             if((key == "ageGroup") && req.query.hasOwnProperty(key)) {
-                for(var index in req.query[key]) {
-                activeAgeGroups.push(parseInt(req.query[key][index]) - 1);
+                for(index = 0; index < req.query[key].length; index++) {
+                    activeAgeGroups.push(parseInt(req.query[key][index]) - 1);
                 }
             }
         }
@@ -330,6 +333,9 @@ module.exports = class navToysRouter extends navBaseRouter {
         //req.assert("shippingAddress","Bad Request").notEmpty();
         var deferred = Q.defer();
         var respUtil =  new navResponseUtil(), toyList, categories, ageGroups, noOfPages, perPageToys = 4;
+        var sortColumns = ["name", "price", "age_group"];
+        var sortLabels = ["Name", "Price", "Age Group"];
+        var sortTypes = ["ASC", "DESC"];
         //console.log(repeatHelper);
         deferred.promise
             .done((result) => {
@@ -360,6 +366,12 @@ module.exports = class navToysRouter extends navBaseRouter {
                             ageGroups : ageGroups,
                             activeCategories : activeCategories,
                             activeAge : activeAgeGroups
+                        },
+                        sorters : {
+                            sortLabels : sortLabels,
+                            sortTypes : sortTypes,
+                            sortBy : sortBy,
+                            sortType : sortType
                         },
                         noOfPages : noOfPages,
                         perPageLimit : perPageToys,
@@ -400,7 +412,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         }
         ageGroups = navCommonUtil.getAgeGroups();
         categories = navCommonUtil.getCategories();
-        new navToysDAO().getAllToys(null, null, activeAgeGroups, activeCategories, q.split(" "))
+        new navToysDAO().getAllToys(null, null, activeAgeGroups, activeCategories, q.split(" "), sortColumns[sortBy], sortTypes[sortType])
             .then((toys) => {
                 toyList = [];
                 /*var temp = [];

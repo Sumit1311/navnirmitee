@@ -20,17 +20,17 @@
         <link href="/css/responsive.css" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
+        <!-- [if lt IE 9] -->
             <script src="js/html5shiv.js"></script>
             <script src="js/respond.min.js"></script>
-        <![endif]-->
+            <!-- [endif] -->
     </head>
 
     <body>
         {{#unless hideNavBar}}
             <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
                 <div class="row">
-                    <div class="{{#and isLoggedIn showSideBar}}col-md-offset-1 col-md-11{{else}}col-md-12{{/and}}" style="padding-left : 0px;padding-right: 0px;">
+                    <div class="col-md-12" style="padding-left : 0px;padding-right: 0px;">
                             <div class="container">
                                 <!-- Brand and toggle get grouped for better mobile display -->
                                 <div class="navbar-header">
@@ -45,7 +45,7 @@
                                         <div class="input-group">
                                             <input name="q" value="" class="form-control" placeholder="Search" type="text">
                                             <div class="input-group-btn">
-                                                <button class="btn btn-default btn-green nav_search_button" type="button" ><span class="glyphicon glyphicon-search"></span></button>
+                                                <button class="btn btn-default btn-green" type="submit" ><span class="glyphicon glyphicon-search"></span></button>
 
                                             </div>
 
@@ -63,12 +63,12 @@
                                         {{else}}
                                         <!-- <li><a href="/pricing">Plans</a></li> -->
                                         {{/if}}
-                                        <li class="navbar-search-custom hidden-xs"> 
-                                                <form class="navbar-form nav_search_form" role="search" style="margin-top: 13px;"  method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}">
+                                        <li class="navbar-search-custom hidden-xs {{#if isLoggedIn}}nav_logged_in{{/if}}"> 
+                                                <form class="navbar-form nav_search_form" role="search" style="margin-top: 13px;"  method="get" action="/toys/search">
                                                     <div class="input-group">
                                                         <input name="q" value="{{query}}" class="form-control" placeholder="Search" type="text">
                                                         <div class="input-group-btn">
-                                                            <button class="btn btn-default btn-green nav_search_button" type="button" ><span class="glyphicon glyphicon-search"></span></button>
+                                                            <button class="btn btn-default btn-green" type="submit" ><span class="glyphicon glyphicon-search"></span></button>
 
                                                         </div>
 
@@ -95,9 +95,7 @@
                                             <!-- <li><a href="/profile">Profile</a></li>-->
                                             <li><a href="/contact">Contact</a></li>
                                             {{#if isLoggedIn }}
-                                                {{#if showSideBar}}
-                                                {{else}}
-                                                    <li class="dropdown"><a class="dropdown-toggle " data-toggle="dropdown"><span style="text-transform: capitalize;">Hi {{user.first_name}},</span><span class="caret"></span></a>
+                                                    <li class="dropdown"><a class="dropdown-toggle " data-toggle="dropdown"><span style="text-transform: capitalize;">My Profile </span><span class="caret"></span></a>
                                                         <ul style="width: 100%; margin-top: 0px;" class="dropdown-menu dropdown-menu-right" >
                                                             <li><a href="/user/rechargeDetails">My Wallet</a></li>
                                                             <li><a href="/user/orderDetails">My Orders</a></li>
@@ -105,10 +103,8 @@
                                                             <li><a href="/logout">Logout</a></li>
                                                         </ul>
                                                     </li>
-                                                {{/if}}
-
                                             {{else}}
-                                                <li><a href="/login" >Login</a></li>
+                                                <li><a class="" href="/login" >Login</a></li>
                                             {{/if}}
                                             <!-- <a class="navbar-btn dropdown-toggle hidden-xs"><i class="glyphicon glyphicon-shopping-cart"></i><span> Cart - 0 </span><span class="caret"></span></a>   
                                                 </li> -->
@@ -126,7 +122,7 @@
            <!-- <a data-toggle="collapse" href="#_nav_age_group_form" aria-expanded="false" aria-controls="_nav_age_group_form"> <h6 style="font-weight : bold;">Age Group</h6> 
            </a>           --><h6 style="font-weight : bold;">Age Group</h6> 
            <!-- <form id="_nav_age_group_form" class="collapse" > -->
-                <form id="_nav_age_group_form">
+                <form class="nav_age_group_form visible-xs">
                     {{#each toysData.filters.ageGroups}}
                     <fieldset>
                         <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
@@ -137,7 +133,7 @@
                     {{/each}}
                 </form>
                     <h6 style="font-weight : bold;"> Categories </h6>
-                    <form id="_nav_category_form">
+                    <form class="nav_category_form visible-xs">
                     {{#each toysData.filters.categories}}
                     <fieldset>
                         <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
@@ -147,38 +143,7 @@
                 {{/each}}
                     </form>
                 </div>
-        {{#and isLoggedIn showSideBar}}
-            <div class="page-content">
-                <div class="container sidebar-container">
-                    <div style="padding-left : 0px; padding-right: 0px;" class="col-md-1 col-xs-2">
-
-                        <ul class="list-group" style="margin-top: 24px;">
-                            <li class="list-group-item sidebar-menu-item">
-                                <a href="/user/orderDetails" style="color : #333">
-                                    <i class="glyphicon glyphicon-link" style=""></i><p style="font-size: 10px;">My Orders</p>
-                                </a>
-                            </li>
-                            <li class="list-group-item sidebar-menu-item">
-                                <a href="/user/rechargeDetails" style="color : #333">
-                                    <i class="glyphicon glyphicon-link" style=""></i><p style="font-size: 10px;">My Plan</p>
-                                </a>
-                            </li>
-                            <li class="list-group-item sidebar-menu-item">
-                                <a href="/logout" style="color : #333">
-                                    <i class="glyphicon glyphicon-log-out" style=""></i><p style="font-size: 10px;">Sign Out</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="col-md-11" style="padding-left : 0px; padding-right: 0px;">
-                    {{/and}}
                     {{{body}}}
-                    {{#and isLoggedIn showSideBar}}    
-                        </div>
-                </div>
-            </div>
-        {{/and}}
         <!-- begin:footer -->
         <div id="footer" class="nav_main_content">
             <div class="container">
@@ -232,7 +197,7 @@ var Q;
             <script src="/js/jquery.js"></script>
             <script src="/js/jquery.validate.min.js"></script>
             <script src="/js/bootstrap.js"></script>
-            <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script>
+             <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script> 
             <script src="/js/gmap3.js"></script>
             <script src="/js/util.js"></script>
             <script src="/js/helpers/navLogInHelper.js"></script>
@@ -240,6 +205,5 @@ var Q;
             <script src="/js/helpers/navOrderHelper.js"></script>
             <script src="/js/helpers/navSearchHelper.js"></script>
             <script src="/js/script.js"></script>
-            <script src="/js/search.js"></script>
     </body>
 </html>

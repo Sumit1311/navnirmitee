@@ -25,50 +25,70 @@
 			
 			<div class="row confirm">
 				<div class="col-md-12">
-					<form class="form-horizontal" role="form" action="/registrationDetails?code={{verificationCode}}" method="post">
+					<form id="_nav_registration_details" class="form-horizontal" role="form" action="/registrationDetails?code={{verificationCode}}" method="post">
 					  	<h3 class="text-center">Fill In Following Details</h3>
 					  	<hr>
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label">First Name</label>
+							<label class="col-sm-2 control-label">First Name</label>
 							<div class="col-sm-4">
                                 <input type="text" class="form-control" placeholder="First Name" name="firstName" length="10" required>
 							</div>
-						</div>
-
-						<div class="form-group">
-							<label class="col-sm-3 control-label">Last Name</label>
+							<label class="col-sm-2 control-label">Last Name</label>
 							<div class="col-sm-4">
                                 <input type="text" class="form-control" placeholder="Last Name" name="lastName" required>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label">Email address</label>
+							<label class="col-sm-2 control-label">Email address</label>
 							<div class="col-sm-4">
                                 <input type="email" class="form-control" placeholder="Email address : " name="email" value="{{user.email_address}}" readonly required>
 							</div>
-						</div>
-
-						<div class="form-group">
-							<label class="col-sm-3 control-label">Phone number</label>
+							<label class="col-sm-2 control-label">Phone number</label>
 							<div class="col-sm-4">
                                 <input type="text" class="form-control" placeholder="Phone number : " name="contactNo" value="{{user.mobile_no}}" required>
 							</div>
 						</div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" name="gender">Gender</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" placeholder="" required>
+                                    <option value="" selected="" disabled> Select Gender Of Child</option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
 
-						<div class="form-group">
-							<label class="col-sm-3 control-label">Permanent Address</label>
-							<div class="col-sm-4">
-							  <textarea class="form-control" rows="8" name="shippingAddress" placeholder="Shipping Address : " required></textarea>
-							</div>
-						</div>
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">Age Group</label>
+                            <div class="col-sm-4">
+                                <select name="ageGroup" class="form-control" required>
+                                    <option value="" disabled selected> Select Age Group</option>
+                                    {{#each ageGroups}}
+                                        <option value="@index" >{{this}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 col-md-2 control-label">Permanent Address</label>
+                            <div class="col-sm-4 col-md-4">
+                                <textarea class="form-control" rows="4" name="shippingAddress" placeholder="Shipping Address : " required></textarea>
+                            </div>
+                            <label class="col-md-2 col-sm-2 control-label">Pin Code</label>
+                            <div class="col-md-4 col-sm-4">
+                                <input class="form-control" type="text" name="pinCode" placeholder="Pin Code :" required>
 
-
-						<div class="form-group">
-						    <div class="col-sm-offset-3 col-sm-10">
-						      <button type="submit" class="btn btn-green">Commit Details</button>
-						    </div>
-						</div>
+                            </div>
+                            <label class="col-md-2 col-sm-2 control-label">Hobbies</label>
+                            <div class="col-md-4 col-sm-4">
+                                <input type="text" class="form-control" placeholder="Commma seperated list of hobbies of your child" name="hobbies" value="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-4">
+                                <button type="submit" class="btn btn-green">Commit Details</button>
+                            </div>
+                        </div>
 					</form>
 				</div>
 			</div>

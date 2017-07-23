@@ -4,6 +4,7 @@ navSearchHelper.prototype.submitSearch = function() {
     var query = this.getQueryString();
     var categories = this.getActiveCategories();
     var ageGroups = this.getActiveAgeGroups();
+    var sorters = this.getSorters();
     //var urlParams = query;
     $("#_nav_search_form").append("<input type=\"hidden\" name="+ query[0].name+" value=\""+ query[0].value+"\">");
     var i;
@@ -19,6 +20,13 @@ navSearchHelper.prototype.submitSearch = function() {
         }
         //urlParams += "&" + ageGroups;
     }
+
+    if(sorters.length !== 0) {
+        for(i = 0; i < sorters.length; i++) {
+            $("#_nav_search_form").append("<input type=\"hidden\" name="+ sorters[i].name+" value=\""+ sorters[i].value+"\">");
+        }
+        
+    } 
     //var searchUrl = "/toys/search?" + urlParams;
     //$("#_nav_search_form").attr("action", searchUrl);
     $("#_nav_search_form").submit();
@@ -29,10 +37,14 @@ navSearchHelper.prototype.getQueryString = function() {
 }
 
 navSearchHelper.prototype.getActiveCategories = function() {
-    return $("#_nav_category_form").serializeArray();
+    return $(".nav_category_form:visible").serializeArray();
 }
 navSearchHelper.prototype.getActiveAgeGroups = function() {
-    return $("#_nav_age_group_form").serializeArray();
+    return $(".nav_age_group_form :visible").serializeArray();
+}
+
+navSearchHelper.prototype.getSorters =function() {
+    return $(".nav_search_sorter").serializeArray();
 }
 
 navSearchHelper.prototype.toggleFilterBar = function() {
@@ -63,26 +75,33 @@ navSearchHelper.prototype.openFilterBar = function() {
 registerSearchHelpers();
 
 function registerSearchHelpers() {
-   $("#_nav_category_form :checkbox").change(function(event) {
-       event.preventDefault();
-       new navSearchHelper().submitSearch();
-   } ); 
-   $("#_nav_age_group_form :checkbox").change(function(event) {
-       event.preventDefault();
-       new navSearchHelper().submitSearch();
-   } );
-  $(".nav_search_button").click(function(event) {
-    event.preventDefault();
-    new navSearchHelper().submitSearch();
-  }) ;
-  $("#_nav_filter_btn").click(function(event) {
-    event.preventDefault();
-    new navSearchHelper().toggleFilterBar();
-    event.stopPropagation();
-  });
-  $(".nav_main_content").click(function(event) {
-    event.preventDefault();
-    new navSearchHelper().closeFilterBar();
-
-  })
+    $(".nav_category_form :checkbox").change(function(event) {
+        //event.preventDefault();
+        new navSearchHelper().submitSearch();
+    } );
+    $(".nav_age_group_form :checkbox").change(function(event) {
+        //event.preventDefault();
+        new navSearchHelper().submitSearch();
+    } );
+    $(".nav_search_sorter").change(function(event){
+        //event.preventDefault();
+        new navSearchHelper().submitSearch();
+    } )
+    $(".nav_search_button").click(function(event) {
+        event.preventDefault();
+        new navSearchHelper().submitSearch();
+        //event.stopPropagation();
+    }) ;
+    $("#_nav_filter_btn").click(function(event) {
+        event.preventDefault();
+        new navSearchHelper().toggleFilterBar();
+        //event.stopPropagation();
+    });
+    $("document").click(function(){
+    debugger;
+    })
+   /*$(".nav_main_content").click(function(event) {
+        //event.preventDefault();
+        new navSearchHelper().closeFilterBar();
+    })*/
 }

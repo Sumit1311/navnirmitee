@@ -2086,6 +2086,7 @@ blockquote {
 .coment textarea,
 .confirm input[type="text"],
 .confirm input[type="password"],
+.confirm select,
 .confirm input[type="email"],
 .confirm textarea{
 	border-radius: 4px;
@@ -2553,19 +2554,28 @@ padding-left:0px;
 }
 
 @media(min-width:768px) {
-li.navbar-search-custom {
-    width : 200px
-}
+    li.navbar-search-custom{
+        width : 221px;
+    }
+    li.navbar-search-custom.nav_logged_in{
+        width : 185px;
+    }
 }
 @media(min-width:980px) {
-li.navbar-search-custom {
-    width : 420px
-}
+    li.navbar-search-custom {
+        width : 445px;
+    }
+    li.navbar-search-custom.nav_logged_in {
+        width : 407px;
+    }
 }
 @media(min-width:1200px) {
-li.navbar-search-custom {
-    width : 620px
-}
+    li.navbar-search-custom {
+        width : 644px;
+    }
+    li.navbar-search-custom.nav_logged_in {
+        width : 603px;
+    }
 }
 
 .navbar .navbar-form {

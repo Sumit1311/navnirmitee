@@ -171,8 +171,8 @@ module.exports = class navAdminRouter extends navBaseRouter {
 
     getPayments(req, res) {
         var offset = parseInt(req.query.offset) || 0, limit = 50, sortBy = req.query.sortBy ? req.query.sortBy : 0, sortType = req.query.sortType || 0;
-        var columnOrdering = ["email_address", "amount_payable", "reason", "credit_date", "paid_date", "status", "transaction_summary", "next_retry_date", "expiration_date"];
-        var columnLabel = ["Customer Email", "Amount", "Payment Reason", "Initiate Date", "Success Date", "Status", "Summary", "Next Attempt", "Expiration Date"];
+        var columnOrdering = ["email_address", "amount_payable", "reason", "credit_date", "paid_date", "status", "transaction_summary", "next_retry_date", "expiration_date", "transaction_type"];
+        var columnLabel = ["Customer Email", "Amount", "Payment Reason", "Initiate Date", "Success Date", "Status", "Summary", "Next Attempt", "Expiration Date", "Trasaction Type"];
         var sortOrdering = ["ASC", "DESC"];
         var toysList, customerList, paymentList, statusList, noOfOrders = 0, noOfPages;
 
@@ -278,9 +278,8 @@ module.exports = class navAdminRouter extends navBaseRouter {
         }
 
         var promises = [];
-        for(var i in updateFields) {
-                console.log(updateFields[i]);
-                promises.push(new navPayments().updatePayment(updateFields[i].paymentId,updateFields[i])); 
+        for(i = 0; i < updateFields.length ; i++) {
+            promises.push(new navPayments().updatePayment(updateFields[i].paymentId,updateFields[i])); 
         }
         Q.allSettled(promises)
             .then((result)=>{
