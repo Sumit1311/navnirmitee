@@ -1073,7 +1073,7 @@ blockquote {
 	font-weight: 600;
 	text-transform: uppercase;
 	text-align: center;
-	color: #ffffff;
+	color: #000000;
 	letter-spacing: -1px;
 	margin: 15px 0;
 }
@@ -1119,7 +1119,7 @@ blockquote {
 }
 
 #testimoni .carousel .item .testimoni-item{
-	color: #ffffff;
+	color: #000000;
 	display: block;
 	box-shadow: inset 0px 1px 1px -1px #ffffff, inset 0px -1px 1px -1px #ffffff; 
 	-o-box-shadow: inset 0px 1px 1px -1px #ffffff, inset 0px -1px 1px -1px #ffffff; 

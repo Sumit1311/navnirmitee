@@ -1,0 +1,139 @@
+{
+    "brands" :[
+            {
+                "id" : 0,
+                "name" : "Fisher Price"
+            },
+            {
+                "id" : 1,
+                "name" : "Chicco"
+            },
+            {
+                "id" : 2,
+                "name" : "Thomas"
+            },
+            {
+                "id" : 3,
+                "name" : "Little Tikes"
+            },
+            {
+                "id" : 4,
+                "name" : "B kids"
+            },
+            {
+                "id" : 5,
+                "name" : "Infantio"
+            },
+            {
+                "id" : 6,
+                "name" : "Leap Frog"
+            },
+            {
+                "id" : 7,
+                "name" : "Playskool"
+            },
+            {
+                "id" : 8,
+                "name" : "Tommy"
+            },
+            {
+                "id" : 9,
+                "name" : "VTech"
+            },
+            {
+                "id" : 10,
+                "name" : "Mee Mee"
+            },
+            {
+                "id" : 11,
+                "name" : "Melissa and Doug"
+            }
+
+
+        ],
+    "skills" : [
+            {
+                "id" : 0,
+                "name" : "Hand-Eye Coordination"
+            },{
+                "id" : 1,
+                "name" : "Object Recognition"
+            },{
+                "id" : 2,
+                "name" : "Comparison"
+            },{
+                "id" : 3,
+                "name" : "Ordering"
+            },{
+                "id" : 4,
+                "name" : "Fine Motor Skills"
+            },{
+                "id" : 5,
+                "name" : "Gross Motor Skills"
+            },{
+                "id" : 6,
+                "name" : "Cognitive Development"
+            },{
+                "id" : 7,
+                "name" : "Emotional Development"
+            },{
+                "id" : 8,
+                "name" : "Cause And Effect"
+            },{
+                "id" : 9,
+                "name" : "Movement"
+            },{
+                "id" : 10,
+                "name" : "Pretending"
+            },{
+                "id" : 11,
+                "name" : "Engaging Child"
+            },{
+                "id" : 12,
+                "name" : "Language"
+            },{
+                "id" : 13,
+                "name" : "Mathematics"
+            },{
+                "id" : 14,
+                "name" : "Listening and Music"
+            },{
+                "id" : 15,
+                "name" : "Real Life Objects Handling"
+            },{
+                "id" : 16,
+                "name" : "Book Reading"
+            },{
+                "id" : 17,
+                "name" : "Color Recognition"
+            },{
+                "id" : 18,
+                "name" : "Responding"
+            },{
+                "id" : 19,
+                "name" : "Recalling Memory"
+            },{
+                "id" : 20,
+                "name" : "Imagination"
+            },{
+                "id" : 21,
+                "name" : "Sports"
+            },{
+                "id" : 22,
+                "name" : "Science"
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ]
+}

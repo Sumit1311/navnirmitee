@@ -55,8 +55,16 @@ CREATE TABLE  nav_toys(
     long_description TEXT,
 	points integer,
 	age_group smallint,
-	category smallint,
+    brand integer,
 	parent_toys_id varchar(36),
+	CONSTRAINT _id PRIMARY KEY (_id)
+)
+WITH (OIDS=FALSE);
+
+CREATE TABLE  nav_toys_skills(
+	_id varchar(36),
+	toys_id varchar(36),
+	skill integer,
 	CONSTRAINT _id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
@@ -117,3 +125,6 @@ REFERENCES  nav_toys (_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE;
 
 
+ALTER TABLE  nav_toys_skills ADD CONSTRAINT nav_toys_skills_id_pk FOREIGN KEY (toys_id)
+REFERENCES  nav_toys (_id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE;
