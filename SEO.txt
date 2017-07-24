@@ -1,0 +1,23 @@
+Most content in html text
+ 1. Add alt to images
+ 2. Transacripts to videos
+ 3. Crawable link structure al important pages should be reached by home page - (How to make toys list crawlable?)
+ 4. rel="nofollow" attribute to tell search engines not to follow
+ 5. Most common key words must be crawlable
+   a. spelling, punctuation, and capitalization
+   b. titles, texts and metadata must contain the required keywords
+   c. in title tag at least once
+   d. once near top of page
+   e. two or three times in body
+   f. at least once in image alt
+   g. once in URL
+   h. Metatags
+   i. links and anchor text distribution, quntity of links
+   j. Make one page attractive to robots and point different pages there
+   k. Accurately define title and alt
+   l. Descriptive URLs and rel="canonical" for repeated content
+   k. Site loading speeds
+6. Newly created website :
+   a. gogle search console
+
+
