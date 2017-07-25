@@ -12,7 +12,7 @@ function navRequestHandler() {
                 url: url,
                 method: method,
                 processData: false,
-                datatType: responseType,
+                dataType: responseType,
                 success: function (result, status, xhr) {
                     if (responseType) {
                         deferred.resolve(result);

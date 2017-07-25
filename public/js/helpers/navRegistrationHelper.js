@@ -34,7 +34,7 @@ navRegistrationHelper.prototype.registrationHandler = function(event, that) {
                } else {
                 self.showError(error.subMessage);
                }
-               $("#_nav_register_button").prop('disabled', false);;
+               $("#_nav_register_button").prop('disabled', false);
            });
 }
 
@@ -47,3 +47,4 @@ navRegistrationHelper.prototype.showError = function(message) {
     $("#_nav_register_error .alert").text(message);
     $("#_nav_register_error").removeClass("hidden");
 }
+

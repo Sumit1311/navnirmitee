@@ -40,10 +40,10 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                     user : req.user,
                     userDetails : {
                         enrollmentDate : new navCommonUtil().getDateString(parseInt(userDetails.enrollment_date)),
-                        membershipExpiryDate : userDetails.membership_expiry != null ? new navCommonUtil().getDateString(parseInt(userDetails.membership_expiry)) : false,
+                        membershipExpiryDate : userDetails.membership_expiry !== null ? new navCommonUtil().getDateString(parseInt(userDetails.membership_expiry)) : false,
                         deposit : userDetails.deposit,
                         balance : userDetails.balance,
-                        membershipStatus :   (userDetails.membership_expiry == null ? true : ( parseInt(userDetails.membership_expiry > new navCommonUtil().getCurrentTime()) ? true : false)),
+                        membershipStatus :   (userDetails.membership_expiry === null ? true : ( parseInt(userDetails.membership_expiry) > new navCommonUtil().getCurrentTime()) ? true : false),
                     },
                     transactions : transactions,
                     isLoggedIn : req.user ? true : false,
@@ -55,6 +55,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
 				var lableClass;
 				switch(status) {
 				    case navPaymentsDAO.getStatus().PENDING :
+				    case navPaymentsDAO.getStatus().PENDING_COD :
 					lableClass = "warning";
 				        break;
 				    case navRentalsDAO.getStatus().DELIVERED:
@@ -65,6 +66,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
 				        break;
 				    case navRentalsDAO.getStatus().CANCELLED:
 				    case navPaymentsDAO.getStatus().CANCELLED :
+				    case navPaymentsDAO.getStatus().FAILED :
 					lableClass = "danger";
 				        break;
 				

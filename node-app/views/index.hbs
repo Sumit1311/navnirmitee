@@ -13,21 +13,33 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="carousel-content">
-                    <h2 class="animated fadeInUpBig text-center text-black">Hello</h2>
-                      <p class="animated rollIn text-black text-center"><span class="text900">Welcome to Navnirmitee Smart Toy Library</span> First of it's kind <br>Build skills in your child from it's child hood<br><br> <a href="#" class="btn btn-green btn-lg">Get Started</a></p>  
+                    <h2 class="animated fadeInUpBig text-center text-black">Welcome</h2>
+                    <p class="animated rollIn text-black text-center"><span class="text900">Navnirmitee Smart Toy Library</span> First of it's kind <br>Raise your kid as smarter one<br><br><a href="#" class="btn btn-green btn-lg">Know How  &raquo;</a></p>  
                   </div>
                 </div> 
               </div>
             </div>
           </div>
-          <div class="item" style="background: url(img/img02.jpg);">
+          <div class="item" style="background: url(img/img02.png) center 20%;">
             <div class="container">
               <div class="row">
                 <div class="col-md-12">
-                  <div class="carousel-content">
-                  	<h3 class="animated fadeInLeftBig text-left">.Built</h3>
-					<p class="animated fadeInDownBig text-left">Your own online shop using this catalog theme.<br> Simple and easy cutomize just $12.</p>
+                  <div class="carousel-content text-center">
+                  	<h3 class="animated fadeInLeftBig text-center" style="color: #000;">Toys are more than fun for kids</h3>
+                    <p class="animated fadeInDownBig text-center">They are valuable tools to make your kid smart <br> They prepare him for skills needed to be an adult.<br><br></p>
 					<a class="btn btn-green btn-lg animated fadeInRight" href="#">Learn more &raquo;</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item" style="background: url(img/img03.jpg) center 20%;">
+            <div class="container">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="carousel-content text-center">
+                  	<h3 class="animated fadeInLeftBig text-center" style="color: rgb(1, 239, 96);">The more variety of toys he has.</h3>
+                    <p class="animated fadeInDownBig text-center">The happier he is and more diverse his learning experience will be.  <br><br></p>
                   </div>
                 </div>
               </div>
@@ -47,16 +59,16 @@
     <!-- end:slider -->
 	
 	<!-- begin:tagline -->	
-	<div id="tagline">
+	<!-- <div id="tagline">
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
-					<h2>Navnirmitee Smart Toy Library</h2>
-					<p>Tag line</p>
+                    <h2>Navnirmitee Smart Kids Library</h2>
+					<p></p>
 				</div>
 			</div>
 		</div>
-	</div>
+    </div> -->
 	<!-- end:tagline -->
 	
 	<!-- begin:featured -->
@@ -66,7 +78,7 @@
 				<div class="col-md-12">
 					<div class="heading-title">
 						<h2>Speciality</h2>
-						<p>There are many toy libraries what's special(smart)? </p>
+						<p></p>
 					</div>
 				</div>
 			</div>
@@ -74,28 +86,28 @@
 				<div class="col-md-4 col-sm-4">
 					<div class="featured-container">
 						<div class="featured-photos">
-							<i class="fa fa-gift"></i>
+							<i class="fa fa-question-circle"></i>
 						</div>
 						<h3>What ?</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque.</p>
+						<p>A toy rental service with smarter selection of toys for the kids.</p>
 					</div>
 				</div>
 				<div class="col-md-4 col-sm-4">
 					<div class="featured-container">
 						<div class="featured-photos">
-							<i class="fa fa-heart-o"></i>
+							<i class="fa fa-hand-o-up"></i>
 						</div>
 						<h3>Why ?</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque.</p>
+						<p>It has became hard to provide the appropriate toys to kids due to higher cost and wide range of options available.</p>
 					</div>
 				</div>
 				<div class="col-md-4 col-sm-4">
 					<div class="featured-container">
 						<div class="featured-photos">
-							<i class="fa fa-flag"></i>
+							<i class="fa fa-lightbulb-o"></i>
 						</div>
 						<h3>How ?</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus quis lectus metus, at posuere neque.</p>
+						<p>We provide the personalized toy renting experience for each kid. We suggest appropriate toys for appropriate ages.</p>
 					</div>
 				</div>
 			</div>
@@ -128,7 +140,14 @@
 						        <h3>{{name}}</h3>
 						        <span class="price">&#x20b9; {{price}}</span>
 					        </div>
-					        <a href="/toys/detail?id={{_id}}"><div class="caption-link"><i class="fa fa-plus"></i><h3>{{short_description}}</h3></div></a>
+                            <a href="/toys/detail?id={{_id}}"><div class="caption-link"><h3>{{short_description}}</h3>
+                                    <h3>Skills Developed :<br>
+                                    {{#each this.skills}}
+                                        {{skill}}
+                                        <br>
+                                    {{/each}}
+                            </h3>
+                    </div></a>
 					    </div>
 				    </div>
                 {{/each}}
@@ -143,7 +162,7 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div class="testimoni-icon"><i class="fa fa-quote-left"></i></div>
-					<h3>Our Testimonials</h3>
+					<h3>What Experts Say?</h3>
 				</div>
 			</div>
 			<div class="row">
@@ -151,12 +170,12 @@
 					<div id="testi" class="carousel slide" data-ride="carousel">
 				      <div class="carousel-inner">
 				        <div class="item active">
-				           <p class="testimoni-item">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-							<h4>&#8212; John doe, Scriptlabs &#8212;</h4>
+				           <p class="testimoni-item">Toys are children's words and play is their language.</p>
+							<h4>&#8212; GARRY L. LANDRETH, Play Therapy: The Art of the Relationship &#8212;</h4>
 				        </div>
 				        <div class="item">
-				           <p class="testimoni-item">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-							<h4>&#8212; John doe, Scriptlabs &#8212;</h4>
+                            <p class="testimoni-item">Based on my experience and expertise, children’s well-being improves when they are busy and active.  Play allows them to be in a mode of discovery and be free to be who they are at that moment in time.</p>
+							<h4>&#8212; Dr. Jane Aronson, Director of Business and Product Development, Planetree &#8212;</h4>
 				        </div>
 				        <div class="item">
 				           <p class="testimoni-item">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>

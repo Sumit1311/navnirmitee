@@ -1,0 +1,113 @@
+<div class="page-header">
+    <h2>Payments</h2>
+</div>
+<div class="panel panel-primary filterable" style="
+        border-color: #1ABC9C;
+        ">
+        <div class="panel-heading" style="
+                background-color: #1ABC9C;
+                    border-color: #1ABC9C;
+                    ">
+        <h3 class="panel-title">Payments</h3>
+        <div class="pull-right">
+            <a class="btn-filter" href="#" style="
+                   color: #FFFFFF;
+                  " ><span class="glyphicon glyphicon-filter"></span> Filter</a>
+        </div>
+    </div>
+    <table class="table table-hover table-responsive">
+        <thead>
+            <tr class="filters hidden">
+                {{#each context.columnLabel}}
+                    <th><input type="text" class="form-control" placeholder="{{this}}"></th>
+                {{/each}}
+            </tr>
+            <tr> 
+                {{#each context.columnLabel}}
+                    <th><a href="/admin/payments?sortBy={{@index}}&{{#compare ../context.sortBy "==" @index}}sortType={{../context.sortType}}{{else}}sortType=0{{/compare}}">{{this}}</a></th>
+                    {{/each}}
+                </tr>
+            </thead>
+            {{#each context.paymentList}}
+                <tr>
+                    <!-- TODO : check whether this works in firefox -->
+                    <form id="{{this._id}}"> 
+                        <td><select name="userId"  class="form-control"  disabled>
+                                <option value="{{user_id}}" selected>{{email_address}}</option>
+                            </select>
+                        </td>
+                        <td><input type="text"  class="form-control" name="amount" value="{{amount_payable}}" readonly />
+                        </td>
+                        <td><input type="text" class="form-control" name="reason" value="{{reason}}" readonly />
+                        </td>
+                        <td><div class="row">
+                                <div class='col-md-12 col-sm-6'>
+                                    <input name="transactionDate" type='text' class="form-control datetimepicker" value="{{credit_date}}" />
+                                </div>
+                            </div>
+                        </td>
+                        <td><div class="row">
+                                <div class='col-md-12 col-sm-6'>
+                                    <input name="paidDate" type='text' class="form-control datetimepicker" value="{{paid_date}}"/>
+                                </div>
+                            </div>
+                        </td>
+                        <td><div class="row">
+                                <div class='col-md-12 col-sm-6'><select name="paymentStatus" data-width="fit" >
+                                        {{#each ../context.statusList}}
+                                            <option value="{{this}}" {{#compare this "==" ../status}}selected{{/compare}}>{{this}}</option>
+                                            {{/each}}
+                                        </select>
+
+                                    </div>
+                                </div>
+                            </td>
+                        <td><p name="transactionSummary">{{transaction_summary}}</p></td>
+                        <!-- <td><textarea class="form-control" name="transactionSummary">{{transaction_summary}}</textarea></td> -->
+                        <td><div class="row">
+                                <div class='col-md-12 col-sm-6'>
+                                    <input type='text' name="retryDate" class="form-control datetimepicker" value="{{next_retry_date}}"/>
+                                </div>
+                            </div>
+                        </td>
+                        <td><div class="row">
+                                <div class='col-md-12 col-sm-6'>
+                                    <input type='text' class="form-control datetimepicker" name="expirationDate" value="{{expiration_date}}"/>
+                                </div>
+                            </div>
+                        </td>
+                        <td><input type="text" class="form-control" name="type" value="{{transaction_type}}" readonly />
+                        </form>
+                    </tr>
+                {{/each}}
+            </table>
+        </div>
+					<div id="_nav_error_div" class="alert alert-danger hidden" style="padding: 7px; font-size: 11px;" role="alert">
+                    </div> 
+            <div class="col-md-2">
+                <button id="_nav_btn_save" class="btn btn-green">
+                    Save
+                    <span class="glyphicon glyphicon-floppy-save"></span>
+                </button>
+            </div>
+            <div class="col-md-offset-6 col-md-4">
+                    {{#compare context.paymentList.length "!=" 0}}
+                    <ul style="margin-top : 0px" class="pagination pull-right">
+                        <li class="disabled"><a href="#">Page {{context.currentPage}} of {{context.noOfPages}}</a></li>
+                        <li class="{{#compare context.currentPage "==" 1}}disabled{{/compare}}"><a href="/admin/payments?{{queryParameters}}&offset={{multiply (subtract context.currentPage 2) context.perPageLimit }}">«</a></li>
+                            {{#if context.noOfPages}} 
+                                {{#repeat context.noOfPages}}
+                                    <li class="{{#compare (add @index 1) "==" ../context/currentPage}}active{{/compare}}"><a href="/admin/payments?{{../queryParameters}}&offset={{multiply @index  ../context/perPageLimit}}">{{add @index 1}}{{#compare (add @index 1) "==" ../context/currentPage}}<span class="sr-only">(current)</span>{{/compare}}</a></li>
+                                {{/repeat}}
+
+                                <li class="{{#compare context.currentPage "==" context.noOfPages }}disabled{{/compare}}"> <a href="/admin/payments?{{queryParameters}}&offset={{multiply context.currentPage context.perPageLimit}}">»</a></li>
+                            {{else}}
+                                <li class="active"><a href="/admin/payments?{{queryParameters}}&offset=0">1 <span class="sr-only">(current)</span></a></li>
+                                <li class="disabled"> <a href="#">»</a></li>
+                            {{/if}}
+                    </ul>
+                    {{/compare}}
+                </div>
+            <script src="/js/util.js"></script>
+            <script src="/js/helpers/navAdminPaymentHelper.js"></script>
+            <script src="/js/helpers/filterTable.js"></script>

@@ -24,8 +24,7 @@ navLogInHelper.prototype.logInHandler = function(event, that) {
             },
             submitHandler : self.logIn
            })*/
-           debugger;
-           $("#_nav_login_button").prop('disabled', true);;
+           $("#_nav_login_button").prop('disabled', true);
            var self = this;
            this.logIn(form)
            .catch(function(error){
@@ -34,7 +33,7 @@ navLogInHelper.prototype.logInHandler = function(event, that) {
                } else {
                 self.showError(error.subMessage);
                }
-               $("#_nav_login_button").prop('disabled', false);;
+               $("#_nav_login_button").prop('disabled', false);
            });
 }
 
@@ -59,15 +58,16 @@ function registerLogInHandlers(){
 }
 function createAccount()
 {
-    $("#_nav_login_div").toggleClass("hidden-xs");
+    $("#_nav_login_div").toggleClass("hidden-xs hidden-sm");
     //toggle($("#_nav_register_div"));
-    $("#_nav_register_div").toggleClass("hidden-xs");
+    $("#_nav_register_div").toggleClass("hidden-xs hidden-sm");
 }
 
 function resetPassword()
 {
     toggle($("#_nav_login_div"));
     toggle($("#_nav_forgot_password_div"));
+    //$("#_nav_register_div").toggleClass("hidden-md hidden-lg");
 }
 
 function toggle(element)

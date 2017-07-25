@@ -9,7 +9,8 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navPasswordUtil = require(process.cwd() + "/lib/navPasswordUtil.js"),
-    navUserDAO= require(process.cwd() + '/lib/dao/user/userDAO.js');
+    navUserDAO = require(process.cwd() + '/lib/dao/user/userDAO.js'),
+    navChildDAO = require(process.cwd() + '/lib/dao/child/navChildDAO.js');
 
 module.exports = class navRegistration extends navBaseRouter {
     constructor() {
@@ -98,14 +99,17 @@ module.exports = class navRegistration extends navBaseRouter {
     saveRegistrationData(req, email, contactNo, password, deferred) {
     }
     doEmailVerification(req, res, next) {
+        var self = this;
         var code = req.query.id;
         var deferred = Q.defer();
+        var ageGroups = navCommonUtil.getAgeGroups(), statesList = navCommonUtil.getStates(), districtsList = navCommonUtil.getDistricts();
         deferred.promise
             .done((user) => {
                 res.render('registrationDetails',{
                     layout : "nav_bar_layout",
                     isLoggedIn : true,
                     user : user[0],
+                    ageGroups : ageGroups,
                     verificationCode : user[0].email_verification
                 } );
             },(error) => {
@@ -137,28 +141,27 @@ module.exports = class navRegistration extends navBaseRouter {
             return deferred.reject(new navLogicalException());
         }
         (new navUserDAO()).getUserDetailsByCode(code)
-        .done(function (userDetails) {
-            if (userDetails != 0) {
-                return deferred.resolve(userDetails);
-                res.render('registrationDetails',{
-                    layout : "nav_bar_layout",
-                    isLoggedIn : true,
-                    user : userDetails[0],
-                    verificationCode : userDetails[0].email_verification
-                } );
-            } else {
-                return deferred.reject(new navLogicalException());
-            }
+            .done(function (userDetails) {
+                if (userDetails !== 0) {
+                    return deferred.resolve(userDetails);
+                } else {
+                    return deferred.reject(new navLogicalException());
+                }
         })
         
     }
     saveAdditionalDetails(req,res) {
+        var self = this;
         var body = req.body;
         var loginEmailId = body.email,
             firstName = body.firstName,
             lastName = body.lastName,
             address = body.shippingAddress,
-            verificationCode = req.query.code;
+            verificationCode = req.query.code,
+            pinCode = req.body.pinCode,
+            ageGroup = req.body.ageGroup,
+            gender = req.body.gender,
+            hobbies = req.body.hobbies;
         var userDAO = new navUserDAO(),
             client, user;
 
@@ -193,6 +196,9 @@ module.exports = class navRegistration extends navBaseRouter {
         req.assert("shippingAddress","First Name is Required").notEmpty();
         req.assert("code","Code is Required").notEmpty();
         req.assert("code","Bad Request").isUUID();
+        req.assert("pinCode","Pin Code Required").notEmpty();
+        //req.assert("ageGroup","Age Group Required").notEmpty();
+        //req.assert("gender","Gender Required").notEmpty();
 
 
         var validationErrors = req.validationErrors();
@@ -211,7 +217,7 @@ module.exports = class navRegistration extends navBaseRouter {
         })
         //todo : uncomment once email verification done and comment above then
         .then(function (userDetails) {
-            if(userDetails.length == 0) {
+            if(userDetails.length === 0) {
                 return Q.reject(new navLogicalException());
             }
             if(userDetails[0].email_address != loginEmailId) {
@@ -227,7 +233,10 @@ module.exports = class navRegistration extends navBaseRouter {
         })
         .then(function () {
             var time = new navCommonUtil().getCurrentTime();
-            return userDAO.updateUserDetails(user._id, firstName, lastName, address, moment().add(30, "days").valueOf(), time);
+            return userDAO.updateUserDetails(user._id, firstName, lastName, address, moment().add(30, "days").valueOf(), time, pinCode);
+        })
+        .then(function () {
+            return new navChildDAO().insertChildDetails(user._id, ageGroup, hobbies, gender);
         })
         .then(function () {
             return userDAO.commitTx();

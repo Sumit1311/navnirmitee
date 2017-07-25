@@ -10,6 +10,17 @@ module.exports = class navBaseRouter {
         return this.router;
     }
 
+    ensureSuperAdmin(req, res, next) {
+        if(req.user && req.user.user_type == 0) {
+            return next();
+        }
+        return res.render('login',{
+            layout: 'nav_bar_layout',
+            hideNavBar : true,
+            redirection : req.query.redirect ? req.query.redirect : req.originalUrl
+        });
+    }
+
     ensureAuthenticated(req, res, next) {
         if (req.isAuthenticated()) {
             next();
@@ -22,7 +33,7 @@ module.exports = class navBaseRouter {
             return res.render('login',{
                 layout: 'nav_bar_layout',
                 hideNavBar : true,
-                redirection : req.query.redirect ? req.query.redirect : false
+                redirection : req.query.redirect ? req.query.redirect : req.originalUrl
             });
         }
     }

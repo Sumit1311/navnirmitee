@@ -345,7 +345,6 @@ blockquote {
 }
 
 .navbar-default .nav-right{
-	margin-left: 170px;
 	float: right;
 }
 
@@ -1074,7 +1073,7 @@ blockquote {
 	font-weight: 600;
 	text-transform: uppercase;
 	text-align: center;
-	color: #ffffff;
+	color: #000000;
 	letter-spacing: -1px;
 	margin: 15px 0;
 }
@@ -1120,7 +1119,7 @@ blockquote {
 }
 
 #testimoni .carousel .item .testimoni-item{
-	color: #ffffff;
+	color: #000000;
 	display: block;
 	box-shadow: inset 0px 1px 1px -1px #ffffff, inset 0px -1px 1px -1px #ffffff; 
 	-o-box-shadow: inset 0px 1px 1px -1px #ffffff, inset 0px -1px 1px -1px #ffffff; 
@@ -2087,6 +2086,7 @@ blockquote {
 .coment textarea,
 .confirm input[type="text"],
 .confirm input[type="password"],
+.confirm select,
 .confirm input[type="email"],
 .confirm textarea{
 	border-radius: 4px;
@@ -2527,3 +2527,64 @@ blockquote {
 width:100%;
 padding-left:0px;
 }
+
+
+.filterable {
+    margin-top: 15px;
+}
+.filterable .panel-heading .pull-right {
+    margin-top: -20px;
+}
+.filterable .filters input[disabled] {
+    background-color: transparent;
+    border: none;
+    cursor: auto;
+    box-shadow: none;
+    padding: 0;
+    height: auto;
+}
+.filterable .filters input[disabled]::-webkit-input-placeholder {
+    color: #333;
+}
+.filterable .filters input[disabled]::-moz-placeholder {
+    color: #333;
+}
+.filterable .filters input[disabled]:-ms-input-placeholder {
+    color: #333;
+}
+
+@media(min-width:768px) {
+    li.navbar-search-custom{
+        width : 221px;
+    }
+    li.navbar-search-custom.nav_logged_in{
+        width : 185px;
+    }
+}
+@media(min-width:980px) {
+    li.navbar-search-custom {
+        width : 445px;
+    }
+    li.navbar-search-custom.nav_logged_in {
+        width : 407px;
+    }
+}
+@media(min-width:1200px) {
+    li.navbar-search-custom {
+        width : 644px;
+    }
+    li.navbar-search-custom.nav_logged_in {
+        width : 603px;
+    }
+}
+
+.navbar .navbar-form {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-right: 0px;
+    margin-left: 0;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+

@@ -6,6 +6,11 @@ module.exports = class navResponseUtils {
                     message : "Internal Server Error", 
                     subMessage: error.message
                 }, error.status);
+            case "navPendingReturnException" :
+                return this.generateResponse(error.code, {
+                    message : "Bad Request", 
+                    subMessage: error.message
+                }, error.status);
             case "navDatabaseException" :
                 return this.generateResponse(error.code, {
                     message : "Internal Server Error", 
@@ -48,7 +53,7 @@ module.exports = class navResponseUtils {
                        subMessage : error.message ? error.message : "",
                 }, 400);
             default :
-                console.log(error);
+                //console.log(error);
                 return this.generateResponse("UNKNOWN", {
                     message : "Internal Server Error",
                        subMessage : "Something Went Wrong, Please try again"
@@ -64,11 +69,21 @@ module.exports = class navResponseUtils {
             status : status
         }
     }
+    static generateResponse_S(code, body, status) {
+        return {
+            code : code,
+            body : body,
+            status : status
+        }
+    }
 
     sendAjaxResponse(res, response) {
         res.status(response.status).send(JSON.stringify(response.body));
     }
 
+    static sendAjaxResponse_S(res, response) {
+        res.status(response.status).send(JSON.stringify(response.body));
+    }
     redirect(req, res, path) {
         if(req.xhr) {
             this.sendAjaxResponse(res, {
@@ -87,6 +102,16 @@ module.exports = class navResponseUtils {
     renderErrorPage(req, res, context) {
         if(req.xhr) {
             this.sendAjaxResponse(res, context.errorResponse); 
+            return;
+        } else {    
+            res.status(context.errorResponse.status).render("errorDocument", context);
+        }
+            
+
+    }
+    static renderErrorPage_S(req, res, context) {
+        if(req.xhr) {
+            navResponseUtils.sendAjaxResponse(res, context.errorResponse); 
             return;
         } else {    
             res.status(context.errorResponse.status).render("errorDocument", context);

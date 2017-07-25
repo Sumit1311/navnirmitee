@@ -10,7 +10,8 @@ var STATUS = {
         DELIVERED : "DELIVERED",
         RETURNED : "RETURNED",
         PLACED : "PLACED",
-	CANCELLED : "CANCELLED"
+        CANCELLED : "CANCELLED",
+        DUE_RETURN : "DUE_RETURN"
     };
 
 
@@ -46,7 +47,7 @@ navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, sta
 
 navRentalsDAO.prototype.getOrdersByUserId = function (userId) {
     var self = this;
-    return this.dbQuery("SELECT _id FROM "+ tableName + " WHERE user_id = $1 AND status != $2",[userId, this.STATUS.RETURNED])
+    return this.dbQuery("SELECT _id, lease_end_date FROM "+ tableName + " WHERE user_id = $1 AND (status != $2 AND status != $3 AND status != $4)",[userId, this.STATUS.CANCELLED, this.STATUS.RETURNED, this.STATUS.DUE_RETURN])
       .then(function(result){
          return result.rows;
       })
@@ -58,7 +59,7 @@ navRentalsDAO.prototype.getOrdersByUserId = function (userId) {
 
 navRentalsDAO.prototype.getAllOrders = function(userId) {
     var self = this;
-    return this.dbQuery("SELECT lease_start_date, lease_end_date, status, delivery_date, returned_date, name, price FROM "+ tableName + " r INNER JOIN nav_toys t ON r.toys_id = t._id WHERE r.user_id = $1",[userId])
+    return this.dbQuery("SELECT r._id, lease_start_date, lease_end_date, status, delivery_date, returned_date, name, price FROM "+ tableName + " r INNER JOIN nav_toys t ON r.toys_id = t._id WHERE r.user_id = $1",[userId])
       .then(function(result){
          return result.rows;
       })
@@ -69,6 +70,99 @@ navRentalsDAO.prototype.getAllOrders = function(userId) {
 
 }
 
+navRentalsDAO.prototype.getOrdersFullList = function(offset, limit, sortBy, sortType) {
+    //debugger;
+    var self = this;
+    var sort = sortType ? sortType : "ASC", sortCol = sortBy ? sortBy : "email_address", p_offset = offset ? offset : 0, p_limit = limit ? limit : 5;
+    var params = [p_limit, p_offset];
+   var queryString = "SELECT r._id, user_id, lease_start_date, lease_end_date, status, delivery_date, returned_date, name , toys_id, email_address, shipping_address FROM "+ tableName + " r INNER JOIN nav_toys t ON r.toys_id = t._id INNER JOIN nav_user u ON r.user_id = u._id ORDER BY "+ sortCol + " " + sort +" LIMIT $1 OFFSET $2" 
+    return this.dbQuery(queryString , params)
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "getOrdersFullList",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
+
+}
 navRentalsDAO.getStatus= function(){
 	return STATUS;
+}
+navRentalsDAO.prototype.getOrdersCount = function() {
+    var self = this;
+    return this.dbQuery("select count(_id) AS count FROM "+tableName)
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "getOrdersFullList",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
+
+}
+navRentalsDAO.prototype.updateRentalDetails = function(orderId, deliveryDate, returnDate, leaseStartDate, leaseEndDate, shippingAddress, orderStatus) {
+    var self = this;
+    var query = "UPDATE "+tableName+" SET delivery_date = $1, returned_date = $2, lease_start_date = $3, lease_end_date = $4, shipping_address = $5 ", params = [deliveryDate, returnDate, leaseStartDate, leaseEndDate, shippingAddress], count = 5;
+    if(orderStatus) {
+    count++
+        query+=", status = $"+count;
+        params.push(orderStatus);
+    }
+    count++;
+    query += " WHERE _id = $"+count;
+    params.push(orderId);
+    return this.dbQuery(query, params)
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "getOrdersFullList",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
+
+}
+
+navRentalsDAO.prototype.updateStatus = function (orderId, status) {
+    var self = this;
+    var query = "UPDATE "+tableName+" SET status = $1 ", params = [status], count = 1;
+    count++;
+    query += " WHERE _id = $"+count;
+    params.push(orderId);
+    return this.dbQuery(query, params)
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "updateStatus",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
+
+}
+
+navRentalsDAO.prototype.getOrderDetails = function(orderId) {
+    var self = this;
+    return this.dbQuery("select user_id, toys_id. status FROM "+tableName+" WHERE _id=$1",[orderId])
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "getOrdersFullList",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
+
+}
+
+navRentalsDAO.prototype.markOrdersForReturn =function() {
+    var self = this;
+    var query = "UPDATE "+tableName+" SET status = $1 WHERE lease_end_date <= $2 AND status IN ($3, $4)", 
+        params = [STATUS.DUE_RETURN, navCommonUtils.getCurrentTime_S(), STATUS.PLACED, STATUS.DELIVERED];
+    return this.dbQuery(query, params)
+      .then(function(result){
+         return result.rows;
+      })
+      .catch(function(error){
+            navLogUtil.instance().log.call(self, "updateStatus",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+      });
 }

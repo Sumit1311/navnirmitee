@@ -101,7 +101,7 @@ BaseDAO.prototype.dbQuery = function (sql, params) {
             return query.call(self, client, sql, params);
         })
         .catch(function (error) {
-            navLogUtil.instance().log.call(self, "dbQuery","Error executing query "+ sql +" params : "+ params +" : " + error.message, "debug" );
+            navLogUtil.instance().log.call(self, "dbQuery","Error executing query "+ sql +" params : "+ params +" : " + error.message, "error" );
             return Q.reject(commonUtil.getErrorObject(error, 500, "DBQUERY", navDatabaseException));
         })
         .finally(function () {
@@ -113,7 +113,6 @@ BaseDAO.prototype.dbQuery = function (sql, params) {
 }
 
 function query(dbClient, sql, params) {
-        var logUtil = new navLogUtil();
         return dbClient.query(sql, params)
             .then(function () {
                 var results = dbClient.results();

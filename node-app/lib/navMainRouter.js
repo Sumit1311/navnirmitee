@@ -1,11 +1,14 @@
 var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navPGRouter = require(process.cwd() + "/lib/navPGRouter.js"),
     navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
+    navSkillsDAO = require(process.cwd() + "/lib/dao/skills/navSkillsDAO.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
     navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navPayments = require(process.cwd() + "/lib/navPayments.js"),
     navLogicalException = require("node-exceptions").LogicalException,
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     helpers = require('handlebars-helpers')(),
@@ -66,14 +69,28 @@ module.exports = class navMainRouter extends navBaseRouter {
             else{
                 promise = (new navToysDAO()).getAllToys(0,10);
             }
-
+            var toys;
             promise
-            .then(function(toysList){
+                .then((toysList) => {
+                    toys = toysList;
+                    var promises = [];
+                    for(var z = 0; z < toysList.length; z++) {
+                        promises.push(new navSkillsDAO().getSkillsForToy(toysList[z]._id));
+                    }
+                    return Q.allSettled(promises);
+                })
+            .then(function(results){
+                for(var w = 0; w < results.length; w++) {
+                    if(results[w].state == 'rejected') {
+                        return Q.reject(results[w].reason)
+                    }
+                    toys[w].skills = results[w].value;
+                }
                 res.render('index', {
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
-                    toysList : toysList
+                    toysList : toys
                 });
             })
             .done(null,function(error){
@@ -102,7 +119,11 @@ module.exports = class navMainRouter extends navBaseRouter {
         var respUtil =  new navResponseUtil();
         deferred.promise
             .done(function(result){
-		res.render(result.pageToRender, {data : result.context, redirectURL : result.redirectURL});
+                if(result) {
+                    res.render(result.pageToRender, {data : result.context, redirectURL : result.redirectURL});
+                } else {
+                    respUtil.redirect(req, res, '/user/rechargeDetails');
+                }
                 //respUtil.redirect(req, res, "/");
             },function(error){
                 var response = respUtil.generateErrorResponse(error);
@@ -117,50 +138,99 @@ module.exports = class navMainRouter extends navBaseRouter {
 
         req.assert("type","type is required").notEmpty();
         req.assert("plan","Plan is  Required").notEmpty();
-        req.assert("type","Type is not a number").isInt();
+        //req.assert("type","Type is not a number").isInt();
         req.assert("plan","Plan is not a number").isInt();
+        req.assert("paymentMethod","paymentMethod is required").notEmpty();
 
         var validationErrors = req.validationErrors();
         if(validationErrors) {
             return deferred.reject(new navValidationException(validationErrors));
         }
-        var plans = navMembershipParser.instance().getConfig("plans",[]), type = req.query.type, plan = req.query.plan;
-        if(plans[type][plan] == undefined) {
+        var plans , type = req.query.type, plan = req.query.plan, paymentMethod = req.body.paymentMethod;
+
+        if(type == "member") {
+            plans =  navMembershipParser.instance().getConfig("membership",[]);
+        } else {
+            plans = navMembershipParser.instance().getConfig("plans",[])[type];
+        }
+
+        if(!plans || plans[plan] === undefined) {
             return deferred.reject(new navLogicalException(validationErrors));
         }
-        var p=plans[type][plan];
+        var p=plans[plan];
 
         var user = req.user;
         var uDAO = new navUserDAO();
-	var deposit, orderId, result;
+        var deposit, orderId, result;
         uDAO.getClient()
             .then((_client) => {
                 uDAO.providedClient = _client;
                 return uDAO.startTx();
             })
             .then(() => {
-                return uDAO.updatePlan(user._id,type + "::" + plan);
+                if(type === "member") {
+                    return Q.resolve();
+                } else {
+                    return uDAO.updatePlan(user._id,type + "::" + plan);
+                }
             })
             .then((result) => {
-		orderId = new navCommonUtil().generateUuid();
-		deposit = parseInt(p.deposit) - user.deposit;
-                if(result && deposit > 0) {
-                    var pDAO = new navPaymentsDAO(uDAO.providedClient);
-                    return pDAO.insertPaymentDetails(user._id, deposit, pDAO.REASON.DEPOSIT, pDAO.STATUS.PENDING, orderId);       
+                orderId = new navCommonUtil().generateUuid();
+                deposit = parseInt(p.deposit) - user.deposit;
+                var pDAO;
+                if(type === "member") {
+                    pDAO = new navPaymentsDAO(uDAO.providedClient);
+                    if(paymentMethod === "cash") {
+                        return pDAO.insertPaymentDetails(user._id, p.amount , pDAO.REASON.REGISTRATION, pDAO.STATUS.PENDING_COD, orderId, pDAO.TRANSACTION_TYPE.CASH);       
+                    } else if(paymentMethod === "paytm") {
+                        return pDAO.insertPaymentDetails(user._id, deposit, pDAO.REASON.REGISTRATION, pDAO.STATUS.PENDING, orderId, pDAO.TRANSACTION_TYPE.PAYTM);       
+                    } else {
+                        return Q.reject(new Error("Undefined payment method"));
+                    }
+                
+                }
+                if(deposit > 0) {
+                    pDAO = new navPaymentsDAO(uDAO.providedClient);
+                    if(paymentMethod === "cash") {
+                        return pDAO.insertPaymentDetails(user._id, deposit, pDAO.REASON.DEPOSIT, pDAO.STATUS.PENDING_COD, orderId, pDAO.TRANSACTION_TYPE.CASH);       
+                    } else if(paymentMethod === "paytm") {
+                        return pDAO.insertPaymentDetails(user._id, deposit, pDAO.REASON.DEPOSIT , pDAO.STATUS.PENDING, orderId, pDAO.TRANSACTION_TYPE.PAYTM);       
+                    } else {
+                        return Q.reject(new Error("Undefined payment method"));
+                    }
                 } else {
-		    return Q.resolve();
+                    return Q.resolve();
                     //return Q.reject(new navLogicalException("Account Already Recharged"));
                 }
             })
             .then(() => {
                 var pDAO = new navPaymentsDAO(uDAO.providedClient);
-                return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING, orderId);
+                if(type === "member") {
+                    return Q.resolve();
+                }else {
+                    if(paymentMethod === "cash") {
+                        return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING_COD, orderId, pDAO.TRANSACTION_TYPE.CASH);
+                    } else if(paymentMethod === "paytm") {
+                        return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING, orderId, pDAO.TRANSACTION_TYPE.PAYTM);
+                    } else {
+                        return Q.reject(new Error("Undefined payment method"));
+                    }
+                }
             })
-	    .then(() => {
-		return navPGRouter.initiate(user._id, (parseInt(p.amount) + deposit) + "", orderId, new navCommonUtil().getBaseURL(req));
-	    })
+            .then(() => {
+                var promises = [];
+                if(paymentMethod === "cash") {
+                    return new navPayments(uDAO.providedClient).success(orderId, "TXN_SUCCESS", "0", "Cash on Delivery", true);
+                } else if(paymentMethod === "paytm") {
+                    return navPGRouter.initiate(user._id, (parseInt(p.amount) + deposit) + "", orderId, new navCommonUtil().getBaseURL(req));
+                } else {
+                    return Q.resolve();
+                }
+            })
             .then((_result) => {
-		result = _result;
+                if(paymentMethod === "paytm") {
+                    result = _result;
+                }
                 return uDAO.commitTx();
             })
 
@@ -197,6 +267,7 @@ module.exports = class navMainRouter extends navBaseRouter {
     getRechargeConfirmation(req, res) {
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil();
+        var plans, type = req.query.type, plan = req.query.plan;
         deferred.promise
             .done(function(){
                 res.render('rechargeConfirmation', {
@@ -206,9 +277,9 @@ module.exports = class navMainRouter extends navBaseRouter {
                     q_plan : plan,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
-		    helpers : {
-			helper : helpers
-		    }
+                    helpers : {
+                        helper : helpers
+                    }
                 });
             },function(error){
                 var response = respUtil.generateErrorResponse(error);
@@ -222,21 +293,23 @@ module.exports = class navMainRouter extends navBaseRouter {
         });
         req.assert("type","Type is Required").notEmpty();
         req.assert("plan","Plan is  Required").notEmpty();
-        req.assert("type","Type is not a number").isInt();
+        //req.assert("type","Type is not a number").isInt();
         req.assert("plan","Plan is not a number").isInt();
 
         var validationErrors = req.validationErrors();
         if(validationErrors) {
             return deferred.reject(new navValidationException(validationErrors));
         }
-        var plans = navMembershipParser.instance().getConfig("plans",[]), type = req.query.type, plan = req.query.plan;
-        if(type == "membership") {
-            plans =  navMembershipParser.instance().getConfig("membership",[])
+        if(type == "member") {
+            plans =  navMembershipParser.instance().getConfig("membership",[]);
+        } else {
+            plans = navMembershipParser.instance().getConfig("plans",[])[type];
         }
-        if(plans[type][plan] == undefined) {
+
+        if(!plans || plans[plan] === undefined) {
             return deferred.reject(new navLogicalException(validationErrors));
         }
-        var p=plans[type][plan];
+        var p = plans[plan];
         return deferred.resolve(); 
 
     }
@@ -266,7 +339,7 @@ module.exports = class navMainRouter extends navBaseRouter {
             return deferred.reject(new navValidationException(validationErrors));
         }
         var plans = navMembershipParser.instance().getConfig("membership",[]), plan = req.query.plan;
-        if(plans[plan] == undefined) {
+        if(plans[plan] === undefined) {
             return deferred.reject(new navLogicalException(validationErrors));
         }
         var p=plans[plan];
