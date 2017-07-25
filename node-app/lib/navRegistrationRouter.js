@@ -197,8 +197,8 @@ module.exports = class navRegistration extends navBaseRouter {
         req.assert("code","Code is Required").notEmpty();
         req.assert("code","Bad Request").isUUID();
         req.assert("pinCode","Pin Code Required").notEmpty();
-        req.assert("ageGroup","Age Group Required").notEmpty();
-        req.assert("gender","Gender Required").notEmpty();
+        //req.assert("ageGroup","Age Group Required").notEmpty();
+        //req.assert("gender","Gender Required").notEmpty();
 
 
         var validationErrors = req.validationErrors();

@@ -45,7 +45,7 @@
 
                             <ol class="carousel-indicators">
                                 {{#repeat imageCount}}
-                                <li data-target="#itemsingle" data-slide-to="0" class="{{#compare @index "==" 0}}active{{/compare}}"><img src="/img/toys/{{toyDetail._id}}_1.jpg" class="img-responsive" alt="slider detail dodolan manuk"></li>
+                                    <li data-target="#itemsingle" data-slide-to="{{@index}}" class="{{#compare @index "==" 0}}active{{/compare}}"><img src="/img/toys/{{toyDetail._id}}_{{add @index 1}}.jpg" class="img-responsive" alt="slider detail dodolan manuk"></li>
                                 {{/repeat}}
                                 <!-- <li data-target="#itemsingle" data-slide-to="0" class="active"><img src="/img/toys/{{toyDetail._id}}_1.jpg" class="img-responsive" alt="slider detail dodolan manuk"></li>
                                 <li data-target="#itemsingle" data-slide-to="1" class=""><img src="/img/toys/{{toyDetail._id}}_2.jpg" class="img-responsive" alt="slider detail dodolan manuk"></li>
@@ -56,10 +56,28 @@
                     </div>
                     <div class="col-md-7 col-sm-7">
                         <h3>{{toyDetail.name}}</h3>
-                        <p>{{toyDetail.short_description}}</p>
-                        <p>Can be rented for duration : {{toyDetail.rent_duration}} Days</p>
-                        <p>In Stock : {{#compare toyDetail.stock "!=" 0}}<span class="label label-success">Yes<span></p>{{else}}<span class="label label-danger">No<span></p>{{/compare}}
-                        <h3>Price : &#x20b9; {{toyDetail.price}}</h3>
+<dl>
+  <dt>Brand Name :</dt>
+  <dd>{{toyDetail.brand}}</dd>
+</dl>
+<dl>
+  <dt>Recommended Age Group : </dt>
+  <dd>{{toyDetail.ageGroup}}</dd>
+</dl>
+<dl>
+  <dt>Description:</dt>
+  <dd>{{toyDetail.short_description}}</dd>
+</dl>
+<dl>
+  <dt>Renting Duration:</dt>
+  <dd>{{toyDetail.rent_duration}}</dd>
+</dl>
+<dl>
+  <dt>In Stock:</dt>
+  <dd>{{#compare toyDetail.stock "!=" 0}}<span class="label label-success">Yes<span>{{else}}<span class="label label-danger">No<span>{{/compare}}
+</dd>
+</dl>
+     <h3 class="">Price : &#x20b9; {{toyDetail.price}}</h3>
                         <p><a href="/toys/order?id={{toyDetail._id}}" class="btn btn-green btn-large"{{#compare toyDetail.stock "==" 0}}disabled{{/compare}}><i class="icon-shopping-cart"></i> Place An Order</a></p>
                         
                     </div>

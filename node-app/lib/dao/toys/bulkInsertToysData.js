@@ -8,9 +8,9 @@ function ConvertToArray() {
     var rows = data.toString().trim().split(/\n/);
     var queries = {
         "nav_toys" : [],
-        "nav_skills" : []
+        "nav_toys_skills" : []
     }
-    var queryPrefixToys = "INSERT INTO nav_toys (_id,", queryPrefixSkills="INSERT INTO nav_skills (_id,toys_id,";
+    var queryPrefixToys = "INSERT INTO nav_toys (_id,", queryPrefixSkills="INSERT INTO nav_toys_skills (_id,toys_id,";
     console.log(rows[0]);
     var columns = rows[0].trim().split(';');
     for(var j = 0; j < columns.length - 1; j++) {
@@ -35,13 +35,21 @@ function ConvertToArray() {
 
         for(j = 0; j < columns.length - 1; j++) {
             cells = columns[j].trim();
-            if(i === 1 && j === 0) {
-                exec("mv \"../public/img/toys/"+ columns[j] +"_1.jpg\" ../public/img/toys/"+toys_id+"_1.jpg");
+            if(j === 0) {
+                for(var x = 1; x <= 5;x++) {
+                   try {
+                       fs.statSync("../public/img/toys/"+ columns[j] +"_"+ x +".jpg");
+                   } catch(error) {
+                        break;
+                   }
+                   exec("mv \"../public/img/toys/"+ columns[j] +"_"+ x +".jpg\" ../public/img/toys/"+toys_id+"_"+ x +".jpg");
+                }
+                //exec("mv \"../public/img/toys/"+ columns[j] +"_1.jpg\" ../public/img/toys/"+toys_id+"_1.jpg");
                 //cells = cells.replace("'", "\\\'");
             }
             //console.log(cells);
             if(j === 0 || j === 4 || j === 5) {
-                cells = cells.replace("'", "''");
+                cells = cells.replace(new RegExp("'", 'g'), "''");
                 queryToys += "'" + cells + "'";
             } else {
                 queryToys += cells;
@@ -63,7 +71,7 @@ function ConvertToArray() {
             cells = skills[j];
             querySkills += cells + ");";
             console.log(querySkills);
-            queries.nav_skills.push(querySkills);
+            queries.nav_toys_skills.push(querySkills);
         }
 
     }
@@ -79,7 +87,7 @@ function CreateImages(rows) {
 
 var query = ConvertToArray();
 //console.log(query.nav_toys[0]);
-//console.log(query.nav_skills.length);
+//console.log(query.nav_toys_skills.length);
 //CreateImages(query.nav_toys);
 
 

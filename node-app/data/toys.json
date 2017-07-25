@@ -122,18 +122,39 @@
                 "id" : 22,
                 "name" : "Science"
             }
+        ],  
+    "ageGroups" : [
+        {
+            "id" : 0,
+            "name" : "0 - 5 Years"
+        }, {
+            "id" : 1,
+            "name" : "6 - 7 Years"
+        }, {
+            "id" : 2,
+            "name" : "8 - 10 Years"
+        }, {
+            "id" : 3,
+            "name" : "11 - 13 Years"
+        }, {
+            "id" : 4,
+            "name" : "13 - 15 Years"
+        }
+    ],  
+    "categories" : [
+        {
+            "id" : 0,
+            "name" : "Educational"
+        },{
+            "id" : 1,
+            "name" : "Scientific"
+        },{
+            "id" : 2,
+            "name" : "Fun"
+        },{
+            "id" : 2,
+            "name" : "Motor Skills"
+        }
+    ]
 
-
-
-
-
-
-
-
-
-
-
-
-
-        ]
 }

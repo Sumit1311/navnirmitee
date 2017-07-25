@@ -4,6 +4,8 @@ navSearchHelper.prototype.submitSearch = function() {
     var query = this.getQueryString();
     var categories = this.getActiveCategories();
     var ageGroups = this.getActiveAgeGroups();
+    var skills = this.getActiveSkills();
+    var brands = this.getActiveBrands();
     var sorters = this.getSorters();
     //var urlParams = query;
     $("#_nav_search_form").append("<input type=\"hidden\" name="+ query[0].name+" value=\""+ query[0].value+"\">");
@@ -17,6 +19,18 @@ navSearchHelper.prototype.submitSearch = function() {
     if(ageGroups.length !== 0) {
         for(i = 0; i < ageGroups.length; i++) {
             $("#_nav_search_form").append("<input type=\"hidden\" name="+ ageGroups[i].name+" value=\""+ ageGroups[i].value+"\">");
+        }
+        //urlParams += "&" + ageGroups;
+    }
+    if(skills.length !== 0) {
+        for(i = 0; i < skills.length; i++) {
+            $("#_nav_search_form").append("<input type=\"hidden\" name="+ skills[i].name+" value=\""+ skills[i].value+"\">");
+        }
+        //urlParams += "&" + ageGroups;
+    }
+    if(brands.length !== 0) {
+        for(i = 0; i < brands.length; i++) {
+            $("#_nav_search_form").append("<input type=\"hidden\" name="+ brands[i].name+" value=\""+ brands[i].value+"\">");
         }
         //urlParams += "&" + ageGroups;
     }
@@ -40,9 +54,15 @@ navSearchHelper.prototype.getActiveCategories = function() {
     return $(".nav_category_form:visible").serializeArray();
 }
 navSearchHelper.prototype.getActiveAgeGroups = function() {
-    return $(".nav_age_group_form :visible").serializeArray();
+    return $(".nav_age_group_form:visible").serializeArray();
 }
 
+navSearchHelper.prototype.getActiveSkills = function() {
+    return $(".nav_skills_form:visible").serializeArray();
+}
+navSearchHelper.prototype.getActiveBrands = function() {
+    return $(".nav_brand_form:visible").serializeArray();
+}
 navSearchHelper.prototype.getSorters =function() {
     return $(".nav_search_sorter").serializeArray();
 }
@@ -83,6 +103,14 @@ function registerSearchHelpers() {
         //event.preventDefault();
         new navSearchHelper().submitSearch();
     } );
+    $(".nav_skills_form :checkbox").change(function(event) {
+        //event.preventDefault();
+        new navSearchHelper().submitSearch();
+    } );
+    $(".nav_brand_form :checkbox").change(function(event) {
+        //event.preventDefault();
+        new navSearchHelper().submitSearch();
+    } );
     $(".nav_search_sorter").change(function(event){
         //event.preventDefault();
         new navSearchHelper().submitSearch();
@@ -97,11 +125,10 @@ function registerSearchHelpers() {
         new navSearchHelper().toggleFilterBar();
         //event.stopPropagation();
     });
-    $("document").click(function(){
-    debugger;
-    })
    /*$(".nav_main_content").click(function(event) {
         //event.preventDefault();
         new navSearchHelper().closeFilterBar();
     })*/
 }
+
+

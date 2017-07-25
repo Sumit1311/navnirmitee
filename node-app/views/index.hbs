@@ -140,7 +140,14 @@
 						        <h3>{{name}}</h3>
 						        <span class="price">&#x20b9; {{price}}</span>
 					        </div>
-					        <a href="/toys/detail?id={{_id}}"><div class="caption-link"><i class="fa fa-plus"></i><h3>{{short_description}}</h3></div></a>
+                            <a href="/toys/detail?id={{_id}}"><div class="caption-link"><h3>{{short_description}}</h3>
+                                    <h3>Skills Developed :<br>
+                                    {{#each this.skills}}
+                                        {{skill}}
+                                        <br>
+                                    {{/each}}
+                            </h3>
+                    </div></a>
 					    </div>
 				    </div>
                 {{/each}}

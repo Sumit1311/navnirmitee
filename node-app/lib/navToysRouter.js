@@ -16,6 +16,7 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     passport = require('passport'),
     navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
+    navSkillsDAO = require(process.cwd() + "/lib/dao/skills/navSkillsDAO.js"),
     navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     url = require("url"),
     Q = require('q'),
@@ -90,6 +91,9 @@ module.exports = class navToysRouter extends navBaseRouter {
                     return Q.reject(new navLogicalException());
                 }
                 toy = toyDetail;
+                toy[0].brand = navCommonUtil.getBrands()[toy[0].brand].name;
+                console.log(toy);
+                toy[0].ageGroup = navCommonUtil.getAgeGroups()[toy[0].age_group];
                 return new navSystemUtil().getNoOfFilesMatchPat(toyDetail[0]._id+'_*',process.cwd() + '/../public/img/toys/');
             })
         .done(function(result){
@@ -311,7 +315,7 @@ module.exports = class navToysRouter extends navBaseRouter {
     }    
     getSearchPage(req, res) {
         var q = req.query.q ? req.query.q : "", offset = req.query.offset ? req.query.offset : 0, sortBy = req.query.sortBy ? req.query.sortBy: 0; 
-        var sortType = req.query.sortType ? req.query.sortType : 0, activeCategories = [], activeAgeGroups = []; 
+        var sortType = req.query.sortType ? req.query.sortType : 0, activeCategories = [], activeAgeGroups = [], activeSkills = [], activeBrands = []; 
         if(!offset ) {
             offset = 0;
         }
@@ -328,18 +332,28 @@ module.exports = class navToysRouter extends navBaseRouter {
                     activeAgeGroups.push(parseInt(req.query[key][index]) - 1);
                 }
             }
+            if((key === "skill") && req.query.hasOwnProperty(key)) {
+                for(index = 0; index < req.query[key].length; index++) {
+                    activeSkills.push(parseInt(req.query[key][index]) - 1);
+                }
+            }
+            if((key === "brand") && req.query.hasOwnProperty(key)) {
+                for(index = 0; index < req.query[key].length; index++) {
+                    activeBrands.push(parseInt(req.query[key][index]) - 1);
+                }
+            }
         }
         req.assert("q"," Bad Request").isByteLength({min :0, max :128});
         //req.assert("shippingAddress","Bad Request").notEmpty();
         var deferred = Q.defer();
-        var respUtil =  new navResponseUtil(), toyList, categories, ageGroups, noOfPages, perPageToys = 4;
+        var respUtil =  new navResponseUtil(), toyList, categories, ageGroups, skills, brands, noOfPages, perPageToys = 4;
         var sortColumns = ["name", "price", "age_group"];
         var sortLabels = ["Name", "Price", "Age Group"];
         var sortTypes = ["ASC", "DESC"];
         //console.log(repeatHelper);
         deferred.promise
             .done((result) => {
-                console.log(activeAgeGroups);
+                console.log(brands);
                 function genQueryParams() {
                     var val = "";
                     for(var i in req.query){
@@ -364,8 +378,12 @@ module.exports = class navToysRouter extends navBaseRouter {
                         filters : {
                             categories : categories,
                             ageGroups : ageGroups,
+                            skills : skills,
+                            brands : brands,
                             activeCategories : activeCategories,
-                            activeAge : activeAgeGroups
+                            activeAge : activeAgeGroups,
+                            activeSkills :activeSkills,
+                            activeBrands : activeBrands
                         },
                         sorters : {
                             sortLabels : sortLabels,
@@ -412,9 +430,12 @@ module.exports = class navToysRouter extends navBaseRouter {
         }
         ageGroups = navCommonUtil.getAgeGroups();
         categories = navCommonUtil.getCategories();
-        new navToysDAO().getAllToys(null, null, activeAgeGroups, activeCategories, q.split(" "), sortColumns[sortBy], sortTypes[sortType])
+        skills = navCommonUtil.getSkills();
+        brands = navCommonUtil.getBrands();
+        new navToysDAO().getAllToys(null, null, activeAgeGroups, activeCategories, q.split(" "), sortColumns[sortBy], sortTypes[sortType], activeSkills, activeBrands)
             .then((toys) => {
                 toyList = [];
+                var promises = [];
                 /*var temp = [];
                 for(var i in activeAgeGroups) {
                     temp[activeAgeGroups[i]] = true;
@@ -431,7 +452,8 @@ module.exports = class navToysRouter extends navBaseRouter {
                 noOfPages = Math.floor(toys.length / perPageToys) ;
 
                 }
-                for(var i = 0; i < toys.length; i++) {
+                var i;
+                for(i = 0; i < toys.length; i++) {
                     if(i >= offset) {
                         toyList.push(toys[i]);
                     }
@@ -439,9 +461,20 @@ module.exports = class navToysRouter extends navBaseRouter {
                         break;
                     }
                 }
-                return Q.resolve();
+
+                for(i = 0; i < toyList.length; i++) {
+                    promises.push(new navSkillsDAO().getSkillsForToy(toyList[i]._id));
+                }
+                return Q.allSettled(promises);
             })
-            .done(() => {
+            .done((results) => {
+                for(var i = 0; i < toyList.length; i++) {
+                    if(results[i].state == 'rejected') {
+                        deferred.reject(results[i].reason);
+                        return;
+                    }
+                    toyList[i].skills = results[i].value;
+                }
                 deferred.resolve();
             }, (error) => {
                 deferred.reject(error);

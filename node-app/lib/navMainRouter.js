@@ -1,6 +1,7 @@
 var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navPGRouter = require(process.cwd() + "/lib/navPGRouter.js"),
     navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
+    navSkillsDAO = require(process.cwd() + "/lib/dao/skills/navSkillsDAO.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
     navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
@@ -68,14 +69,28 @@ module.exports = class navMainRouter extends navBaseRouter {
             else{
                 promise = (new navToysDAO()).getAllToys(0,10);
             }
-
+            var toys;
             promise
-            .then(function(toysList){
+                .then((toysList) => {
+                    toys = toysList;
+                    var promises = [];
+                    for(var z = 0; z < toysList.length; z++) {
+                        promises.push(new navSkillsDAO().getSkillsForToy(toysList[z]._id));
+                    }
+                    return Q.allSettled(promises);
+                })
+            .then(function(results){
+                for(var w = 0; w < results.length; w++) {
+                    if(results[w].state == 'rejected') {
+                        return Q.reject(results[w].reason)
+                    }
+                    toys[w].skills = results[w].value;
+                }
                 res.render('index', {
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
-                    toysList : toysList
+                    toysList : toys
                 });
             })
             .done(null,function(error){

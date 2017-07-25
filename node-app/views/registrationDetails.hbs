@@ -50,26 +50,6 @@
 							</div>
 						</div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" name="gender">Gender</label>
-                            <div class="col-sm-4">
-                                <select class="form-control" placeholder="" required>
-                                    <option value="" selected="" disabled> Select Gender Of Child</option>
-                                    <option value="1">Male</option>
-                                    <option value="2">Female</option>
-
-                                </select>
-                            </div>
-                            <label class="col-sm-2 control-label">Age Group</label>
-                            <div class="col-sm-4">
-                                <select name="ageGroup" class="form-control" required>
-                                    <option value="" disabled selected> Select Age Group</option>
-                                    {{#each ageGroups}}
-                                        <option value="@index" >{{this}}</option>
-                                    {{/each}}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
                             <label class="col-sm-2 col-md-2 control-label">Permanent Address</label>
                             <div class="col-sm-4 col-md-4">
                                 <textarea class="form-control" rows="4" name="shippingAddress" placeholder="Shipping Address : " required></textarea>
@@ -79,11 +59,36 @@
                                 <input class="form-control" type="text" name="pinCode" placeholder="Pin Code :" required>
 
                             </div>
-                            <label class="col-md-2 col-sm-2 control-label">Hobbies</label>
-                            <div class="col-md-4 col-sm-4">
-                                <input type="text" class="form-control" placeholder="Commma seperated list of hobbies of your child" name="hobbies" value="">
+
+                        </div>
+                        <h5><b>Filling in following details about your child is optional but we recommend that fill in them so that we can recommend toys for your child</b></h5>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" name="gender">Gender</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" placeholder="">
+                                    <option value="" selected="" disabled> Select Gender Of Child</option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
+
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">Age Group</label>
+                            <div class="col-sm-4">
+                                <select name="ageGroup" class="form-control">
+                                    <option value="" disabled selected> Select Age Group</option>
+                                    {{#each ageGroups}}
+                                        <option value="@index" >{{this}}</option>
+                                    {{/each}}
+                                </select>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-md-2 col-sm-2 control-label">Hobbies</label>
+                                                        <div class="col-md-4 col-sm-4">
+                                                                                            <input type="text" class="form-control" placeholder="Commma seperated list of hobbies of your child" name="hobbies" value="">
+                                                                                                                        </div>
+
+                            </div>
                         <div class="form-group">
                             <div class="col-md-offset-2 col-md-4 col-sm-offset-2 col-sm-4">
                                 <button type="submit" class="btn btn-green">Commit Details</button>

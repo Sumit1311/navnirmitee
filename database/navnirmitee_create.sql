@@ -50,12 +50,13 @@ CREATE TABLE  nav_toys(
 	name varchar(50),
 	stock integer,
 	rent_duration integer,
-	price varchar(20),
+	price integer,
     short_description varchar(100),
     long_description TEXT,
 	points integer,
 	age_group smallint,
     brand integer,
+    category smallint,
 	parent_toys_id varchar(36),
 	CONSTRAINT _id PRIMARY KEY (_id)
 )

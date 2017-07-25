@@ -119,29 +119,49 @@
         {{/unless}}
         <form class="hidden" role="search" id="_nav_search_form" method="get" action="/toys/search{{#if queryParameters}}?{{queryParameters}}{{/if}}"></form>
         <div class="sidenav page-content visible-xs" style="" id="_nav_filter_side">
-           <!-- <a data-toggle="collapse" href="#_nav_age_group_form" aria-expanded="false" aria-controls="_nav_age_group_form"> <h6 style="font-weight : bold;">Age Group</h6> 
+            <!-- <a data-toggle="collapse" href="#_nav_age_group_form" aria-expanded="false" aria-controls="_nav_age_group_form"> <h6 style="font-weight : bold;">Age Group</h6> 
            </a>           --><h6 style="font-weight : bold;">Age Group</h6> 
-           <!-- <form id="_nav_age_group_form" class="collapse" > -->
-                <form class="nav_age_group_form visible-xs">
-                    {{#each toysData.filters.ageGroups}}
+            <!-- <form id="_nav_age_group_form" class="collapse" > -->
+            <form class="nav_age_group_form visible-xs">
+                {{#each toysData.filters.ageGroups}}
                     <fieldset>
                         <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
                             <input type="checkbox" name="ageGroup" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeAge @index}}checked{{/inArray}}><span>{{this}}</span>
 
-                        </label>
-                    </fieldset>
+                            </label>
+                        </fieldset>
                     {{/each}}
                 </form>
-                    <h6 style="font-weight : bold;"> Categories </h6>
-                    <form class="nav_category_form visible-xs">
+                <h6 style="font-weight : bold;"> Categories </h6>
+                <form class="nav_category_form visible-xs">
                     {{#each toysData.filters.categories}}
-                    <fieldset>
-                        <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                            <input type="checkbox" name="category" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeCategories @index}}checked{{/inArray}}><span>{{this}}</span>
-                        </label>
-                    </fieldset>
-                {{/each}}
+                        <fieldset>
+                            <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
+                                <input type="checkbox" name="category" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeCategories @index}}checked{{/inArray}}><span>{{this}}</span>
+                                </label>
+                            </fieldset>
+                        {{/each}}
                     </form>
+                <h6 style="font-weight : bold;"> Brands </h6>
+                <form class="nav_brand_form visible-xs">
+                    {{#each toysData.filters.brands}}
+                        <fieldset>
+                            <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
+                                <input type="checkbox" name="brand" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeBrands @index}}checked{{/inArray}}><span>{{this.name}}</span>
+                                </label>
+                            </fieldset>
+                        {{/each}}
+                    </form>
+                    <h6 style="font-weight : bold;"> Skills </h6>
+                    <form class="nav_skills_form visible-xs">
+                        {{#each toysData.filters.skills}}
+                            <fieldset>
+                                <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
+                                    <input type="checkbox" name="skill" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeSkills @index}}checked{{/inArray}}>&nbsp;{{this.name}}
+                                    </label>
+                                </fieldset>
+                            {{/each}}
+                        </form>
                 </div>
                     {{{body}}}
         <!-- begin:footer -->

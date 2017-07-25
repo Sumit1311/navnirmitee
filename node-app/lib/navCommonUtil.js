@@ -1,9 +1,28 @@
 var uuid = require('node-uuid');
 const url = require('url');
-var AGE_GROUPS = ['0 - 5 Years', '6 - 7 Years', '8 - 10 Years', '11 - 13 Years', '13 - 15 Years'];
-var CATEGORIES = ['Educational', 'Scientific', 'Fun', 'Motor Skills'];
+var AGE_GROUPS = [];
+var CATEGORIES = [];
 var moment = require('moment');
 var COUNTRIES =["INDIA"], STATES = { "INDIA" : ["Maharashtra"] }, DISTRICTS = {"Maharashtra" : ["Pune"]};
+var navToysParser = require(process.cwd() + "/lib/navToysParser.js");
+
+function readCategories() {
+    var categories = navToysParser.instance().config.categories;
+    for(var i =0; i < categories.length; i++) {
+        CATEGORIES.push(categories[i].name);    
+    }
+
+}
+function readAgeGroups() {
+    var ageGroups = navToysParser.instance().config.ageGroups;
+    for(var i =0; i < ageGroups.length; i++) {
+        AGE_GROUPS.push(ageGroups[i].name);    
+    }
+
+}
+
+readCategories();
+readAgeGroups();
 
 module.exports = class navCommonUtils {
     constructor() {
@@ -68,6 +87,13 @@ module.exports = class navCommonUtils {
     }
     static getCategories() {
         return CATEGORIES;
+    }
+
+    static getSkills() {
+        return  navToysParser.instance().config.skills;
+    }
+    static getBrands() {
+        return  navToysParser.instance().config.brands;
     }
 }
 
