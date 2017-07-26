@@ -65,7 +65,7 @@ module.exports = class navOrders {
                     updateFields.returnDate = navCommonUtil.getTimeinMillis( updateFields.returnDate);
                 }
                 //if(updateFields.deliveryDate) {
-                return rDAO.updateRentalDetails(updateFields.orderId, navCommonUtil.getTimeinMillis(updateFields.deliveryDate),updateFields.returnDate, navCommonUtil.getTimeinMillis(updateFields.leaseStartDate), navCommonUtil.getTimeinMillis(updateFields.leaseEndDate), updateFields.shippingAddress, updateFields.orderStatus);
+                return rDAO.updateRentalDetails(orderId, navCommonUtil.getTimeinMillis(updateFields.deliveryDate),updateFields.returnDate, navCommonUtil.getTimeinMillis(updateFields.leaseStartDate), navCommonUtil.getTimeinMillis(updateFields.leaseEndDate), updateFields.shippingAddress, updateFields.orderStatus);
                 /*} else {
                    return rDAO.updateStatus(orderId, updateFields.orderStatus); 
                 }*/
