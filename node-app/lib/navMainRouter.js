@@ -25,6 +25,7 @@ module.exports = class navMainRouter extends navBaseRouter {
         this.router.get('/about', this.getAbout.bind(this));
         this.router.get('/contact',this.getContact.bind(this) );
         this.router.get('/pricing', this.getPricing.bind(this) );
+        this.router.get('/howItWorks', this.getHowItWorks.bind(this) );
         this.router.get('/rechargeConfirmation', this.getRechargeConfirmation.bind(this) );
         this.router.get('/subscribeMembership', this.subscribeMembership.bind(this) );
         this.router.post('/subscribePlan', this.ensureVerified, 
@@ -38,6 +39,14 @@ module.exports = class navMainRouter extends navBaseRouter {
         var plans = navMembershipParser.instance().getConfig("plans");
         res.render('pricing', {
             plans : plans,
+            user : req.user,
+            isLoggedIn : req.user ? true : false,
+            layout : 'nav_bar_layout'
+        });
+    }
+    getHowItWorks(req, res) {
+
+        res.render('howItWorks', {
             user : req.user,
             isLoggedIn : req.user ? true : false,
             layout : 'nav_bar_layout'
