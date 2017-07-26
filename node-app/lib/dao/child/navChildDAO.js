@@ -13,9 +13,36 @@ module.exports = class navChildDAO extends BaseDAO{
     }
     insertChildDetails(userId, ageGroup, hobbies, gender) {
         var self = this;
-        var queryString1 = "INSERT INTO "+ tableName + " (_id, user_id, age_group, hobbies, gender)"; 
-        var query2 = " VALUES($1, $2, $3, $4)";
-        var params = [new navCommonUtil().generateUuid(), userId, ageGroup, hobbies, gender];
+        if(!ageGroup && !hobbies && !gender) {
+            return Q.resolve(0);
+        }
+        
+        var queryString1 = "INSERT INTO "+ tableName + " (_id, user_id ";
+        var query2 = " VALUES($1, $2 ";
+        var params = [new navCommonUtil().generateUuid(), userId];
+
+        var count = 2;
+        if(ageGroup) {
+            count++;
+            queryString1 += " , age_group";
+            query2 += ", $"+count +" ";
+            params.push(ageGroup);
+        }
+
+        if(hobbies) {
+            count++;
+            queryString1 += " , hobbies";
+            query2 += ", $"+count +" ";
+            params.push(hobbies);
+        
+        }
+        if(gender) {
+            count++;
+            queryString1 += " , gender";
+            query2 += ", $"+count +" ";
+            params.push(gender);
+        }
+
         return this.dbQuery(queryString1+query2, params)
             .then(function (result) {
                 return result.rowCount;
