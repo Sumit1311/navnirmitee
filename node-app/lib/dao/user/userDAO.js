@@ -62,7 +62,7 @@ UserDAO.prototype.getLoginDetails = function (loginName) {
  */
 UserDAO.prototype.getAddress = function (userId) {
     var self = this;
-    return this.dbQuery("SELECT address, city, state" +
+    return this.dbQuery("SELECT address, city, state, pin_code" +
     " FROM " + tableName + " WHERE _id=$1", [userId])
         .then(function (result) {
             return result.rows;
