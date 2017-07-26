@@ -39,6 +39,9 @@
 	[20. PRICING]
 	[21. FOOTER]
 	[22. COPYRIGHT]
+	[23. ADMIN AREA TABLE FILTER]
+	[24. NAVIGATION SEARCH BAR]
+	[26. DEVICE SPECIFIC SETTINGS FOR SEARCH BAR]
 
 */
 
@@ -78,7 +81,7 @@ a:hover{
 	padding: 20px 0;
 }
 
-::-moz-selection { 
+:-moz-selection { 
 	background: #1ABC9C; 
 	color: #fff; 
 	text-shadow: none; 
@@ -2527,8 +2530,11 @@ blockquote {
 width:100%;
 padding-left:0px;
 }
-
-
+/*
+	=============================
+	[23. ADMIN AREA TABLE FILTER]
+	=============================
+*/
 .filterable {
     margin-top: 15px;
 }
@@ -2552,7 +2558,110 @@ padding-left:0px;
 .filterable .filters input[disabled]:-ms-input-placeholder {
     color: #333;
 }
+/*
+	=============================
+	[24. NAVIGATION SEARCH BAR]
+	=============================
+*/
+.navbar .navbar-form {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-right: 0px;
+    margin-left: 0;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+/*
+	=============================
+	[25. SHAPES]
+	=============================
+*/
+.nav_shape_circle {
+   width: 200px; 
+   height: 200px; 
+   background: #1ABC9C; 
+   -moz-border-radius: 50%; 
+   -webkit-border-radius: 50%; 
+   border-radius: 50%; 
+   margin-left: 10%;
+   margin-bottom: 9%;
+   color: #FFFFFF;
+   text-align: center;
+   font-size: 23px;
+}
+.circle {
+    position: relative;
+    display: block;
+    margin: 2em 0;
+    background-color: transparent;
+    color : #FFF;
+    text-align: center;
+}
 
+.circle:after {
+    display: block;
+    padding-bottom: 100%;
+    width: 100%;
+    height: 0;
+    border-radius: 50%;
+    background-color: #1ABC9C;
+    content: "";
+}
+
+.circle__inner {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.circle__wrapper {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.circle__content {
+    display: table-cell;
+    padding: 1em;
+    vertical-align: middle;
+    line-height : 100%;
+}
+
+@media (min-width: 320px) {
+    .circle__content {
+        font-size: 10px;
+    }
+    .circle__content .glyphicon {
+        font-size : 60px;
+    }
+}
+
+@media (min-width: 480px) {
+    .circle__content {
+        font-size: 24px;
+    }
+    .circle__content .glyphicon {
+        font-size : 90px;
+    }
+}
+@media (min-width: 980px) {
+    .circle__content {
+        font-size: 22px;
+    }
+    .circle__content .glyphicon {
+        font-size : 55px;
+    }
+}
+
+/*
+	=============================
+	[26. DEVICE SPECIFIC SETTINGS FOR SEARCH BAR]
+	=============================
+*/
 @media(min-width:768px) {
     li.navbar-search-custom{
         width : 221px;
@@ -2578,13 +2687,4 @@ padding-left:0px;
     }
 }
 
-.navbar .navbar-form {
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-right: 0px;
-    margin-left: 0;
-    border: 0;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-}
 
