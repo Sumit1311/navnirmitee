@@ -142,7 +142,7 @@ navRentalsDAO.prototype.updateStatus = function (orderId, status) {
 
 navRentalsDAO.prototype.getOrderDetails = function(orderId) {
     var self = this;
-    return this.dbQuery("select user_id, toys_id. status FROM "+tableName+" WHERE _id=$1",[orderId])
+    return this.dbQuery("select user_id, toys_id, status FROM "+tableName+" WHERE _id=$1",[orderId])
       .then(function(result){
          return result.rows;
       })
