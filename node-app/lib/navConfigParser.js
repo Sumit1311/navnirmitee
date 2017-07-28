@@ -14,7 +14,9 @@ module.exports = class navConfigParser {
                 try {
                     this.config = JSON.parse(fs.readFileSync(process.cwd() + "/config/navnirmitee.config"));
                     this.config = mustache.render(this.config, process.env);
-
+                    if(this.config.LogLevel === undefined) {
+                        this.config.LogLevel = {};
+                    }
                 } catch(e){
                     this.config = {
                         DatabaseHost: process.env.DB_HOST || "localhost",
@@ -41,6 +43,9 @@ module.exports = class navConfigParser {
                         BackgroundProcessing : {
                             TransactionInterval : 1000, // ms,
                             OrderInterval : 1000
+                        },
+                        LogLevel : {
+                            "web-server" : "INFO"
                         }
                     }
                 }

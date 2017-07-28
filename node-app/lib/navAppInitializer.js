@@ -57,7 +57,8 @@ module.exports = class navAppInitializer {
             app.use(morgan('combined', {
                 stream : rfs('web_access.log', {
                     interval: '1d', // rotate daily 
-                    path: process.cwd() + '/log'
+                    path: process.cwd() + '/log',
+                    compress: 'gzip'
                 })
             }));
             return app;
