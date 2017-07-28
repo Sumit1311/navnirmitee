@@ -7,6 +7,9 @@ var flash = require('connect-flash');
 var navConfigParser = require(process.cwd() + "/lib/navConfigParser.js");
 var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
 var morgan = require('morgan');
+var fs = require('fs');
+var rfs = require('rotating-file-stream');
+
 module.exports = class navAppInitializer {
 
     constructor() {
@@ -21,8 +24,9 @@ module.exports = class navAppInitializer {
             app.use(cookieParser());
             // Set Static Folder
             var staticRelPath = navConfigParser.instance().getConfig("StaticPath",'../public');
-            if(staticRelPath != "")
-            app.use(express.static(path.join(process.cwd(),staticRelPath )));
+            if(staticRelPath !== "") {
+                app.use(express.static(path.join(process.cwd(),staticRelPath )));
+            }
             // Express Validator
             app.use(expressValidator({
                 customValidators : {
@@ -31,9 +35,9 @@ module.exports = class navAppInitializer {
                     }
                 },
                 errorFormatter: function (param, msg, value) {
-                    var namespace = param.split('.')
-                    , root = namespace.shift()
-                    , formParam = root;
+                    var namespace = param.split('.'),
+                        root = namespace.shift(),
+                        formParam = root;
 
                     while (namespace.length) {
                         formParam += '[' + namespace.shift() + ']';
@@ -50,7 +54,12 @@ module.exports = class navAppInitializer {
 
             // Connect Flash
             app.use(flash());
-            app.use(morgan('combined'));
+            app.use(morgan('combined', {
+                stream : rfs('web_access.log', {
+                    interval: '1d', // rotate daily 
+                    path: process.cwd() + '/log'
+                })
+            }));
             return app;
 
     }
