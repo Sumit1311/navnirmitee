@@ -44,9 +44,12 @@ var tableName = "nav_user",
  */
 UserDAO.prototype.getLoginDetails = function (loginName) {
     var self = this;
+    navLogUtil.instance().log.call(this, "getLoginDetails", "Getting information for "+loginName, "info");
+
     return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type, deposit, address" +
     " FROM " + tableName + " WHERE email_address=$1", [loginName])
         .then(function (result) {
+            navLogUtil.instance().log.call(self, "getLoginDetails", "Login Details for "+ loginName + "with id " + result.rows[0]._id, "debug");
             return result.rows;
         })
         .catch(function (error) {
@@ -62,9 +65,11 @@ UserDAO.prototype.getLoginDetails = function (loginName) {
  */
 UserDAO.prototype.getAddress = function (userId) {
     var self = this;
+    navLogUtil.instance().log.call(this, "getAddress", "Get Address details for "+userId, "info");
     return this.dbQuery("SELECT address, city, state, pin_code" +
     " FROM " + tableName + " WHERE _id=$1", [userId])
         .then(function (result) {
+            navLogUtil.instance().log.call(this, "getAddress", "Get Address details for "+userId, "debug");
             return result.rows;
         })
         .catch(function (error) {
@@ -79,9 +84,10 @@ UserDAO.prototype.getAddress = function (userId) {
  */
 UserDAO.prototype.createRootUser = function (client) {
     var self = this;
+    navLogUtil.instance().log.call(this, "createRootUser", "Create root user", "info");
     return self.dbQuery('select * from ' + tableName + ' where _id=$1', [rootUserId])
         .then(function (result) {
-            if (result.rowCount == 0) {
+            if (result.rowCount === 0) {
                 return self.dbQuery('INSERT INTO ' + tableName + '(_id,first_name,user_type,email_address,password) ' +
                 'VALUES($1,$2,$3,$4,$5)', [rootUserId, "Admin", 0, "_root_@localhost.com", new navPasswordUtil().encryptPassword("_toor_")]);
             } else {
@@ -89,7 +95,7 @@ UserDAO.prototype.createRootUser = function (client) {
             }
         })
         .catch(function (error) {
-            navLogUtil.instance().log.call(self, "getAddress", error.message, "error");
+            navLogUtil.instance().log.call(self, "createRootUser", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         });
 };
@@ -102,13 +108,14 @@ UserDAO.prototype.createRootUser = function (client) {
  */
 UserDAO.prototype.getEmailVerificationDetails = function (email) {
     var self = this;
+    navLogUtil.instance().log.call(this, "getEmailVerificationDetails", "Getting verification details "+email, "debug");
     return this.dbQuery("select email_address,mobile_no,email_verification " +
     "from " + tableName + " where email_address = $1", [email])
         .then(function (result) {
             return result.rows;
         })
         .catch(function (error) {
-            navLogUtil.instance().log.call(self, "getAddress", error.message, "error");
+            navLogUtil.instance().log.call(self, "getEmailVerificationDetails", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         })
 };
@@ -123,6 +130,7 @@ UserDAO.prototype.getEmailVerificationDetails = function (email) {
  */
 UserDAO.prototype.insertRegistrationData = function (email, phone, password, verificationCode) {
     var self = this;
+    navLogUtil.instance().log.call(this, "insertRegistrationData", "Insert registration data for "+email +", "+ ", " + phone , "debug");
     return this.dbQuery("INSERT INTO " + tableName +
     " (_id,email_address,mobile_no,email_verification, password)" +
     " VALUES($1,$2,$3,$4,$5)", [new navCommonUtil().generateUuid(), email, phone, verificationCode, password])
@@ -147,6 +155,7 @@ UserDAO.prototype.insertRegistrationData = function (email, phone, password, ver
  */
 UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address, membershipExpiry, enrollmentDate, pinCode) {
     var self = this;
+    navLogUtil.instance().log.call(this, "updateUserDetails", "Update user details for : "+ pkey , "debug");
     return this.dbQuery("UPDATE " + tableName +
     " SET " +
     " first_name=$1," +
@@ -170,6 +179,7 @@ UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, addre
  */
 UserDAO.prototype.clearVerificationCode = function (_id) {
     var self = this;
+    navLogUtil.instance().log.call(this, "clearVerificationCode", "Clearing verification : "+ _id , "debug");
     return this.dbQuery("UPDATE " + tableName + "" +
     " SET email_verification=$1" +
     " WHERE _id=$2", [null, _id])
@@ -191,10 +201,12 @@ UserDAO.prototype.clearVerificationCode = function (_id) {
  */
 UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
     var self = this;
+    navLogUtil.instance().log.call(this, "getUserDetailsByCode", "Get details for verification code : "+ verifCode , "debug");
     return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type" +
     " FROM " + tableName +
     " WHERE email_verification=$1", [verifCode])
         .then(function (result) {
+            navLogUtil.instance().log.call(this, "getUserDetailsByCode", "Details for verification code : "+ verifCode + ", email_address : "+ result.rows[0]._id, "debug");
             return result.rows;
         })
         .catch(function (error) {
@@ -205,10 +217,12 @@ UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
 
 UserDAO.prototype.updatePlan = function (userId, plan){
     var self = this;
+    navLogUtil.instance().log.call(this, "getUserDetailsByCode", "Update plan  "+ userId , "debug");
     return this.dbQuery("UPDATE " + tableName + 
     " SET subscribed_plan = $1 WHERE _id = $2;",
     [plan, userId])
         .then(function (result) {
+            navLogUtil.instance().log.call(this, "getUserDetailsByCode", "Updated rows "+ result.rowCount , "debug");
             return result.rowCount;
         })
         .catch(function (error) {
@@ -221,6 +235,7 @@ UserDAO.prototype.updatePlan = function (userId, plan){
 UserDAO.prototype.getUserDetails = function(userId) {
     var self = this;
     
+    navLogUtil.instance().log.call(this, "getUserDetails", "Get additional details for : "+ userId , "debug");
     return this.dbQuery("SELECT subscribed_plan, points, balance, membership_expiry, enrollment_date, deposit" +
     " FROM " + tableName +
     " WHERE _id=$1", [userId])
@@ -246,8 +261,8 @@ UserDAO.prototype.updatePoints = function (userId, points, membershipExpiry){
     }
     query += " WHERE _id = $" + i;
     params.push(userId);
-    console.log(query, params);
     var self = this;
+    navLogUtil.instance().log.call(this, "updatePoints", "Points for user id : "+ userId + "updated to "+points , "debug");
     return this.dbQuery(query, params)
         .then(function (result) {
             return result.rowCount;
@@ -262,10 +277,12 @@ UserDAO.prototype.updatePoints = function (userId, points, membershipExpiry){
 
 UserDAO.prototype.updateMembershipExpiry =function (userId, membershipExpiry) {
     var self = this;
+    navLogUtil.instance().log.call(this, "updateMembershipExpiry", "Membership expiry of "+ userId + " updating to "+membershipExpiry , "debug");
     return this.dbQuery("UPDATE " + tableName + 
     " SET membership_expiry = $1  WHERE _id = $2;",
     [membershipExpiry, userId])
-        .then(function (result) {
+        .then(function (result) {    
+
             return result.rowCount;
         })
         .catch(function (error) {
@@ -277,6 +294,7 @@ UserDAO.prototype.updateMembershipExpiry =function (userId, membershipExpiry) {
 }
 UserDAO.prototype.updateBalance = function (userId, amount, decrement){
     var self = this;
+    navLogUtil.instance().log.call(this, "updateBalance", "Update balance to user id : "+ userId + " with "+ decrement+ amount , "debug");
     return this.dbQuery("UPDATE " + tableName + 
     " SET balance = balance"+(decrement ? "-" : "+") + "$1 WHERE _id = $2;",
     [amount, userId])
@@ -291,6 +309,7 @@ UserDAO.prototype.updateBalance = function (userId, amount, decrement){
 }
 UserDAO.prototype.updateDeposit = function (userId, amount, decrement){
     var self = this;
+    navLogUtil.instance().log.call(this, "updateDeposit", "Update deposit for user id : "+ userId + "updated to "+decrement +amount , "debug");
     return this.dbQuery("UPDATE " + tableName + 
     " SET deposit = deposit" + (decrement ? "-" : "+") + "$1 WHERE _id = $2;",
     [amount, userId])

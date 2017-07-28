@@ -43,6 +43,7 @@ module.exports = class navChildDAO extends BaseDAO{
             params.push(gender);
         }
 
+        navLogUtil.instance().log.call(this, "insertChildDetails", "Insert for "+ userId + "" , "debug");
         return this.dbQuery(queryString1+query2, params)
             .then(function (result) {
                 return result.rowCount;
