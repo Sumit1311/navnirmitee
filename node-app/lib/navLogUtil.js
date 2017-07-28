@@ -8,6 +8,12 @@ var log4jsConfig = {
             filename : process.cwd() + "/log/web-server.log",
             compress : true
         },
+
+        "background-processing" : {
+            type  : "dateFile",
+            filename : process.cwd() + "/log/background-processing.log",
+            compress : true
+        },
         "out" : {
             type : "stdout"
         }
@@ -20,7 +26,12 @@ var log4jsConfig = {
         "web-server" : {
             appenders : ["web-server"],
             level : "INFO"
+        },
+        "background-processing" : {
+            appenders : ["background-processing"],
+            level : "INFO"
         }
+
     }
 }
 
