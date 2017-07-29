@@ -1,5 +1,6 @@
 var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navAuthenticateUser = require(process.cwd() + "/lib/navAuthenticateUser.js"),
     Q = require('q');
     
@@ -13,15 +14,16 @@ module.exports = class navSignInRouter extends navBaseRouter {
         this.router.post('/', this.authentication.bind(this));
         this.router.get('/logout', this.ensureAuthenticated, this.isSessionAvailable, this.logOut.bind(this));        
         //the path which will be used to login this is the route for displaying sign in page to user
-        this.router.get('/login', this.ensureAuthenticated,this.ensureVerified, this.logIn.bind(this));
+        this.router.get('/login', this.ensureAuthenticated,this.ensureVerified, this.isSessionAvailable, this.logIn.bind(this));
         return this;
     }
 
     authentication(req, res, next) {    
+        var self = this;
         var deferred = Q.defer();
         deferred.promise
             .done(function(){
-                console.log("Re : ", req.query.redirect);
+                //console.log("Re : ", req.query.redirect);
                 if(req.query.redirect) {
                     return new navResponseUtil().redirect(req, res, req.query.redirect);
                 }
@@ -37,13 +39,18 @@ module.exports = class navSignInRouter extends navBaseRouter {
             
                 });
              });
+        navLogUtil.log.call(self, self.authentication.name, "Authenticating user : " + req.user.email_address, "info");
         new navAuthenticateUser().authenticate(req, res, deferred);
     }
     logOut(req, res) {
+        var self = this;
+        navLogUtil.log.call(self, self.logOut.name, "Logging out user : " + req.user.email_address, "info");
         req.session.destroy();
         new navResponseUtil().redirect(req, res, '/');
     }
     logIn (req, res) {
+        var self = this;
+        navLogUtil.log.call(self, self.logIn.name, "Logging In user : " + req.user.email_address, "info");
         //if the user is already authenticated i.e. exist in the session then continue to the home page
         new navResponseUtil().redirect(req, res, '/');
     }

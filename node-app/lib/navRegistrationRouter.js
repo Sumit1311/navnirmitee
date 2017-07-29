@@ -61,17 +61,18 @@ module.exports = class navRegistration extends navBaseRouter {
         //req.assert("mobileNo","Valid Mobile No Required").isMobilePhone(contactNo, "any");
         var validationErrors = req.validationErrors();
         var response;
-        console.log(validationErrors);
+        //console.log(validationErrors);
         if(validationErrors) {
             return deferred.reject(new navValidationException(validationErrors));
         }
         if(password != passwordConf) {
             return deferred.reject(new navLogicalException());
         }
-        var verificationCode 
+        navLogUtil.instance().log.call(self, self.doRegistration.name, "New user registration : " + email, "info")
+
         userDAO.getLoginDetails(email)
         .then(function(user){
-             if(user.length != 0) {
+             if(user.length !== 0) {
                  return Q.reject(new navUserExistsException());
              }
              var emailVer = new navEmailVerification();
@@ -80,18 +81,21 @@ module.exports = class navRegistration extends navBaseRouter {
 	     base.pathname = "/verify";
 	     base.search = "?id=" + verificationCode;
              var verificationLink = base.format();
+             navLogUtil.instance().log.call(self, self.doRegistration.name, "Verification link for user : " + email + " "+ verificationLink, "info");
+
              //return userDAO.insertRegistrationData(email, contactNo, password,verificationCode);
              //todo : uncomment when want to send verification email
              return emailVer.sendVerificationEmail(email, null, verificationLink)
         })
         .then(function (response) {
-             navLogUtil.instance().log.call(self, "/register"," Sent verificiation email" + response, 'debug');
+             navLogUtil.instance().log.call(self, self.doRegistration.name," Sent verificiation email" + response, 'info');
              return userDAO.insertRegistrationData(email, contactNo, new navPasswordUtil().encryptPassword(password), verificationCode);
         })
         .done(function(result){
              return deferred.resolve();
         },
         function (error) {
+             navLogUtil.instance().log.call(self, self.doRegistration.name,"Error Occured : " + error, 'error');
              return deferred.reject(error);
         });
 
@@ -145,6 +149,7 @@ module.exports = class navRegistration extends navBaseRouter {
                 if (userDetails !== 0) {
                     return deferred.resolve(userDetails);
                 } else {
+                    navLogUtil.instance().log.call(self, self.doRegistration.name,"User not found for code  "+code  , 'error');
                     return deferred.reject(new navLogicalException());
                 }
         })
@@ -244,7 +249,7 @@ module.exports = class navRegistration extends navBaseRouter {
         .catch(
         function (error) {
             //logg error
-            navLogUtil.instance().log.call(self,'[/registerDetails]', 'Error while doing registration step 2' + error, "error");
+            navLogUtil.instance().log.call(self,self.saveAdditionalDetails.name, 'Error while doing registration step 2' + error, "error");
             return userDAO.rollBackTx()
                 .then(function () {
                     return Q.reject(error);
@@ -252,6 +257,7 @@ module.exports = class navRegistration extends navBaseRouter {
                 })
                 .catch(function (err) {
                     //log error
+                    navLogUtil.instance().log.call(self,self.saveAdditionalDetails.name, 'Error while doing registration step 2' + err, "error");
                     return Q.reject(err)
                 })
         })
@@ -270,6 +276,7 @@ module.exports = class navRegistration extends navBaseRouter {
                 return deferred.resolve();
             }) 
         },(error) => {
+            navLogUtil.instance().log.call(self,self.saveAdditionalDetails.name, 'Error while doing registration step 2' + error, "error");
             return deferred.reject(error);
         });
     }

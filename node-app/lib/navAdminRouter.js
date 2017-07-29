@@ -9,6 +9,7 @@ var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navOrders = require(process.cwd() + "/lib/navOrders.js"),
     navPayments = require(process.cwd() + "/lib/navPayments.js"),
     navLogicalException = require("node-exceptions").LogicalException,
@@ -52,7 +53,6 @@ module.exports = class navAdminRouter extends navBaseRouter {
         deferred.promise
             .done(function(result){
                 delete req.query.offset;
-                debugger;
                 res.render('navAdmin/orders', {
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
@@ -84,7 +84,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
 
                 });
             });
-
+        var i =0;
         return new navRentalsDAO().getOrdersCount()
             .then((_orderCount) => {
                 noOfOrders = parseInt(_orderCount[0].count);
@@ -98,7 +98,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
             } )
             .then((_rentals) => {
                 orderList = _rentals;
-                for(var i in orderList) {
+                for(i = 0; i < orderList.length; i++) {
                    orderList[i].delivery_date = orderList[i].delivery_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].delivery_date), "YYYY-MM-DDTHH:mm:ssZ");
                    orderList[i].returned_date = orderList[i].returned_date === null ? "" :new navCommonUtil().getDateString(parseInt(orderList[i].returned_date), "YYYY-MM-DDTHH:mm:ssZ");
                    orderList[i].lease_start_date =orderList[i].lease_start_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_start_date), "YYYY-MM-DDTHH:mm:ssZ");
@@ -106,7 +106,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
                 }
                 var orderStatus = navRentalsDAO.getStatus();
                 statusList = [];
-                for(var i in orderStatus) {
+                for(i = 0; i <  orderStatus.length; i++) {
                     if(orderStatus.hasOwnProperty(i)) {
                         statusList.push(orderStatus[i]);
                     }
@@ -116,6 +116,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
             .done(() =>{
                 deferred.resolve();
             }, (error) => {
+                navLogUtil.instance().log.call(self, self.getOrders.name, "Error occured "+error, "error")
                 deferred.reject(error);
             } )
 
@@ -149,8 +150,9 @@ module.exports = class navAdminRouter extends navBaseRouter {
         }
 
         var promises = [];
-        for(var i in updateFields) {
-                console.log(updateFields[i]);
+        for(i = 0;i < updateFields.length; i++) {
+                //console.log(updateFields[i]);
+                navLogUtil.instance().log.call(self, self.saveOrders.name, "Updating orders " + updateFields[i].orderId , "info");
                 promises.push(new navOrders().updateOrder(updateFields[i].orderId,updateFields[i].toyId, updateFields[i].userId, updateFields[i])); 
         }
         Q.allSettled(promises)
@@ -165,6 +167,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
             .done(() => {
                 deferred.resolve();
             }, (error) => {
+                navLogUtil.instance().log.call(self, self.saveOrders.name, "Error occured "+error, "error")
                 deferred.reject(error);
             })
     }
@@ -236,7 +239,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
                 }
                 var paymentStatus = navPaymentsDAO.getStatus();
                 statusList = [];
-                for(var i in paymentStatus) {
+                for(i in paymentStatus) {
                     if(paymentStatus.hasOwnProperty(i)) {
                         statusList.push(paymentStatus[i]);
                     }
@@ -246,8 +249,9 @@ module.exports = class navAdminRouter extends navBaseRouter {
             .done(() =>{
                 deferred.resolve();
             }, (error) => {
+                navLogUtil.instance().log.call(self, self.getPayments.name, "Error occured" + error , "error");
                 deferred.reject(error);
-            } )
+            })
     
     }
     savePayments(req, res) {
@@ -278,8 +282,9 @@ module.exports = class navAdminRouter extends navBaseRouter {
         }
 
         var promises = [];
-        for(i = 0; i < updateFields.length ; i++) {
-            promises.push(new navPayments().updatePayment(updateFields[i].paymentId,updateFields[i])); 
+       for(i = 0; i < updateFields.length ; i++) {
+           navLogUtil.instance().log.call(self, self.savePayments.name,"Updating payments with id : " + updateFields[i].paymentId , "info");
+           promises.push(new navPayments().updatePayment(updateFields[i].paymentId,updateFields[i])); 
         }
         Q.allSettled(promises)
             .then((result)=>{
@@ -293,6 +298,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
             .done(() => {
                 deferred.resolve();
             }, (error) => {
+                navLogUtil.instance().log.call(self, self.savePayments.name, "Error occured" + error , "error");
                 deferred.reject(error);
             })
     }

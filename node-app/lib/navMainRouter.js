@@ -71,7 +71,7 @@ module.exports = class navMainRouter extends navBaseRouter {
 
     getHome(req, res){
             var promise = Q.resolve();
-
+            var self = this;
             if(!req.user){
                 promise = (new navToysDAO()).getAllToys(0,10);
             }
@@ -103,6 +103,7 @@ module.exports = class navMainRouter extends navBaseRouter {
                 });
             })
             .done(null,function(error){
+                navLogUtil.log.call(self, self.getHome.name, "Error occured  " + error, "error");
                 //var response = new navResponseUtil().generateErrorResponse(error);
                 var respUtil =  new navResponseUtil();
                 var response = respUtil.generateErrorResponse(error);
@@ -167,6 +168,7 @@ module.exports = class navMainRouter extends navBaseRouter {
             return deferred.reject(new navLogicalException(validationErrors));
         }
         var p=plans[plan];
+        navLogUtil.log.call(self, self.subscribePlan.name, "Plan details : " + p +", type : "+type, "info");
 
         var user = req.user;
         var uDAO = new navUserDAO();
@@ -188,6 +190,7 @@ module.exports = class navMainRouter extends navBaseRouter {
                 deposit = parseInt(p.deposit) - user.deposit;
                 var pDAO;
                 if(type === "member") {
+                    navLogUtil.log.call(self, self.subscribePlan.name, "For User "+user._id +", TransactionId : "+ orderId+", PaymentMethod : " + paymentMethod + ", For Membership" , "info");
                     pDAO = new navPaymentsDAO(uDAO.providedClient);
                     if(paymentMethod === "cash") {
                         return pDAO.insertPaymentDetails(user._id, p.amount , pDAO.REASON.REGISTRATION, pDAO.STATUS.PENDING_COD, orderId, pDAO.TRANSACTION_TYPE.CASH);       
@@ -199,6 +202,7 @@ module.exports = class navMainRouter extends navBaseRouter {
                 
                 }
                 if(deposit > 0) {
+                    navLogUtil.log.call(self, self.subscribePlan.name, "For User "+user._id +", TransactionId : "+ orderId+", PaymentMethod : " + paymentMethod + ", For Deposit" , "info");
                     pDAO = new navPaymentsDAO(uDAO.providedClient);
                     if(paymentMethod === "cash") {
                         return pDAO.insertPaymentDetails(user._id, deposit, pDAO.REASON.DEPOSIT, pDAO.STATUS.PENDING_COD, orderId, pDAO.TRANSACTION_TYPE.CASH);       
@@ -217,6 +221,7 @@ module.exports = class navMainRouter extends navBaseRouter {
                 if(type === "member") {
                     return Q.resolve();
                 }else {
+                    navLogUtil.log.call(self, self.subscribePlan.name, "For User "+user._id +", TransactionId : "+ orderId+", PaymentMethod : " + paymentMethod + ", For Recharge" , "info");
                     if(paymentMethod === "cash") {
                         return pDAO.insertPaymentDetails(user._id, p.amount, pDAO.REASON.PLANS[type][plan], pDAO.STATUS.PENDING_COD, orderId, pDAO.TRANSACTION_TYPE.CASH);
                     } else if(paymentMethod === "paytm") {
@@ -228,6 +233,7 @@ module.exports = class navMainRouter extends navBaseRouter {
             })
             .then(() => {
                 var promises = [];
+                navLogUtil.log.call(self, self.subscribePlan.name, "Initiating payment for TransactionId : "+orderId +", for User : "+user._id + ", with PaymentMethod : " + paymentMethod, "info");
                 if(paymentMethod === "cash") {
                     return new navPayments(uDAO.providedClient).success(orderId, "TXN_SUCCESS", "0", "Cash on Delivery", true);
                 } else if(paymentMethod === "paytm") {
@@ -245,7 +251,7 @@ module.exports = class navMainRouter extends navBaseRouter {
 
             .catch(function (error) {
                 //logg error
-                navLogUtil.instance().log.call(self,'[/subscribePlan]', 'Error while doing payment' + error, "error");
+                navLogUtil.log.call(self, self.subscribePlan.name, "Error occured , Reason : "+error , "error");
                 return uDAO.rollBackTx()
                 .then(function () {
                     return Q.reject(error);
@@ -253,6 +259,7 @@ module.exports = class navMainRouter extends navBaseRouter {
                 })
                 .catch(function (err) {
                     //log error
+                    navLogUtil.log.call(self, self.subscribePlan.name, "Error occured , Reason : "+err , "error");
                     return Q.reject(err)
                 })
             })
@@ -267,6 +274,7 @@ module.exports = class navMainRouter extends navBaseRouter {
 
                 //res.redirect("/login");
             },(error) => {
+                navLogUtil.log.call(self, self.subscribePlan.name, "Error occured , Reason : "+error , "error");
                 return deferred.reject(error);
             });
 
@@ -319,6 +327,7 @@ module.exports = class navMainRouter extends navBaseRouter {
             return deferred.reject(new navLogicalException(validationErrors));
         }
         var p = plans[plan];
+        navLogUtil.log.call(self, self.subscribePlan.name, "Selected plans : "+ p , "info");
         return deferred.resolve(); 
 
     }
