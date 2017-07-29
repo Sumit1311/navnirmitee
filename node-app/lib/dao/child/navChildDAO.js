@@ -49,7 +49,7 @@ module.exports = class navChildDAO extends BaseDAO{
                 return result.rowCount;
             })
         .catch(function (error) {
-            navLogUtil.instance().log.call(self, "insertPaymentDetails", error.message, "error");
+            navLogUtil.instance().log.call(self, "insertChildDetails", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
         });
     }
