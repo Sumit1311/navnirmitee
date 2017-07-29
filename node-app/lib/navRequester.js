@@ -2,6 +2,7 @@ var request = require('request');
 const url = require('url');
 var Q = require('q');
 var navRequestHandlerException = require(process.cwd() + "/lib/exceptions/navRequestHandlerException.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navHTTPException = require(process.cwd() + "/lib/exceptions/navHTTPException.js");
 
 
@@ -40,8 +41,9 @@ module.exports = class navRequester {
     }
 
     doRequest(options) {
+        var self = this;
         var requestOptions = {}, deferred = Q.defer();
-        if(!this.urlObj.hostname && !this.urlObj.href) { return Q.reject(new Error()) };
+        if(!this.urlObj.hostname && !this.urlObj.href) { return Q.reject(new Error()) }
         if(this.urlObj.href) {
             requestOptions.uri = this.urlObj.href;
         } else {
@@ -61,11 +63,15 @@ module.exports = class navRequester {
         if(requestOptions.method == "POST" || requestOptions.method == "PUT" || requestOptions.method == "PATCH") {
             requestOptions.body = body;
         }
+        navLogUtil.instance().log.call(self,self.doRequest.name, 'Requesting with ' + requestOptions, "debug");
+
         request(requestOptions, function(error, response, body) {
             if(error) {
+                navLogUtil.instance().log.call(self,self.doRequest.name, 'Error occured while requesting ' + error, "error");
                 return deferred.reject(new navRequestHandlerException(error));
             }
             if(response && (response.statusCode/100 == 4 || response.statusCode/100 == 5 )) {
+                navLogUtil.instance().log.call(self,self.doRequest.name, 'Server returned error ' + response, "error");
                 return deferred.reject(new navHTTPException(body, response.statusCode));
             }
             return deferred.resolve({

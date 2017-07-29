@@ -39,18 +39,18 @@ module.exports = class navSignInRouter extends navBaseRouter {
             
                 });
              });
-        navLogUtil.log.call(self, self.authentication.name, "Authenticating user : " + req.user.email_address, "info");
+        navLogUtil.instance().log.call(self, self.authentication.name, "Authenticating user : " + req.user.email_address, "info");
         new navAuthenticateUser().authenticate(req, res, deferred);
     }
     logOut(req, res) {
         var self = this;
-        navLogUtil.log.call(self, self.logOut.name, "Logging out user : " + req.user.email_address, "info");
+        navLogUtil.instance().log.call(self, self.logOut.name, "Logging out user : " + req.user.email_address, "info");
         req.session.destroy();
         new navResponseUtil().redirect(req, res, '/');
     }
     logIn (req, res) {
         var self = this;
-        navLogUtil.log.call(self, self.logIn.name, "Logging In user : " + req.user.email_address, "info");
+        navLogUtil.instance().log.call(self, self.logIn.name, "Logging In user : " + req.user.email_address, "info");
         //if the user is already authenticated i.e. exist in the session then continue to the home page
         new navResponseUtil().redirect(req, res, '/');
     }

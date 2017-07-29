@@ -42,6 +42,7 @@ module.exports = class navToysRouter extends navBaseRouter {
     getToysDetails(req, res) {
         var id = req.query.id, toy;
         var deferred = Q.defer();
+        var self = this;
         deferred.promise
             .done((result) => {
                 res.render('detail', {
@@ -99,11 +100,13 @@ module.exports = class navToysRouter extends navBaseRouter {
         .done(function(result){
             return deferred.resolve(result);
         },function(error){
+            navLogUtil.instance().log.call(self,self.getToysDetails.name, 'Error occured ' + error, "error");
             return deferred.reject(error);
         });
     } 
     getOrder(req, res) {
         var id = req.query.id, user = req.user;
+        var self = this;
         var deferred = Q.defer();
         deferred.promise
             .done((result) => {
@@ -161,6 +164,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         .done((toyDetail) => {
             deferred.resolve(toyDetail);
         },(err) => {
+            navLogUtil.instance().log.call(self,self.getOrder.name, 'Error occured ' + err, "error");
             deferred.reject(err);
         });
     }
