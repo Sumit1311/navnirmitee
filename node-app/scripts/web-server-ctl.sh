@@ -1,7 +1,6 @@
 #!/bin/bash
 
 EXECUTABLE='node'
-DEBUG='debug'
 SCRIPT='app.js'
 USER=`whoami`
 APP_DIR='/home/geek/workspace/navnirmitee/node-app'

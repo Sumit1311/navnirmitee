@@ -1,13 +1,16 @@
-var Q = require('q');
+var Q = require('q'),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
+
 
 module.exports = class navSystemUtils {
     executeCommand(command) {
         const exec = require('child_process').exec;
-
+        var self = this;
         var deferred = Q.defer();
+        navLogUtil.instance().log.call(self, self.executeCommand.name, `Executing command ${command}`, 'debug');
         exec(command, (error, stdout, stderr) => {
             if (error) {
-                console.error(`exec error: ${error}`);
+                navLogUtil.instance().log.call(self, self.executeCommand.name, `Exec error: ${error}`, "error");
                 deferred.reject(error);
             }
             deferred.resolve({

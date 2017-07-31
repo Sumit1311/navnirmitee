@@ -1,5 +1,9 @@
+var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
+
+
 module.exports = class navResponseUtils {
     generateErrorResponse(error) {
+        navLogUtil.instance().log.call(this, this.generateErrorResponse.name, `Generating response for exception ${error.name}`, "info");
         switch(error.name){
             case "navPGFailureException" :
                 return this.generateResponse(error.code, {
@@ -111,7 +115,7 @@ module.exports = class navResponseUtils {
     }
     static renderErrorPage_S(req, res, context) {
         if(req.xhr) {
-            navResponseUtils.sendAjaxResponse(res, context.errorResponse); 
+            navResponseUtils.sendAjaxResponse_S(res, context.errorResponse); 
             return;
         } else {    
             res.status(context.errorResponse.status).render("errorDocument", context);

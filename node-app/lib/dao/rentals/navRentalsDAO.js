@@ -174,7 +174,7 @@ navRentalsDAO.prototype.markOrdersForReturn =function() {
       .then(function(result){
               navLogUtil.instance().log.call(self, self.markOrdersForReturn.name, "Marked "+ result.rowCount+" orders for return ", "info");
 
-         return result.rows;
+         return result.rowCount;
       })
       .catch(function(error){
             navLogUtil.instance().log.call(self, self.markOrdersForReturn,  error.message, "error" );

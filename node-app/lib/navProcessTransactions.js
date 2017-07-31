@@ -14,6 +14,7 @@ module.exports = class navProcessTransactions {
                 return new navPaymentsDAO().getNextPendingTransaction();
             })
             .then(function(transactionDetails){
+                navLogUtil.instance().log.call(self, self.processPendingTransactions.name,`Got ${transactionDetails.length} transactions for processing` ,"info")
                 if(transactionDetails.length !== 0) {
                     return navPGRouter.checkStatus(transactionDetails[0].transaction_id);   
                 }

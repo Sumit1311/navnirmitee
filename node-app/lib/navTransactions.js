@@ -12,20 +12,20 @@ module.exports = class navTransactions {
     static createObject(context, type){
         if(type == TYPE.RENT) {
             return {
-		dateMilis : parseInt(context.transaction_date),
+                dateMilis : parseInt(context.transaction_date),
                 transactionDate : new navCommonUtil().getDateString(parseInt(context.transaction_date)),
                 summary : "Rented Toy : "+context.name,
                 amountDeducted : context.price,
-		transactionStatus : context.status
+                transactionStatus : context.status
             };
         }
         else if(type == TYPE.PAYMENTS) {
             return {
-		dateMilis : parseInt(context.paid_date),
+                dateMilis : parseInt(context.paid_date),
                 transactionDate : new navCommonUtil().getDateString(parseInt(context.paid_date)),
                 summary : context.reason,
                 amountPaid : context.amount_payable,
-		transactionStatus : context.status
+                transactionStatus : context.status
 		
             };
         }

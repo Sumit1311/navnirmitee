@@ -54,7 +54,7 @@ module.exports = class navDatabaseUtils {
             break;
         }
 
-        for (var r in rows) {
+        for (var r =0; r < rows.length; r++) {
             refactoredRows[r] = {};
             for (var key in rows[r]) {
                 if (rows[r].hasOwnProperty(key)) {

@@ -10,8 +10,12 @@ module.exports = class navProcessTransactions {
     processOrders() {
         var self = this; 
         return new navRentalsDAO().markOrdersForReturn()
+            .then((result) => {
+                navLogUtil.instance().log.call(self, self.processOrders.name, "Marked Orders "+result +" for return ", "info");
+                return Q.resolve();
+            })
             .catch((error) => {
-                navLogUtil.instance().log.call(self, "processOrders","Error : " + error, "error");
+                navLogUtil.instance().log.call(self, self.processOrders.name,"Error : " + error, "error");
                 return Q.resolve();
             })
     }

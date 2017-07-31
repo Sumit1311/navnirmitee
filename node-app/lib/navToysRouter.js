@@ -97,12 +97,12 @@ module.exports = class navToysRouter extends navBaseRouter {
                 toy[0].ageGroup = navCommonUtil.getAgeGroups()[toy[0].age_group];
                 return new navSystemUtil().getNoOfFilesMatchPat(toyDetail[0]._id+'_*',process.cwd() + '/../public/img/toys/');
             })
-        .done(function(result){
-            return deferred.resolve(result);
-        },function(error){
-            navLogUtil.instance().log.call(self,self.getToysDetails.name, 'Error occured ' + error, "error");
-            return deferred.reject(error);
-        });
+            .done(function(result){
+                return deferred.resolve(result);
+            },function(error){
+                navLogUtil.instance().log.call(self,self.getToysDetails.name, 'Error occured ' + error, "error");
+                return deferred.reject(error);
+            });
     } 
     getOrder(req, res) {
         var id = req.query.id, user = req.user;
@@ -169,6 +169,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         });
     }
     placeOrder(req, res){
+        var self = this;
         var id = req.query.id, dbClient; 
         var deferred = Q.defer();
         var respUtil =  new navResponseUtil();
@@ -248,6 +249,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                 //var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
                 return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(toyDetails.rent_duration,'days').valueOf(), rDAO.STATUS.PLACED);
             } else {
+                navLogUtil.instance().log.call(self, self.placeOrder.name, "No toys found for " + id , "warn");
                 return Q.resolve();
             }
         })
@@ -257,6 +259,8 @@ module.exports = class navToysRouter extends navBaseRouter {
                 if(userDetails.membership_expiry !== null) {
                     membershipExpiry = new navCommonUtil().getCurrentTime();
                 }
+                navLogUtil.instance().log.call(self, self.placeOrder.name, "Updating balance of user "+ userDetails.email_address +" to : " + ((userDetails.balance) - (toyDetails.price)) , "info");
+
                 return new navUserDAO(rDAO.providedClient).updatePoints(user._id, (userDetails.balance) - (toyDetails.price), membershipExpiry);
             } else {
                 return Q.resolve();
@@ -264,6 +268,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         })
         .then(function() {
             if(toyDetails) {
+                navLogUtil.instance().log.call(self, self.placeOrder.name, "Updating stock of toy : "+id , "info");
                 return new navToysDAO(rDAO.providedClient).updateToyStock(toyDetails._id, 1);
             } else {
                 return Q.resolve();
@@ -291,9 +296,11 @@ module.exports = class navToysRouter extends navBaseRouter {
                   return Q.reject(error);
                   }*/
                 //res.status(500).send("Internal Server Error");
+                navLogUtil.instance().log.call(self, self.placeOrder.name, "Error occured Details : " + error, "error");
                 return Q.reject(error);
             })
             .catch(function (err) {
+                navLogUtil.instance().log.call(self, self.placeOrder.name, "Error occured while rollbacking : " + err, "error");
                 //log error
                 return Q.reject(err);
             })
@@ -318,6 +325,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         });
     }    
     getSearchPage(req, res) {
+        var self = this;
         var q = req.query.q ? req.query.q : "", offset = req.query.offset ? req.query.offset : 0, sortBy = req.query.sortBy ? req.query.sortBy: 0; 
         var sortType = req.query.sortType ? req.query.sortType : 0, activeCategories = [], activeAgeGroups = [], activeSkills = [], activeBrands = []; 
         if(!offset ) {
@@ -357,7 +365,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         //console.log(repeatHelper);
         deferred.promise
             .done((result) => {
-                console.log(brands);
+                //console.log(brands);
                 function genQueryParams() {
                     var val = "";
                     for(var i in req.query){
@@ -366,11 +374,11 @@ module.exports = class navToysRouter extends navBaseRouter {
                         }
                     }
                     //val.charAt[val.length -1] = "";
-                console.log(val);
+                //console.log(val);
                     return val;
                 }
                 delete req.query.offset;
-                console.log(querystring.stringify(req.query));
+                //console.log(querystring.stringify(req.query));
                 res.render('searchToys', {
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
@@ -400,9 +408,9 @@ module.exports = class navToysRouter extends navBaseRouter {
                         currentPage : offset ? (Math.floor(offset/perPageToys) + 1) : 1
 
                     },
-                        helpers : {
-                            repeat : repeatHelper
-                        }
+                    helpers : {
+                        repeat : repeatHelper
+                    }
 
                 })    
             },(error) => {
@@ -481,6 +489,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                 }
                 deferred.resolve();
             }, (error) => {
+                navLogUtil.instance().log.call(self, self.getSearchPage.name, "Error occured Details : " + error, "error");
                 deferred.reject(error);
             });
 
@@ -488,6 +497,7 @@ module.exports = class navToysRouter extends navBaseRouter {
     }
 
     cancelOrder(req, res) {
+        var self = this;
          var orderId = req.query.orderId;
         var deferred = Q.defer();
         var respUtil =  new navResponseUtil();
@@ -523,12 +533,14 @@ module.exports = class navToysRouter extends navBaseRouter {
         {
             return deferred.reject(new navValidationException(validationErrors));
         }
+        navLogUtil.instance().log.call(self, self.getSearchPage.name, "Canceling order :  " + orderId, "info");
          new navOrders().updateOrder(orderId, null, null, {
             orderStatus : navRentalsDAO.getStatus().CANCELLED
          })
              .done(() => {
                 deferred.resolve();
              },(error) => {
+                navLogUtil.instance().log.call(self, self.cancelOrder.name, "Error occured Details : " + error, "error");
                 deferred.reject(error);
              })
     }

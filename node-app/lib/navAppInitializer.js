@@ -17,6 +17,7 @@ module.exports = class navAppInitializer {
     }
 
     init () {
+        const self = this;
             var app = express();
             // BodyParser Middleware
             app.use(bodyParser.json());
@@ -61,6 +62,7 @@ module.exports = class navAppInitializer {
                     compress: 'gzip'
                 })
             }));
+            navLogUtil.instance().log.call(self, self.init.name, `Express initialization done`, "info");
             return app;
 
     }

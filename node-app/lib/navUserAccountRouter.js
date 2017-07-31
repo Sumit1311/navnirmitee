@@ -50,34 +50,34 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                     layout : 'nav_bar_layout',
                     plans : plans,
                     membershipPlans : membershipPlans,
-		    helpers : {
-			getClass : function(status, options) {
-				var lableClass;
-				switch(status) {
-				    case navPaymentsDAO.getStatus().PENDING :
-				    case navPaymentsDAO.getStatus().PENDING_COD :
-					lableClass = "warning";
-				        break;
-				    case navRentalsDAO.getStatus().DELIVERED:
-				    case navRentalsDAO.getStatus().PLACED:
-				    case navRentalsDAO.getStatus().RETURNED:
-				    case navPaymentsDAO.getStatus().COMPLETED :
-					lableClass = "success";
-				        break;
-				    case navRentalsDAO.getStatus().CANCELLED:
-				    case navPaymentsDAO.getStatus().CANCELLED :
-				    case navPaymentsDAO.getStatus().FAILED :
-					lableClass = "danger";
-				        break;
-				
-				    default :
-					lableClass = "default";
-				        break;
-				     
-				}
-				return lableClass;
-			}
-		    }
+                    helpers : {
+                        getClass : function(status, options) {
+                            var lableClass;
+                            switch(status) {
+                                case navPaymentsDAO.getStatus().PENDING :
+                                case navPaymentsDAO.getStatus().PENDING_COD :
+                                    lableClass = "warning";
+                                    break;
+                                case navRentalsDAO.getStatus().DELIVERED:
+                                case navRentalsDAO.getStatus().PLACED:
+                                case navRentalsDAO.getStatus().RETURNED:
+                                case navPaymentsDAO.getStatus().COMPLETED :
+                                    lableClass = "success";
+                                    break;
+                                case navRentalsDAO.getStatus().CANCELLED:
+                                case navPaymentsDAO.getStatus().CANCELLED :
+                                case navPaymentsDAO.getStatus().FAILED :
+                                    lableClass = "danger";
+                                    break;
+
+                                default :
+                                    lableClass = "default";
+                                    break;
+
+                            }
+                            return lableClass;
+                        }
+                    }
                 
                 });
         },function(error){
@@ -109,6 +109,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                 membershipPlans =  navMembershipParser.instance().getConfig("membership",[]); 
                 deferred.resolve();
             },(error) => {
+                navLogUtil.instance().log.call(self, self.getRechargeDetails.name, "Error occured Details : " + error, "error");
                 deferred.reject(error);
             });
     
@@ -120,59 +121,59 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
         var user = req.user;
         deferred.promise
             .done(function(orders){
-		for(var i = 0; i < orders.length; i++) {
-		    orders[i].delivery_date = new navCommonUtil().getDateString(parseInt(orders[i].delivery_date));
-		    orders[i].returned_date = new navCommonUtil().getDateString(parseInt(orders[i].returned_date));
-		    orders[i].lease_start_date = new navCommonUtil().getDateString(parseInt(orders[i].lease_start_date));
-		}
+                for(var i = 0; i < orders.length; i++) {
+                    orders[i].delivery_date = new navCommonUtil().getDateString(parseInt(orders[i].delivery_date));
+                    orders[i].returned_date = new navCommonUtil().getDateString(parseInt(orders[i].returned_date));
+                    orders[i].lease_start_date = new navCommonUtil().getDateString(parseInt(orders[i].lease_start_date));
+                }
                 res.render("orderDetails",{
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
                     orders : orders,		    helpers : {
-			getClass : function(status, options) {
-				var lableClass;
-				console.log(status);
-				switch(status) {
-				    case navRentalsDAO.getStatus().DELIVERED:
-					lableClass = "success";
-					break;
-				    case navRentalsDAO.getStatus().PLACED:
-					lableClass = "info";
-					break;
-				    case navRentalsDAO.getStatus().RETURNED:
-					lableClass = "warning";
-					break;
-				    case navRentalsDAO.getStatus().CANCELLED:
-					lableClass = "danger";
-				        break;
-				    default :
-					lableClass = "default";
-				        break;
-				}
-				return lableClass;
-			}
-		    }
+                        getClass : function(status, options) {
+                            var lableClass;
+                            console.log(status);
+                            switch(status) {
+                                case navRentalsDAO.getStatus().DELIVERED:
+                                    lableClass = "success";
+                                    break;
+                                case navRentalsDAO.getStatus().PLACED:
+                                    lableClass = "info";
+                                    break;
+                                case navRentalsDAO.getStatus().RETURNED:
+                                    lableClass = "warning";
+                                    break;
+                                case navRentalsDAO.getStatus().CANCELLED:
+                                    lableClass = "danger";
+                                    break;
+                                default :
+                                    lableClass = "default";
+                                    break;
+                            }
+                            return lableClass;
+                        }
+                    }
 
                 });
-        },function(error){
+            },function(error){
                 var response = respUtil.generateErrorResponse(error);
                 respUtil.renderErrorPage(req, res, {
                     errorResponse : response,
                     user : req.user,
                     isLoggedIn : false,
                     layout : 'nav_bar_layout',
-            
+
                 });
-        });
+            });
         return new navRentalsDAO().getAllOrders(user._id)
             .done((_orders) => {
 
                 deferred.resolve(_orders);
             },(error) => {
+                navLogUtil.instance().log.call(self, self.getOrderDetails.name, "Error occured Details : " + error, "error");
                 deferred.reject(error);
             });
     
     }
-
 }

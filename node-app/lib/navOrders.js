@@ -1,6 +1,7 @@
 var navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     Q = require('q'), 
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
@@ -10,6 +11,7 @@ module.exports = class navOrders {
     }
 
     updateOrder(orderId, toyId, userId, updateFields) {
+        var self = this;
         var rDAO = new navRentalsDAO(), toyDetail, userDetail, promise = Q.resolve();
         if(!toyId || !userId) {
             promise = rDAO.getOrderDetails(orderId)
@@ -35,18 +37,21 @@ module.exports = class navOrders {
                 return rDAO.startTx();
             })
             .then(() => {
-            if(updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED || updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
-                
-                return new navToysDAO(rDAO.providedClient).getToyDetailById(toyId);
-            } else {
-                return Q.resolve();
-            }
+                if(updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED || updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
+
+                    return new navToysDAO(rDAO.providedClient).getToyDetailById(toyId);
+                } else {
+                    navLogUtil.log.call(self, self.updateOrder.name, "No pending orders for "+userId+" for toy : "+toyId, "info");
+                    return Q.resolve();
+                }
             })
             .then((_toyDetails) => {
                     if(_toyDetails && _toyDetails.length !== 0 && updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED) {
                         toyDetail = _toyDetails[0];
+                        navLogUtil.log.call(self, self.updateOrder.name, "Updating balance of user "+userId+" for cancellation of order "+orderId, "info");
                         return new navUserDAO(rDAO.providedClient).updateBalance(userId,  parseInt(toyDetail.price));
                     } else {
+                        navLogUtil.log.call(self, self.updateOrder.name, "No toy exists for "+toyId, "info");
                         return Q.resolve();
                     }
 
@@ -60,6 +65,8 @@ module.exports = class navOrders {
             })
             .then(() => {
                 if(updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
+
+                    navLogUtil.log.call(self, self.updateOrder.name, `Marking order ${orderId} as returned`, "info");
                     updateFields.returnDate = navCommonUtil.getCurrentTime_S();
                 } else {
                     updateFields.returnDate = navCommonUtil.getTimeinMillis( updateFields.returnDate);

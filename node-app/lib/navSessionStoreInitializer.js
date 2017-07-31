@@ -1,8 +1,9 @@
 var client, redisServerURL;
 var redisStore;
 var redis = require("redis");
-var navConfigParser = require(process.cwd() + "/lib/navConfigParser.js");
-var session = require('express-session');
+var navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    session = require('express-session');
 
 module.exports = class navSessionStoreInitializer {
 	constructor(url) {
@@ -11,6 +12,7 @@ module.exports = class navSessionStoreInitializer {
         } else {
             redisServerURL = navConfigParser.instance().getConfig("RedisServerURL", "redis://127.0.0.1:6379");
         }   
+        navLogUtil.instance().log.call(this, this.contructor.name, "Configured redis server url "+redisServerURL,"info")
     }
 
     init() {

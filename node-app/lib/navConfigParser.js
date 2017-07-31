@@ -1,58 +1,31 @@
 var that, fs = require('fs');
-var mustache = require("mustache");
+var mustache = require("mustache"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
+
 module.exports = class navConfigParser {
     constructor(fileName) {
+            var self = this;
             if(fileName) {
                 try {
                     this.config = JSON.parse(fs.readFileSync(process.cwd() + "/" + fileName));
                     //this.config = mustache.render(this.config, process.env);
-
+                    setMandatoryConfig.call(this);
                 } catch(e){
-                    throw e;
+                    //throw e;
+                    this.config = getDefaultConfig();
                 }
             } else {
                 try {
-                    this.config = JSON.parse(fs.readFileSync(process.cwd() + "/config/navnirmitee.config"));
-                    this.config = mustache.render(this.config, process.env);
-                    if(this.config.LogLevel === undefined) {
-                        this.config.LogLevel = {};
-                    }
+                    var configString = fs.readFileSync(process.cwd() + "/config/navnirmitee.json");
+                    configString = mustache.render(configString.toString(), process.env);
+                    this.config = JSON.parse(configString);
+                    setMandatoryConfig.call(this);
                 } catch(e){
-                    this.config = {
-                        DatabaseHost: process.env.DB_HOST || "localhost",
-                        DatabaseUser: process.env.DB_USER || "admin",
-                        DatabasePassword: process.env.DB_PASS || "admin",
-                        DatabaseName: process.env.DB_NAME || "navnirmitee",
-                        DatabasePort: process.env.DB_PORT || "5433",
-                        RedisServerURL: process.env.REDISCLOUD_URL,
-                        ListeningPort : process.env.PORT,
-                        HostName : process.env.HOST_NAME || "localhost",
-                        PaymentGateway : {
-                            Domain : "https://pguat.paytm.com",
-                            MerchantID : "WorldP64425807474247",
-                            MerchantKey : "kbzk1DSbJiV_O3p5",
-                            Website : "worldpressplg",
-                            ChannelID : "WEB",
-                            IndustryType : "Retail",
-                            CallbackURLPath : "/callback", 
-                            TransactionURLPath : "/oltp-web/processTransaction",
-                            StatusAPIPath : "/oltp/HANDLER_INTERNAL/getTxnStatus",
-                            RetryInterval : 8, //hours
-                            ExpirationInterval : 72 //hours
-                        },
-                        BackgroundProcessing : {
-                            TransactionInterval : 1000, // ms,
-                            OrderInterval : 1000
-                        },
-                        LogLevel : {
-                            "web-server" : "INFO"
-                        }
-                    }
+                    this.config = getDefaultConfig();
                 }
             }
     }
    
-
     getConfig(key, defaultValue) {
         if(this.config[key] === undefined) {
             return defaultValue;
@@ -70,3 +43,44 @@ module.exports = class navConfigParser {
             }
     }
 };
+function getDefaultConfig() {
+    return {
+        DatabaseHost: process.env.DB_HOST || "localhost",
+        DatabaseUser: process.env.DB_USER || "admin",
+        DatabasePassword: process.env.DB_PASS || "admin",
+        DatabaseName: process.env.DB_NAME || "navnirmitee",
+        DatabasePort: process.env.DB_PORT || "5433",
+        RedisServerURL: process.env.REDISCLOUD_URL,
+        ListeningPort : process.env.PORT,
+        HostName : process.env.HOST_NAME || "localhost",
+        PaymentGateway : {
+            Domain : "https://pguat.paytm.com",
+            MerchantID : "WorldP64425807474247",
+            MerchantKey : "kbzk1DSbJiV_O3p5",
+            Website : "worldpressplg",
+            ChannelID : "WEB",
+            IndustryType : "Retail",
+            CallbackURLPath : "/callback", 
+            TransactionURLPath : "/oltp-web/processTransaction",
+            StatusAPIPath : "/oltp/HANDLER_INTERNAL/getTxnStatus",
+            RetryInterval : 8, //hours
+            ExpirationInterval : 72 //hours
+        },
+        BackgroundProcessing : {
+            TransactionInterval : 1000, // ms,
+            OrderInterval : 1000
+        },
+        LogLevel : {
+            "web-server" : "INFO"
+        }
+    }
+}
+
+function setMandatoryConfig() {
+    if(this.config.LogLevel === undefined) {
+        this.config.LogLevel = {};
+    }
+    if(this.config.PaymentGateway === undefined) {
+        this.config.PaymentGateway = {};
+    }
+}
