@@ -65,7 +65,7 @@ navRentalsDAO.prototype.getAllOrders = function(userId) {
     var self = this;
     navLogUtil.instance().log.call(self, self.getAllOrders.name, "Fetch all orders for user "+ userId, "debug")            
 
-    return this.dbQuery("SELECT r._id, lease_start_date, lease_end_date, status, delivery_date, returned_date, name, price FROM "+ tableName + " r INNER JOIN nav_toys t ON r.toys_id = t._id WHERE r.user_id = $1",[userId])
+    return this.dbQuery("SELECT r._id, lease_start_date, lease_end_date, status, delivery_date, returned_date, name, price,transaction_date FROM "+ tableName + " r INNER JOIN nav_toys t ON r.toys_id = t._id WHERE r.user_id = $1",[userId])
       .then(function(result){
           navLogUtil.instance().log.call(self, self.getAllOrders.name, "All orders for user "+ userId + " are"+result.rowCount, "debug");
          return result.rows;

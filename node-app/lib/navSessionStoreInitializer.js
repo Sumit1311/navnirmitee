@@ -12,7 +12,7 @@ module.exports = class navSessionStoreInitializer {
         } else {
             redisServerURL = navConfigParser.instance().getConfig("RedisServerURL", "redis://127.0.0.1:6379");
         }   
-        navLogUtil.instance().log.call(this, this.contructor.name, "Configured redis server url "+redisServerURL,"info")
+        navLogUtil.instance().log.call(this, this.constructor.name, "Configured redis server url "+redisServerURL,"info")
     }
 
     init() {

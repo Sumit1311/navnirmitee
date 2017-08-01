@@ -38,6 +38,15 @@ var TRANSACTION_TYPE = {
     CASH :"Cash on Deliver"
 }
 
+var plans = navMembershipParser.instance().getConfig('plans');
+for(var i = 0; i < plans.length; i++)
+{
+    REASON.PLANS[i] = [];
+    for(var j = 0; j < plans[0].length; j++)
+    {
+        REASON.PLANS[i][j] = "RECH_"+ i + "::" + plans[i][j].id;
+    }
+}
 module.exports = class navPaymentsDAO extends BaseDAO{
     constructor(client, persistence) {
         super(persistence);

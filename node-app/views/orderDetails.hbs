@@ -49,12 +49,12 @@
                     <tr>
                         <form action="/toys/cancelOrder?orderId={{this._id}}" method="POST">
                         </form>
-                            <td>{{lease_start_date}}</td>
-                            <td>{{delivery_date}}</td>
-                            <td>{{returned_date}}</td>
-                            <td>{{name}}</td>
-                            <td>{{price}}</td>
-                            <td><span class="label label-{{#getClass status}}{{/getClass}}">{{status}}</span></td>
+                            <td>{{orderedDate}}</td>
+                            <td>{{deliveryDate}}</td>
+                            <td>{{returnedDate}}</td>
+                            <td>{{toyName}}</td>
+                            <td>{{toyPrice}}</td>
+                            <td><span class="label label-{{#getClass transactionStatus}}{{/getClass}}">{{transactionStatus}}</span></td>
                             <td>
                                 <button type="submit" class="btn btn-green btn-cancel-order" {{#compare status "!=" "PLACED"}}disabled{{/compare}}>Cancel</button>
                             </td>

@@ -12,10 +12,6 @@ var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navOrders = require(process.cwd() + "/lib/navOrders.js"),
     navPayments = require(process.cwd() + "/lib/navPayments.js"),
-    navLogicalException = require("node-exceptions").LogicalException,
-    navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
-    helpers = require('handlebars-helpers')(),
-    moment =require('moment'),
     Q = require('q');
 
 module.exports = class navAdminRouter extends navBaseRouter {
@@ -25,7 +21,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
 
 
     setup(){
-        this.router.use(this.ensureAuthenticated, this.ensureSuperAdmin)
+        this.router.use(this.ensureAuthenticated.bind(this), this.ensureSuperAdmin.bind(this))
         this.router.get('/', this.getAdminHome.bind(this)); 
         this.router.get('/orders', this.getOrders.bind(this)); 
         this.router.get('/payments', this.getPayments.bind(this)); 
@@ -46,7 +42,6 @@ module.exports = class navAdminRouter extends navBaseRouter {
         var columnOrdering = ["email_address", "name", "lease_start_date", "delivery_date", "returned_date", "lease_end_date", "shipping_address", "status"];
         var columnLabel = ["Customer Label", "Toys Name", "Order Placement Date", "Delivery Date", "Returned Date", "Lease Expiry", "Shipping Address", "Order Status"]
         var sortOrdering = ["ASC", "DESC"];
-        var toysList, customerList, orderList, statusList, noOfOrders = 0, noOfPages;
 
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil();
@@ -59,10 +54,10 @@ module.exports = class navAdminRouter extends navBaseRouter {
                     layout : 'nav_admin_layout',
                     queryParameters : querystring.stringify(req.query),
                     context : {
-                        orderList : orderList,
-                        statusList : statusList,
+                        orderList : result.orderList,
+                        statusList : result.statusList,
                         dateFormat : "YYYY-MM-DDTHH:mm:ssZ",
-                        noOfPages : noOfPages,
+                        noOfPages : result.noOfPages,
                         perPageLimit : limit,
                         currentPage : offset ? (Math.floor(offset/limit) + 1) : 1,
                         sortType : sortType == 1 ? 0 : 1,
@@ -84,37 +79,12 @@ module.exports = class navAdminRouter extends navBaseRouter {
 
                 });
             });
-        var i =0;
-        return new navRentalsDAO().getOrdersCount()
-            .then((_orderCount) => {
-                noOfOrders = parseInt(_orderCount[0].count);
-
-                if(noOfOrders % limit !== 0 ) {
-                    noOfPages = Math.floor(noOfOrders / limit) + 1;
-                } else {
-                    noOfPages = Math.floor(noOfOrders / limit) ;
-                }
-                return new navRentalsDAO().getOrdersFullList(offset, limit, columnOrdering[sortBy], sortOrdering[sortType]);
-            } )
-            .then((_rentals) => {
-                orderList = _rentals;
-                for(i = 0; i < orderList.length; i++) {
-                   orderList[i].delivery_date = orderList[i].delivery_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].delivery_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   orderList[i].returned_date = orderList[i].returned_date === null ? "" :new navCommonUtil().getDateString(parseInt(orderList[i].returned_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   orderList[i].lease_start_date =orderList[i].lease_start_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_start_date), "YYYY-MM-DDTHH:mm:ssZ");
-                   orderList[i].lease_end_date =orderList[i].lease_end_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_end_date), "YYYY-MM-DDTHH:mm:ssZ");
-                }
-                var orderStatus = navRentalsDAO.getStatus();
-                statusList = [];
-                for(i = 0; i <  orderStatus.length; i++) {
-                    if(orderStatus.hasOwnProperty(i)) {
-                        statusList.push(orderStatus[i]);
-                    }
-                }
-                return Q.resolve();
-            })
-            .done(() =>{
-                deferred.resolve();
+        new navOrders().getOrdersList(offset, limit, [{ 
+            column : columnOrdering[sortBy], 
+            type : sortOrdering[sortType]
+        }])
+            .done((result) =>{
+                deferred.resolve(result);
             }, (error) => {
                 navLogUtil.instance().log.call(self, self.getOrders.name, "Error occured "+error, "error")
                 deferred.reject(error);
@@ -167,7 +137,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
             .done(() => {
                 deferred.resolve();
             }, (error) => {
-                navLogUtil.instance().log.call(self, self.saveOrders.name, "Error occured "+error, "error")
+                navLogUtil.instance().log.call(self, self.saveOrders.name, "Error occured "+error.stack, "error")
                 deferred.reject(error);
             })
     }
@@ -190,10 +160,10 @@ module.exports = class navAdminRouter extends navBaseRouter {
                     layout : 'nav_admin_layout',
                     queryParameters : querystring.stringify(req.query),
                     context : {
-                        paymentList : paymentList,
-                        statusList : statusList,
+                        paymentList : result.paymentList,
+                        statusList : result.statusList,
                         dateFormat : "YYYY-MM-DDTHH:mm:ssZ",
-                        noOfPages : noOfPages,
+                        noOfPages : result.noOfPages,
                         perPageLimit : limit,
                         currentPage : offset ? (Math.floor(offset/limit) + 1) : 1,
                         sortType : sortType == 1 ? 0 : 1,
@@ -216,38 +186,12 @@ module.exports = class navAdminRouter extends navBaseRouter {
                 });
             });
 
-        return new navPaymentsDAO().getPaymentsCount()
-            .then((_paymentCount) => {
-                noOfOrders = parseInt(_paymentCount[0].count);
-
-                if(noOfOrders % limit !== 0 ) {
-                    noOfPages = Math.floor(noOfOrders / limit) + 1;
-                } else {
-                    noOfPages = Math.floor(noOfOrders / limit) ;
-                }
-                return new navPaymentsDAO().getPaymentsFullList(offset, limit, columnOrdering[sortBy], sortOrdering[sortType]);
-            } )
-            .then((_rentals) => {
-                paymentList = _rentals;
-                for(var i in paymentList) {
-                    if(paymentList.hasOwnProperty(i)) {
-                        paymentList[i].credit_date = paymentList[i].delivery_date === null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].credit_date), "YYYY-MM-DDTHH:mm:ssZ");
-                        paymentList[i].paid_date = paymentList[i].paid_date === null ? "" :new navCommonUtil().getDateString(parseInt(paymentList[i].paid_date), "YYYY-MM-DDTHH:mm:ssZ");
-                        paymentList[i].next_retry_date =paymentList[i].next_retry_date === null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].next_retry_date), "YYYY-MM-DDTHH:mm:ssZ");
-                        paymentList[i].expiration_date =paymentList[i].expiration_date === null ? "" : new navCommonUtil().getDateString(parseInt(paymentList[i].expiration_date), "YYYY-MM-DDTHH:mm:ssZ");
-                    }
-                }
-                var paymentStatus = navPaymentsDAO.getStatus();
-                statusList = [];
-                for(i in paymentStatus) {
-                    if(paymentStatus.hasOwnProperty(i)) {
-                        statusList.push(paymentStatus[i]);
-                    }
-                }
-                return Q.resolve();
-            })
-            .done(() =>{
-                deferred.resolve();
+        new navPayments().getPaymentsList(offset, limit, [{
+            column : columnOrdering[sortBy],
+            type: sortOrdering[sortType]
+        }])
+            .done((result) =>{
+                deferred.resolve(result);
             }, (error) => {
                 navLogUtil.instance().log.call(self, self.getPayments.name, "Error occured" + error , "error");
                 deferred.reject(error);

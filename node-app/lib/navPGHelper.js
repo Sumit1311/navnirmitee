@@ -1,15 +1,8 @@
-var navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
-    navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
-    navPGFailureException = require(process.cwd() + "/lib/exceptions/navPGFailureException.js"),
-    navTransactionPendingException = require(process.cwd() + "/lib/exceptions/navTransactionPendingException.js"),
-    navPaymentFailureException = require(process.cwd() + "/lib/exceptions/navPaymentFailureException.js"),
-    navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
-    navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
-    navPayments = require(process.cwd() + "/lib/navPayments.js"),
-    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
-    moment = require('moment'),
-    Q = require('q'),
-    navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js");
+var navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
+    navPayments = require(process.cwd() + "/lib/navPayments.js");
+    
+    
+    
 
 
 

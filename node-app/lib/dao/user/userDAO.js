@@ -49,7 +49,7 @@ UserDAO.prototype.getLoginDetails = function (loginName) {
     return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type, deposit, address" +
     " FROM " + tableName + " WHERE email_address=$1", [loginName])
         .then(function (result) {
-            navLogUtil.instance().log.call(self, "getLoginDetails", "Login Details for "+ loginName + "with id " + result.rows[0]._id, "debug");
+            navLogUtil.instance().log.call(self, "getLoginDetails", "Login Details for "+ loginName + "with id ", "debug");
             return result.rows;
         })
         .catch(function (error) {
@@ -69,7 +69,7 @@ UserDAO.prototype.getAddress = function (userId) {
     return this.dbQuery("SELECT address, city, state, pin_code" +
     " FROM " + tableName + " WHERE _id=$1", [userId])
         .then(function (result) {
-            navLogUtil.instance().log.call(this, "getAddress", "Get Address details for "+userId, "debug");
+            navLogUtil.instance().log.call(self, "getAddress", "Get Address details for "+userId, "debug");
             return result.rows;
         })
         .catch(function (error) {
@@ -206,7 +206,7 @@ UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
     " FROM " + tableName +
     " WHERE email_verification=$1", [verifCode])
         .then(function (result) {
-            navLogUtil.instance().log.call(this, "getUserDetailsByCode", "Details for verification code : "+ verifCode + ", email_address : "+ result.rows[0]._id, "debug");
+            navLogUtil.instance().log.call(self, "getUserDetailsByCode", "Details for verification code : "+ verifCode, "debug");
             return result.rows;
         })
         .catch(function (error) {
@@ -222,7 +222,7 @@ UserDAO.prototype.updatePlan = function (userId, plan){
     " SET subscribed_plan = $1 WHERE _id = $2;",
     [plan, userId])
         .then(function (result) {
-            navLogUtil.instance().log.call(this, "getUserDetailsByCode", "Updated rows "+ result.rowCount , "debug");
+            navLogUtil.instance().log.call(self, "getUserDetailsByCode", "Updated rows "+ result.rowCount , "debug");
             return result.rowCount;
         })
         .catch(function (error) {

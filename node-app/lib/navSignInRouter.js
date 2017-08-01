@@ -12,17 +12,18 @@ module.exports = class navSignInRouter extends navBaseRouter {
 
     setup(){
         this.router.post('/', this.authentication.bind(this));
-        this.router.get('/logout', this.ensureAuthenticated, this.isSessionAvailable, this.logOut.bind(this));        
+        this.router.get('/logout', this.ensureAuthenticated.bind(this), this.isSessionAvailable.bind(this), this.logOut.bind(this));        
         //the path which will be used to login this is the route for displaying sign in page to user
-        this.router.get('/login', this.ensureAuthenticated,this.ensureVerified, this.isSessionAvailable, this.logIn.bind(this));
+        this.router.get('/login', this.ensureAuthenticated.bind(this),this.ensureVerified.bind(this) , this.isSessionAvailable.bind(this), this.logIn.bind(this));
         return this;
     }
 
-    authentication(req, res, next) {    
+    authentication(req, res) {    
         var self = this;
         var deferred = Q.defer();
         deferred.promise
             .done(function(){
+                navLogUtil.instance().log.call(self, self.authentication.name, "Authenticating user : " + req.user.email_address, "info");
                 //console.log("Re : ", req.query.redirect);
                 if(req.query.redirect) {
                     return new navResponseUtil().redirect(req, res, req.query.redirect);
@@ -39,7 +40,6 @@ module.exports = class navSignInRouter extends navBaseRouter {
             
                 });
              });
-        navLogUtil.instance().log.call(self, self.authentication.name, "Authenticating user : " + req.user.email_address, "info");
         new navAuthenticateUser().authenticate(req, res, deferred);
     }
     logOut(req, res) {

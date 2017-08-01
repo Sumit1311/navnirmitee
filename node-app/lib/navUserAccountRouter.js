@@ -1,13 +1,14 @@
 var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navResponseUtil = require(process.cwd() + '/lib/navResponseUtil.js'),
+    navAccount = require(process.cwd() + "/lib/navAccount.js"),
     navCommonUtil = require(process.cwd() + '/lib/navCommonUtil.js'),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navTransactions = require(process.cwd() + "/lib/navTransactions.js"),
-    navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
+    navOrders = require(process.cwd() + "/lib/navOrders.js"),
+    navPayments = require(process.cwd() + "/lib/navPayments.js"),
     navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
     navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
-    navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     Q = require('q');
 
 module.exports = class navUserAccountRouter extends navBaseRouter {
@@ -16,7 +17,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
     }
     setup(){
         var self = this;
-        this.router.use(this.isSessionAvailable, this.ensureAuthenticated, this.ensureVerified)
+        this.router.use(this.isSessionAvailable.bind(this), this.ensureAuthenticated.bind(this), this.ensureVerified.bind(this))
         this.router.get('/rechargeDetails', function(req,res, next) {self.getRechargeDetails(req,res,next)});
         this.router.get('/orderDetails', function(req,res, next) {self.getOrderDetails(req,res,next)}); 
         this.router.get("/accountDetails", function(req,res, next) {self.getAccountDetails(req,res,next)});
@@ -90,21 +91,17 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
             
                 });
         });
-        new navUserDAO().getUserDetails(user._id)
+        new navAccount().getWalletDetails(user._id)
             .then((_userDetails) =>{
                 userDetails = _userDetails[0];
-                return new navPaymentsDAO().getAllPaymentTransactions(user._id);
+                return new navPayments().getPayments(user._id);
             } )
             .then((_transactions) => {
-                for(var i = 0; i < _transactions.length; i++) {
-                    creditTransactions[i] = navTransactions.createObject(_transactions[i], navTransactions.getType().PAYMENTS); 
-                }
-                return new navToysDAO().getAllRentalTransactions(user._id);
+                creditTransactions = _transactions;
+                return new navOrders().getOrders(user._id);
             })
             .done((_transactions) => {
-                for(var i = 0; i < _transactions.length; i++) {
-                    debitTransactions[i] = navTransactions.createObject(_transactions[i], navTransactions.getType().RENT); 
-                }
+                debitTransactions = _transactions;
                 plans = navMembershipParser.instance().getConfig("plans",[]); 
                 membershipPlans =  navMembershipParser.instance().getConfig("membership",[]); 
                 deferred.resolve();
@@ -115,22 +112,18 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
     
     }
 
-    getOrderDetails(req, res, next){
+    getOrderDetails(req, res){
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil();
         var user = req.user;
         deferred.promise
             .done(function(orders){
-                for(var i = 0; i < orders.length; i++) {
-                    orders[i].delivery_date = new navCommonUtil().getDateString(parseInt(orders[i].delivery_date));
-                    orders[i].returned_date = new navCommonUtil().getDateString(parseInt(orders[i].returned_date));
-                    orders[i].lease_start_date = new navCommonUtil().getDateString(parseInt(orders[i].lease_start_date));
-                }
                 res.render("orderDetails",{
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
-                    orders : orders,		    helpers : {
+                    orders : orders,
+                    helpers : {
                         getClass : function(status, options) {
                             var lableClass;
                             console.log(status);
@@ -166,9 +159,8 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
 
                 });
             });
-        return new navRentalsDAO().getAllOrders(user._id)
+        return new navOrders().getOrders(user._id)
             .done((_orders) => {
-
                 deferred.resolve(_orders);
             },(error) => {
                 navLogUtil.instance().log.call(self, self.getOrderDetails.name, "Error occured Details : " + error, "error");

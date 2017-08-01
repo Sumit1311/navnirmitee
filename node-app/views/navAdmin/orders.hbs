@@ -31,7 +31,7 @@
             {{#each context.orderList}}
                 <tr>
                     <!-- TODO : check whether this works in firefox -->
-                    <form id="{{this._id}}"> 
+                    <form id="{{this._id}}" name=""> 
                         <td><select name="userId">
                                 <option value="{{user_id}}" selected>{{email_address}}</option>
                             </select>
@@ -66,7 +66,7 @@
                         </td>
                         <td><textarea class="form-control" name="shippingAddress">{{shipping_address}}</textarea></td>
                         <td><div class="row">
-                                <div class='col-md-12 col-sm-6'><select name="orderStatus" data-width="fit" >
+                                <div class='col-md-12 col-sm-6'><select name="orderStatus" data-width="fit" val={{status}} >
                                         {{#each ../context.statusList}}
                                             <option value="{{this}}" {{#compare this "==" ../status}}selected{{/compare}}>{{this}}</option>
                                             {{/each}}

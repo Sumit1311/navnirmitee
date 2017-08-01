@@ -35,7 +35,7 @@ new navDatabaseInitializer()
     .done(() => {
         navLogUtil.instance().log.call(this, "app.js", "App Successfully Started", "info");
     },(error) => {
-        navLogUtil.instance().log.call(this, "app.js", "Fatal Error Occured : " + error, "fatal");
+        navLogUtil.instance().log.call(this, "app.js", "Fatal Error Occured : " + error.stack, "fatal");
         navLogUtil.instance().log.call(this, "app.js", "Exiting Now", "fatal");
         process.exit(-1);
     });

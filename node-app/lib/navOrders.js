@@ -1,7 +1,9 @@
 var navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
+    navTransactions = require(process.cwd() + "/lib/navTransactions.js"),
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     Q = require('q'), 
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
@@ -39,26 +41,26 @@ module.exports = class navOrders {
             .then(() => {
                 if(updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED || updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
 
-                    return new navToysDAO(rDAO.providedClient).getToyDetailById(toyId);
+                    return new navToysHandler(rDAO.providedClient).getToyDetail(toyId);
                 } else {
-                    navLogUtil.log.call(self, self.updateOrder.name, "No pending orders for "+userId+" for toy : "+toyId, "info");
+                    navLogUtil.instance().log.call(self, self.updateOrder.name, "No pending orders for "+userId+" for toy : "+toyId, "info");
                     return Q.resolve();
                 }
             })
-            .then((_toyDetails) => {
-                    if(_toyDetails && _toyDetails.length !== 0 && updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED) {
-                        toyDetail = _toyDetails[0];
-                        navLogUtil.log.call(self, self.updateOrder.name, "Updating balance of user "+userId+" for cancellation of order "+orderId, "info");
+            .then((result) => {
+                    if(result && result.toyDetail && updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED) {
+                        toyDetail = result.toyDetail;
+                        navLogUtil.instance().log.call(self, self.updateOrder.name, "Updating balance of user "+userId+" for cancellation of order "+orderId, "info");
                         return new navUserDAO(rDAO.providedClient).updateBalance(userId,  parseInt(toyDetail.price));
                     } else {
-                        navLogUtil.log.call(self, self.updateOrder.name, "No toy exists for "+toyId, "info");
+                        navLogUtil.instance().log.call(self, self.updateOrder.name, "No toy exists for "+toyId, "info");
                         return Q.resolve();
                     }
 
             })
             .then(() => {
                 if(toyDetail) {
-                    return new navToysDAO(rDAO.providedClient).updateToyStock(toyId, 1, true);
+                    return new navToysHandler(rDAO.providedClient).returnFromRent(toyDetail._id);
                 } else {
                     return Q.resolve();
                 }
@@ -66,7 +68,7 @@ module.exports = class navOrders {
             .then(() => {
                 if(updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
 
-                    navLogUtil.log.call(self, self.updateOrder.name, `Marking order ${orderId} as returned`, "info");
+                    navLogUtil.instance().log.call(self, self.updateOrder.name, `Marking order ${orderId} as returned`, "info");
                     updateFields.returnDate = navCommonUtil.getCurrentTime_S();
                 } else {
                     updateFields.returnDate = navCommonUtil.getTimeinMillis( updateFields.returnDate);
@@ -81,7 +83,7 @@ module.exports = class navOrders {
                 return rDAO.commitTx();
             })
             .catch((error) => {
-                return rDAO.rollbackTx()
+                return rDAO.rollBackTx()
                     .then(() => {
                         return Q.reject(error);
                     })
@@ -98,5 +100,55 @@ module.exports = class navOrders {
 
     }
 
+    getOrdersList(offset, limit, sorters) {
+        var orderList, statusList, noOfOrders = 0, noOfPages, i = 0;
+        return new navRentalsDAO().getOrdersCount()
+            .then((_orderCount) => {
+                noOfOrders = parseInt(_orderCount[0].count);
+
+                if(noOfOrders % limit !== 0 ) {
+                    noOfPages = Math.floor(noOfOrders / limit) + 1;
+                } else {
+                    noOfPages = Math.floor(noOfOrders / limit) ;
+                }
+                return new navRentalsDAO().getOrdersFullList(offset, limit, sorters[0].column, sorters[0].type);
+            } )
+            .then((_rentals) => {
+                orderList = _rentals;
+                for(i = 0; i < orderList.length; i++) {
+                   orderList[i].delivery_date = orderList[i].delivery_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].delivery_date), "YYYY-MM-DDTHH:mm:ssZ");
+                   orderList[i].returned_date = orderList[i].returned_date === null ? "" :new navCommonUtil().getDateString(parseInt(orderList[i].returned_date), "YYYY-MM-DDTHH:mm:ssZ");
+                   orderList[i].lease_start_date =orderList[i].lease_start_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_start_date), "YYYY-MM-DDTHH:mm:ssZ");
+                   orderList[i].lease_end_date =orderList[i].lease_end_date === null ? "" : new navCommonUtil().getDateString(parseInt(orderList[i].lease_end_date), "YYYY-MM-DDTHH:mm:ssZ");
+                }
+                var orderStatus = navRentalsDAO.getStatus();
+                statusList = [];
+                for(var j in orderStatus) {
+                    if(orderStatus.hasOwnProperty(j)) {
+                        statusList.push(orderStatus[j]);
+                    }
+                }
+                return Q.resolve({
+                    noOfPages : noOfPages,
+                    orderList : orderList,
+                    statusList : statusList
+                });
+            })
+    }
+
+    getOrders(userId) {
+        var transactions = [];
+        return new navRentalsDAO().getAllOrders(userId)
+        .then((_transactions) => {
+            for(var i = 0; i < _transactions.length; i++) {
+                transactions.push(navTransactions.createObject(_transactions[i], navTransactions.getType().RENT)); 
+            }
+            return Q.resolve(transactions);
+        })
+        .catch((error) => {
+            return Q.reject(error);
+        })
+
+    }
 
 } 

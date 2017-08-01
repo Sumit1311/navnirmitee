@@ -71,7 +71,7 @@ function getDefaultConfig() {
             OrderInterval : 1000
         },
         LogLevel : {
-            "web-server" : "INFO"
+            "web-server" : "DEBUG"
         }
     }
 }

@@ -177,7 +177,7 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
 
 navToysDAO.prototype.getToyDetailById = function (toyId) {
     var self = this;
-    navLogUtil.instance().log.call(self, self.getToyDetailsById.name, "Fetch toys details by id " + toyId, "debug");
+    navLogUtil.instance().log.call(self, self.getToyDetailById.name, "Fetch toys details by id " + toyId, "debug");
 
     return this.dbQuery("SELECT _id, name, stock , price, points , age_group , category , parent_toys_id, short_description, long_description, rent_duration, brand" +
             " FROM " + tableName + " WHERE _id = $1",[toyId])
