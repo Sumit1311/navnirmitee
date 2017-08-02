@@ -9,6 +9,7 @@ var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navPayments = require(process.cwd() + "/lib/navPayments.js"),
+    navEnquiry = require(process.cwd() + "/lib/navEnquiry.js"),
     navAccount = require(process.cwd() + "/lib/navAccount.js"),
     navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
     navLogicalException = require("node-exceptions").LogicalException,
@@ -25,7 +26,8 @@ module.exports = class navMainRouter extends navBaseRouter {
     setup(){        
         this.router.get('/', this.ensureVerified.bind(this), this.getHome.bind(this));
         this.router.get('/about', this.getAbout.bind(this));
-        this.router.get('/contact',this.getContact.bind(this) );
+        this.router.get('/selectionGuides',this.getSelectionGuides.bind(this) );
+        this.router.post('/submitEnquiry',this.postEnquiry.bind(this) );
         this.router.get('/pricing', this.getPricing.bind(this) );
         this.router.get('/howItWorks', this.getHowItWorks.bind(this) );
         this.router.get('/rechargeConfirmation', this.getRechargeConfirmation.bind(this) );
@@ -35,6 +37,47 @@ module.exports = class navMainRouter extends navBaseRouter {
                         this.subscribePlan.bind(this));
         return this;
     }
+
+    postEnquiry(req, res) {
+        var deferred = Q.defer(), self = this;
+        var respUtil =  new navResponseUtil();
+        deferred.promise
+            .done(function(){
+                debugger;
+                respUtil.sendAjaxResponse(res, {
+                    "message" : "Enquiry successfully submitted."
+                })
+                //respUtil.redirect(req, res, "/");
+            },function(error){
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+        });
+        req.assert("message","message is required").notEmpty();
+        req.assert("message","Message exceeds the length").isByteLength({max : 100});
+        req.assert("name","Name exceeds the length").isByteLength({max : 50});
+        req.assert("contactNo","Contact No exceeds the length").isByteLength({max : 15});
+        req.assert("email","Email exceeds the length").isByteLength({max : 50});
+        var validationErrors = req.validationErrors();
+        if(validationErrors) {
+            navLogUtil.instance().log.call(self, self.postEnquiry.name, "Validation Error : " + validationErrors, "error");
+            return deferred.reject(new navValidationException(validationErrors));
+        }
+        var body = req.body;
+        new navEnquiry().submitEnquiry(body.name, body.email, body.contactNo, body.message)
+            .done(() => {
+                deferred.resolve();
+            },(error) => {
+                deferred.reject(error);
+            })
+        
+    }
+
     getPricing(req, res) {
 
         var plans = navMembershipParser.instance().getConfig("plans");
@@ -53,7 +96,7 @@ module.exports = class navMainRouter extends navBaseRouter {
             layout : 'nav_bar_layout'
         });
     }
-    getContact(req, res){
+    getSelectionGuides(req, res){
         res.render('contact', {
             user : req.user,
             isLoggedIn : req.user ? true : false,

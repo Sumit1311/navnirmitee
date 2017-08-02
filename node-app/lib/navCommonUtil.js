@@ -34,6 +34,10 @@ module.exports = class navCommonUtils {
         return uuid.v4();
     }
 
+    static generateUuid_S() {
+        return uuid.v4();
+    }
+
     getErrorObject(error, status, code ,exception) {
         if(error.name != exception.name)
         {

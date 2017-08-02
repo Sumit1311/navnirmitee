@@ -5,6 +5,7 @@ var navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.j
     navPaymentFailureException = require(process.cwd() + "/lib/exceptions/navPaymentFailureException.js"),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     moment = require('moment'),
+    navPGCommunicator = require(process.cwd() + "/lib/navPGCommunicator.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
 
@@ -171,7 +172,7 @@ module.exports = class navPayments{
                 if(paymentMethod === "cash") {
                     return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true);
                 } else if(paymentMethod === "paytm") {
-                    return require(process.cwd() + "/lib/navPGRouter.js").initiate(userId, amount + "", transactionId, baseUrl);
+                    return navPGCommunicator.initiate(userId, amount + "", transactionId, baseUrl);
                 } else {
                     return Q.resolve();
                 }

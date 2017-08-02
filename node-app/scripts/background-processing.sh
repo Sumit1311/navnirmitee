@@ -6,8 +6,8 @@ SCRIPT='background.js'
 USER=`whoami`
 APP_DIR='/home/geek/workspace/navnirmitee/node-app'
 
-PIDFILE=$APP_DIR/navnirmitee.pid
-LOGFILE=$APP_DIR/navnirmitee.log
+PIDFILE=$APP_DIR/navnirmitee-background.pid
+LOGFILE=$APP_DIR/navnirmitee-background.log
 
 start() {
     echo $(cat "$PIDFILE");

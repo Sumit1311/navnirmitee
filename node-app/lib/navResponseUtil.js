@@ -82,11 +82,11 @@ module.exports = class navResponseUtils {
     }
 
     sendAjaxResponse(res, response) {
-        res.status(response.status).send(JSON.stringify(response.body));
+        res.status(response.status ? response.status : 200).send(JSON.stringify(response.body));
     }
 
     static sendAjaxResponse_S(res, response) {
-        res.status(response.status).send(JSON.stringify(response.body));
+        res.status(response.status ? response.status : 200).send(JSON.stringify(response.body));
     }
     redirect(req, res, path) {
         if(req.xhr) {

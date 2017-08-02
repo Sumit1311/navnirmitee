@@ -121,12 +121,12 @@ module.exports = class navPaymentsDAO extends BaseDAO{
         var queryString = "UPDATE "+tableName + " SET status = $1, transaction_summary = $2, paid_date = $3";
         var params = [status, summary, paid_date];
         count = 4;
-        if(retryDate === undefined) {
+        if(retryDate !== undefined && retryDate !== null) {
             queryString += ", next_retry_date = $" + (count);
             params.push(retryDate);
             count++;
         }
-        if(expirationDate === undefined) {
+        if(expirationDate !== undefined && expirationDate !== null) {
             queryString += ", expiration_date = $" + (count);
             params.push(expirationDate);
             count++;
@@ -192,7 +192,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
     }
     markExpiredTransactionAsFailed() {
         var self  = this;
-        var queryString = "UPDATE "+tableName + " SET status = $1, transaction_summary = $2, expiration_date = $3 WHERE expiration_date IS NOT NULL AND expiration_date >= $3 AND status != $1";
+        var queryString = "UPDATE "+tableName + " SET status = $1, transaction_summary = $2, expiration_date = $3 WHERE expiration_date IS NOT NULL AND expiration_date <= $3 AND status != $1";
         var params = [STATUS.TRANSACTION_FAILED, "MARKING_AS_FAILED", navCommonUtil.getCurrentTime_S()];
         return this.dbQuery(queryString, params)
             .then(function (result) {

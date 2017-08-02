@@ -93,7 +93,7 @@
                                         <ul class="nav navbar-nav nav-right" >
                                             <li><a href="/about">About Us</a></li> 
                                             <!-- <li><a href="/profile">Profile</a></li>-->
-                                            <li><a href="/contact">Contact</a></li>
+                                            <li><a href="/selectionGuides">Guides</a></li>
                                             {{#if isLoggedIn }}
                                                     <li class="dropdown"><a class="dropdown-toggle " data-toggle="dropdown"><span style="text-transform: capitalize;">My Profile </span><span class="caret"></span></a>
                                                         <ul style="width: 100%; margin-top: 0px;" class="dropdown-menu dropdown-menu-right" >
@@ -164,6 +164,53 @@
                         </form>
                 </div>
                     {{{body}}}
+    <div class="container">
+        <div class="row confirm">
+            <div class="col-md-3 chatbox" id="chatbox">
+                <div class="panel panel-green">
+                    <div class="panel-heading text-left" id="accordion" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                        <p style="margin : 0px; font-size : 14px;">Contact Us</p> 
+                    </div>
+                    <form action="/submitEnquiry" method="post" id="_nav_enquiry_form">
+                        <div class="panel-collapse collapse" id="collapseOne">
+                            <div class="panel-body">
+
+                                <div class="form-group">
+                                    <div class="">
+                                        <input type="text" class="form-control" placeholder="Name" name="name" length="50">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="">
+                                        <input type="email" class="form-control" placeholder="Email" name="email" length="50">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="">
+                                        <input type="text" class="form-control" placeholder="Contact No" name="contactNo" length="15">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="">
+                                        <textarea class="form-control" placeholder="Type your message here" name="message" length="100" rows="8" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="hidden" id="_nav_enquiry_error">
+                                    <div class="alert alert-danger" style="padding: 7px; font-size: 11px; margin-bottom: 0px;" role="alert">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="panel-footer">
+                                <button class="btn btn-green" style="width : 100%" type="submit" id="_nav_submit_enquiry">
+                                    Submit Enquiry</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>    
         <!-- begin:footer -->
         <div id="footer" class="nav_main_content">
             <div class="container">
@@ -224,6 +271,7 @@ var Q;
             <script src="/js/helpers/navRegistrationHelper.js"></script>
             <script src="/js/helpers/navOrderHelper.js"></script>
             <script src="/js/helpers/navSearchHelper.js"></script>
+            <script src="/js/helpers/navEnquiryHelper.js"></script>
             <script src="/js/script.js"></script>
     </body>
 </html>
