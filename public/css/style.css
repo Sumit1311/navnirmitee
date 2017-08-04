@@ -2666,17 +2666,28 @@ padding-left:0px;
 	=============================
 */
 @media(min-width:768px) {
+    li.navbar-search-custom {
+        width : 123px;
+    }
     li.navbar-search-custom.nav_logged_in{
         width : 91px;
     }
 }
-@media(min-width:980px) {
-    li.navbar-search-custom.nav_logged_in {
+
+@media(min-width:980px){
+    li.navbar-search-custom {
+        width : 347px;
+    }
+    
+    li.navbar-search-custom.nav_logged_in{
         width : 313px;
     }
 }
 @media(min-width:1200px) {
-    li.navbar-search-custom.nav_logged_in {
+    li.navbar-search-custom {
+        width : 549px;
+    }
+    li.navbar-search-custom.nav_logged_in{
         width : 509px;
     }
 }
