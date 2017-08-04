@@ -971,13 +971,14 @@ blockquote {
 	top: 0;
 	width: 100%;
 	height: 100%;
-	background: rgba(26,188,156,0.7);
+	background: rgba(66,143,127,0.7);
 	opacity: 0;
 	filter: alpha(opacity=0);
 	-o-transition: all 0.3s ease-in-out;
 	-moz-transition: all 0.3s ease-in-out;
 	-webkit-transition: all 0.3s ease-in-out;
 	transition: all 0.3s ease-in-out;
+    color : #ffffff;
 }
 
 #_nav_ordered_toy .thumbnail > a:hover > .caption-link,
@@ -1682,13 +1683,14 @@ blockquote {
 	top: 0;
 	width: 100%;
 	height: 100%;
-	background: rgba(26,188,156,0.7);
+	background: rgba(66,143,127,0.7);
 	opacity: 0;
 	filter: alpha(opacity=0);
 	-o-transition: all 0.3s ease-in-out;
 	-moz-transition: all 0.3s ease-in-out;
 	-webkit-transition: all 0.3s ease-in-out;
 	transition: all 0.3s ease-in-out;
+    color : #fff;
 }
 
 .search-results .thumbnail > a:hover > .caption-link{
@@ -1711,7 +1713,7 @@ blockquote {
 }
 .search-results .thumbnail .caption-link > h3 {
     text-align : center;
-	color: #1ABC9C;
+	color: #FFFFFF;
     font-weight : 500;
 }
 /* 
@@ -2663,27 +2665,18 @@ padding-left:0px;
 	=============================
 */
 @media(min-width:768px) {
-    li.navbar-search-custom{
-        width : 221px;
-    }
     li.navbar-search-custom.nav_logged_in{
-        width : 185px;
+        width : 91px;
     }
 }
 @media(min-width:980px) {
-    li.navbar-search-custom {
-        width : 445px;
-    }
     li.navbar-search-custom.nav_logged_in {
-        width : 407px;
+        width : 313px;
     }
 }
 @media(min-width:1200px) {
-    li.navbar-search-custom {
-        width : 644px;
-    }
     li.navbar-search-custom.nav_logged_in {
-        width : 603px;
+        width : 509px;
     }
 }
 
@@ -2723,7 +2716,7 @@ padding-left:0px;
     margin-right: 5px;
 }
 
-.panel-body
+#_nav_chatbox .panel-body
 {
     overflow-y: scroll;
     height: 250px;
@@ -2751,9 +2744,9 @@ padding-left:0px;
     top: auto;bottom: 0px;position: fixed;right: 0px;z-index:1031;padding-right: 0px;
 }
 
-#accordion { cursor: pointer; cursor: hand; }
+#_nav_chatbox_accordion { cursor: pointer; cursor: hand; }
 
-#accordion h4{
+#_nav_chatbox_accordion h4{
     margin: 0px;
 }
 
@@ -2776,4 +2769,9 @@ padding-left:0px;
         height: 100px;
     }
 
+}
+#_nav_guide_accordion .panel-heading{ cursor : pointer; cursor: hand; }
+
+.popover {
+    background : #f5f5f5;
 }

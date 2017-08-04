@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	
 	// Contact Maps
+    /*
 	$("#maps").gmap3({
 		map: {
 			options: {
@@ -18,8 +19,9 @@ $(document).ready(function() {
 			 )
 			}
 		 }
-	});
+	});*/
 	
+    $('[data-toggle="popover"]').popover();
 	//Slider
 	$("#slider").carousel({
 		interval: 5000

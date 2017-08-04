@@ -93,7 +93,7 @@
                                         <ul class="nav navbar-nav nav-right" >
                                             <li><a href="/about">About Us</a></li> 
                                             <!-- <li><a href="/profile">Profile</a></li>-->
-                                            <li><a href="/selectionGuides">Guides</a></li>
+                                            <li><a href="/selectionGuides">Toy Selection Guides</a></li>
                                             {{#if isLoggedIn }}
                                                     <li class="dropdown"><a class="dropdown-toggle " data-toggle="dropdown"><span style="text-transform: capitalize;">My Profile </span><span class="caret"></span></a>
                                                         <ul style="width: 100%; margin-top: 0px;" class="dropdown-menu dropdown-menu-right" >
@@ -166,13 +166,13 @@
                     {{{body}}}
     <div class="container">
         <div class="row confirm">
-            <div class="col-md-3 chatbox" id="chatbox">
+            <div class="col-md-3 chatbox" id="_nav_chatbox">
                 <div class="panel panel-green">
-                    <div class="panel-heading text-left" id="accordion" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                    <div class="panel-heading text-left" id="_nav_chatbox_accordion" data-toggle="collapse" data-parent="#_nav_chatbox_accordion" href="#_nav_chatbox_collapse_one">
                         <p style="margin : 0px; font-size : 14px;">Contact Us</p> 
                     </div>
                     <form action="/submitEnquiry" method="post" id="_nav_enquiry_form">
-                        <div class="panel-collapse collapse" id="collapseOne">
+                        <div class="panel-collapse collapse" id="_nav_chatbox_collapse_one">
                             <div class="panel-body">
 
                                 <div class="form-group">
@@ -264,8 +264,8 @@ var Q;
             <script src="/js/jquery.js"></script>
             <script src="/js/jquery.validate.min.js"></script>
             <script src="/js/bootstrap.js"></script>
-             <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script> 
-            <script src="/js/gmap3.js"></script>
+            <!-- <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script> -->
+            <!-- <script src="/js/gmap3.js"></script> -->>
             <script src="/js/util.js"></script>
             <script src="/js/helpers/navLogInHelper.js"></script>
             <script src="/js/helpers/navRegistrationHelper.js"></script>
