@@ -22,6 +22,13 @@ $(document).ready(function() {
 	});*/
 	
     $('[data-toggle="popover"]').popover();
+
+    $("li.dropdown").hover(function() {
+        $(this).addClass("open");
+    });
+    $("li.dropdown").mouseleave(function() {
+        $(this).removeClass("open");
+    });
 	//Slider
 	$("#slider").carousel({
 		interval: 5000
