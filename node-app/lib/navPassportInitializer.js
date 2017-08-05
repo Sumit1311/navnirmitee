@@ -43,7 +43,7 @@ module.exports = class navPassportHandler {
                     if (userData[0].email_address == user.userId) {
                         return done(null, userData[0]);
                     } else {
-                        navLogUtil.log.call(self, self.deserializeUser.name, `User does not exist ${userData[0].email_address}`, "debug");
+                        navLogUtil.instance().log.call(self, self.deserializeUser.name, `User does not exist ${userData[0].email_address}`, "debug");
                         return done(null, false);
                     }
                 } else {
@@ -63,7 +63,7 @@ module.exports = class navPassportHandler {
                     if (password && new navPasswordUtil().comparePassword(password, user[0].password)) {
                         return done(null, user[0]);
                     } else {
-                        navLogUtil.log.call(self, self.authenticateHandler.name, `Password mismatch for user ${email}`, "debug");
+                        navLogUtil.instance().log.call(self, self.authenticateHandler.name, `Password mismatch for user ${email}`, "debug");
                         return done(new navUserNotFoundException());
                     }
                 } else {
@@ -71,7 +71,7 @@ module.exports = class navPassportHandler {
                 }
             })
         .catch(function (error) {
-            navLogUtil.log.call(self, self.authenticateHandler.name, `Error occured while authenticating user ${error}`, "error");
+            navLogUtil.instance().log.call(self, self.authenticateHandler.name, `Error occured while authenticating user ${error}`, "error");
             return done(error);
         });
     }
@@ -79,16 +79,16 @@ module.exports = class navPassportHandler {
     static authenticate(req, res, next, deferred){
         passport.authenticate('local',function(err, user){
             if(err) {
-                navLogUtil.log.call(that ,"authenticate", `Error occured while authenticating ${err}`, "error");
+                navLogUtil.instance().log.call(that ,"authenticate", `Error occured while authenticating ${err}`, "error");
                 return deferred.reject(err);
             }
             if(!user) {
-                navLogUtil.log.call(that ,"authenticate", `No user exist`, "error");
+                navLogUtil.instance().log.call(that ,"authenticate", `No user exist`, "error");
                 return deferred.reject();
             }
             req.logIn(user, err => {
                 if (err) {
-                    navLogUtil.log.call(that ,"authenticate", `Error occured ${err}`, "error");
+                    navLogUtil.instance().log.call(that ,"authenticate", `Error occured ${err}`, "error");
                     return deferred.reject(err);
                 }
                 // Redirect to homepage
