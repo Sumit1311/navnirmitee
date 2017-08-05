@@ -1,4 +1,5 @@
 var navResponseUtil = require(process.cwd() + '/lib/navResponseUtil.js'),
+    navLogUtil = require(process.cwd() + '/lib/navLogUtil.js'),
     express = require('express'); 
 
 module.exports = class navBaseRouter {
@@ -11,9 +12,12 @@ module.exports = class navBaseRouter {
     }
 
     ensureSuperAdmin(req, res, next) {
-        if(req.user && req.user.user_type == 0) {
+        var self = this;
+        if(req.user && req.user.user_type === 0) {
             return next();
         }
+        navLogUtil.instance().log.call(self, self.ensureSuperAdmin.name, "User is not super admin", "debug");
+
         return res.render('login',{
             layout: 'nav_bar_layout',
             hideNavBar : true,
@@ -22,25 +26,32 @@ module.exports = class navBaseRouter {
     }
 
     ensureAuthenticated(req, res, next) {
+        var self = this;
         if (req.isAuthenticated()) {
             next();
             return;
         }
+        navLogUtil.instance().log.call(self, self.ensureAuthenticated.name, "User is not authenticated , redirecting", "debug");
         // Redirect if not authenticated
         if(req.xhr) {
             new navResponseUtil.redirect(req, res, "/login"); 
         }else {
+            //:w
+            //console.log(req.originalUrl);
             return res.render('login',{
                 layout: 'nav_bar_layout',
                 hideNavBar : true,
-                redirection : req.query.redirect ? req.query.redirect : req.originalUrl
+                redirection : req.query.redirect ? req.query.redirect : encodeURIComponent(req.originalUrl)
             });
         }
     }
     ensureVerified(req, res, next) {
-        if (req.user == undefined || (req.user && req.user.email_verification == null)  ) {
+        var self = this;
+        if (req.user === undefined || (req.user && req.user.email_verification === null)  ) {
             return next();
         }
+        navLogUtil.instance().log.call(self, self.ensureVerified.name, "User has not verified email", "debug");
+
         // Redirect if not authenticated
         if(req.xhr) {
             new navResponseUtil.redirect(req, res, "/"); 
@@ -52,10 +63,11 @@ module.exports = class navBaseRouter {
         }
     }
     isSessionAvailable(req, res, next) {
-        var userDetails = req.user;
+        var userDetails = req.user, self = this;
         if (userDetails && userDetails._id) {
             next();
         } else {
+        navLogUtil.instance().log.call(self, self.isSessionAvailable.name, "Session not available", "warn");
             new navResponseUtil().redirect("/login");
         }
     }

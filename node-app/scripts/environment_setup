@@ -1,0 +1,10 @@
+#! /bin/bash
+
+DB_HOST="localhost"
+DB_USER="admin"
+DB_PASS="admin"
+DB_NAME="navnirmitee"
+DB_PORT="5433"
+REDISCLOUD_URL="redis://127.0.0.1:6379"
+PORT="3000"
+HOST_NAME="localhost"

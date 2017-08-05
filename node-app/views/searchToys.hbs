@@ -32,7 +32,7 @@
                         {{#each toysData.filters.ageGroups}}
                         <fieldset>
                             <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                                <input type="checkbox" name="ageGroup" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeAge @index}}checked{{/inArray}}>&nbsp;{{this}}
+                                <input type="checkbox" name="ageGroup" value="{{add @index 0}}" {{#inArray ../toysData.filters.activeAge @index}}checked{{/inArray}}>&nbsp;{{this}}
 
                             </label>
                         </fieldset>
@@ -43,7 +43,7 @@
                         {{#each toysData.filters.categories}}
                         <fieldset>
                             <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                                <input type="checkbox" name="category" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeCategories @index}}checked{{/inArray}}>&nbsp;{{this}}
+                                <input type="checkbox" name="category" value="{{add @index 0}}" {{#inArray ../toysData.filters.activeCategories @index}}checked{{/inArray}}>&nbsp;{{this}}
                             </label>
                         </fieldset>
                         {{/each}}
@@ -53,7 +53,7 @@
                         {{#each toysData.filters.brands}}
                         <fieldset>
                             <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                                <input type="checkbox" name="brand" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeBrands @index}}checked{{/inArray}}>&nbsp;{{this.name}}
+                                <input type="checkbox" name="brand" value="{{add @index 0}}" {{#inArray ../toysData.filters.activeBrands @index}}checked{{/inArray}}>&nbsp;{{this.name}}
                             </label>
                         </fieldset>
                         {{/each}}
@@ -63,7 +63,7 @@
                         {{#each toysData.filters.skills}}
                         <fieldset>
                             <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                                <input type="checkbox" name="skill" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeSkills @index}}checked{{/inArray}}>&nbsp;{{this.name}}
+                                <input type="checkbox" name="skill" value="{{add @index 0}}" {{#inArray ../toysData.filters.activeSkills @index}}checked{{/inArray}}>&nbsp;{{this.name}}
                             </label>
                         </fieldset>
                         {{/each}}

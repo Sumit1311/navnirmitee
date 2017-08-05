@@ -14,8 +14,9 @@ module.exports = class navMembershipConfigParser extends navConfigParser {
         }
     }
     static instance() {
-            if(that)
+            if(that) {
                 return that;
+            }
             else{
                 that= new navMembershipConfigParser();        
                 return that;

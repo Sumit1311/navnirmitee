@@ -1,4 +1,3 @@
-"use strict";
 
 var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     Q = require("q"),
@@ -8,8 +7,9 @@ var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     util = require("util");
 
 function navToysDAO(client, persistence) {
+    var self = this;
     if (persistence) {
-        BaseDAO.call(this, persistence);
+        BaseDAO.call(self, persistence);
     }
     this.providedClient = client ? client : undefined;
     return this;
@@ -19,9 +19,7 @@ util.inherits(navToysDAO, BaseDAO);
 
 module.exports = navToysDAO;
 //private variables
-var tableName = "nav_toys",
-    rootUserId = "45058a54-b3e2-4a3b-96ab-c13dcf3023e3",
-    fileName = 'toys/navToysDAO';
+var tableName = "nav_toys";
 
 
 navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories, query, sortBy, sortType, skills, brands) {
@@ -54,7 +52,7 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
         }    
     }
 
-    console.log(categories);
+    //console.log(categories);
     if(categories && categories.length !== 0) {
         if(count !== 0) {
             queryString += " AND "
@@ -111,7 +109,7 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
         }    
             
     }
-    console.log(query);
+    //console.log(query);
     if(query && query.length !== 0) {
         var shouldAppend = true;
         for(var w =0; w < query.length; w++) {
@@ -160,9 +158,12 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
         params.push(offset);
     }
 
-    console.log(queryString);
+    //console.log(queryString);
+    navLogUtil.instance().log.call(self, self.getAllToys.name, "Get toys list with given filters", "debug");
+
     return this.dbQuery(queryString, params)
         .then(function (result) {
+            navLogUtil.instance().log.call(self, self.getAllToys.name, "Got " + result.rowCount + " toys ", "debug");
                         return result.rows;
         })
         .catch(function (error) {
@@ -174,9 +175,12 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
 
 navToysDAO.prototype.getToyDetailById = function (toyId) {
     var self = this;
+    navLogUtil.instance().log.call(self, self.getToyDetailById.name, "Fetch toys details by id " + toyId, "debug");
+
     return this.dbQuery("SELECT _id, name, stock , price, points , age_group , category , parent_toys_id, short_description, long_description, rent_duration, brand" +
             " FROM " + tableName + " WHERE _id = $1",[toyId])
         .then(function (result) {
+
             return result.rows;
         })
     .catch(function (error) {
@@ -212,6 +216,7 @@ navToysDAO.prototype.getToysFullList = function() {
 
 navToysDAO.prototype.updateToyStock = function(toyId, stock, increment) {
     var self = this;
+    navLogUtil.instance().log.call(self, self.updateToyStock.name, "Update the toy "+ toyId+" stock with "+increment + stock, "debug");
     return this.dbQuery("UPDATE "+tableName + " SET stock " +  "= stock "+ (increment ? "+" : "-")+"$1 WHERE _id=$2", [stock, toyId])
         .then(function (result) {
             return result.rows;

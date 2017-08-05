@@ -4,7 +4,8 @@ var AGE_GROUPS = [];
 var CATEGORIES = [];
 var moment = require('moment');
 var COUNTRIES =["INDIA"], STATES = { "INDIA" : ["Maharashtra"] }, DISTRICTS = {"Maharashtra" : ["Pune"]};
-var navToysParser = require(process.cwd() + "/lib/navToysParser.js");
+var navToysParser = require(process.cwd() + "/lib/navToysParser.js"),
+    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
 
 function readCategories() {
     var categories = navToysParser.instance().config.categories;
@@ -33,6 +34,10 @@ module.exports = class navCommonUtils {
         return uuid.v4();
     }
 
+    static generateUuid_S() {
+        return uuid.v4();
+    }
+
     getErrorObject(error, status, code ,exception) {
         if(error.name != exception.name)
         {
@@ -54,11 +59,11 @@ module.exports = class navCommonUtils {
         return dateString === "" ? null : moment(dateString).valueOf();
     }
     getDateString(timeInMilis, format) {
-	if(timeInMilis) {
-		return moment(timeInMilis).format(format ? format : "ddd, MMM Do YYYY");
-	} else {
-		return "";
-	}
+        if(timeInMilis) {
+            return moment(timeInMilis).format(format ? format : "ddd, MMM Do YYYY");
+        } else {
+            return "";
+        }
     }
 
     static getDateFormat() {
@@ -66,10 +71,12 @@ module.exports = class navCommonUtils {
     }
 
     getBaseURL(req) {
-	var base = new url.Url();
-	base.protocol = req.protocol;
-	base.host = req.get("host");
-	return base;
+        const self = this;
+        var base = new url.Url();
+        base.protocol = req.protocol;
+        base.host = req.get("host");
+        navLogUtil.instance().log.call(self, self.getBaseURL.name, "Server base url is "+base, "debug")
+        return base;
     }    
 
     static getAgeGroups() {

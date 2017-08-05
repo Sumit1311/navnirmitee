@@ -78,16 +78,16 @@ function ConvertToArray() {
     return queries; 
 }
 
-function CreateImages(rows) {
+/*function CreateImages(rows) {
     for(var i =0; i < 1; i++) {
         exec("cp ../public/img/toys/T1_1.jpg ../public/img/toys/"+rows[i].name+"_1.jpg");
         exec("mv ../public/img/toys/"+rows[i].name +"_1.jpg ../public/img/toys/"+rows[i]._id+"_1.jpg");
     }
-}
+}*/
 
 var query = ConvertToArray();
 //console.log(query.nav_toys[0]);
-//console.log(query.nav_toys_skills.length);
+console.log(query.nav_toys_skills.length);
 //CreateImages(query.nav_toys);
 
 

@@ -3,7 +3,6 @@
  * Like creating database tables, indices, any required views etc..
  *  Inherits the BaseDAO and uses it's API to query database.
  */
-"use strict";
 
 var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
@@ -51,6 +50,9 @@ navDatabaseInitializer.prototype.init = function () {
         .then(() => {
             return self.dbQuery('CREATE TABLE IF NOT EXISTS  nav_payments(_id varchar(36), user_id varchar(36), amount_payable integer, reason VARCHAR(30), credit_date bigint, paid_date bigint, status VARCHAR(10),transaction_id VARCHAR(36), transaction_summary TEXT, next_retry_date bigint, expiration_date bigint, transaction_type VARCHAR(20), CONSTRAINT nav_payments_id PRIMARY KEY (_id),CONSTRAINT nav_payments_user_id FOREIGN KEY (user_id) REFERENCES  nav_user (_id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE NOT DEFERRABLE);');
         })
+        .then(() => {
+            return self.dbQuery('CREATE TABLE IF NOT EXISTS  nav_enquiry(_id varchar(36), name varchar(50), email varchar(50), contact_no VARCHAR(15), message varchar(500), submission_date bigint, CONSTRAINT nav_enquiry_id PRIMARY KEY (_id));');
+        })
         .catch(function (error) {
             navLogUtil.instance().log.call(self, "setupSchema",  error.message, "error" );
             return Q.reject(new navCommonUtil().getErrorObject(error,500,"DBSETUP", navDatabaseException));
@@ -65,23 +67,20 @@ navDatabaseInitializer.prototype.init = function () {
  * @param keys
  * @param values
  */
-function indicesList(dbClient, keys, values) {
-    /*var dbClient;*/
+/*function indicesList(dbClient, keys, values) {
+    var dbClient;
     var self = this;
     if (keys.length === 0 || values.length === 0) {
         return Q.resolve();
     } else {
         var key = keys.shift();
         var value = values.shift();
-        /*return self.getClient()
-         .then(function (_client) {
-         dbClient = _client;*/
-        return executeIndex(dbClient, key, value)/*;
-         })*/.then(function () {
+        return executeIndex(dbClient, key, value)
+         .then(function () {
                 return indicesList.call(self, dbClient, keys, values);
             });
     }
-}
+}*/
 
 /**
  * This function creates Indexes in Database after checking its existence.
@@ -90,17 +89,17 @@ function indicesList(dbClient, keys, values) {
  * @param createSql
  * @returns {*}
  */
-function executeIndex(dbClient, indexName, createSql) {
+/*function executeIndex(dbClient, indexName, createSql) {
     return dbClient.query(
         "SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relname = $1 and n.nspname = 'public'", [indexName]
     ).then(function () {
             if (dbClient.results().rowCount > 0) {
-                jive.logger.debug("[DBUtils]:[executeIndex] : Index - ", indexName, " - already Exist!");
+                //jive.logger.debug("[DBUtils]:[executeIndex] : Index - ", indexName, " - already Exist!");
                 return Q.resolve();
             } else {
-                jive.logger.debug("[DBUtils]:[executeIndex] : Index - ", indexName, " - Created Successfully");
+                //jive.logger.debug("[DBUtils]:[executeIndex] : Index - ", indexName, " - Created Successfully");
                 return dbClient.query(createSql);
             }
         });
-}
+}*/
 

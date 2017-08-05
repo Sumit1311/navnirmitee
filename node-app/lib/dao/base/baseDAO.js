@@ -11,8 +11,7 @@ var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navCommonUtils = require(process.cwd() + "/lib/navCommonUtil.js");
 var navDbConnection = require("./pg-conn.js"),
     Q = require("q"),
-    navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
-    fileName = "baseDAO.js";
+    navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js');
 
 function BaseDAO(persistence) {
     //if some custom persistence provided use it other wise use the default postgres persistence
@@ -63,7 +62,7 @@ BaseDAO.prototype.executeTransaction = function (query, param) {
                 .then(function (results) {
                     deferred.resolve(results);
                 }, function (err) {
-                    deferred.reject();
+                    deferred.reject(err);
                 })
             .catch(function(error){
                 
@@ -88,11 +87,11 @@ BaseDAO.prototype.executeTransaction = function (query, param) {
 BaseDAO.prototype.dbQuery = function (sql, params) {
     var client, promise, self = this, commonUtil = new navCommonUtils();
 
-    if (this.providedClient == undefined) {
-        navLogUtil.instance().log.call(this, "dbQuery", "No client provided getting new one", "debug");
+    if (this.providedClient === undefined) {
+        navLogUtil.instance().log.call(this, "dbQuery", "No client provided getting new one" + sql + ", " +  params, "debug");
         promise = this.getClient();
     } else {
-        navLogUtil.instance().log.call(this, "dbQuery", "Usign provided client", "info");
+        navLogUtil.instance().log.call(this, "dbQuery", "Usign provided client, QueryString : "+sql + ", Params : "+params, "debug");
         promise = Q.resolve(this.providedClient)
     }
     return promise
@@ -101,11 +100,11 @@ BaseDAO.prototype.dbQuery = function (sql, params) {
             return query.call(self, client, sql, params);
         })
         .catch(function (error) {
-            navLogUtil.instance().log.call(self, "dbQuery","Error executing query "+ sql +" params : "+ params +" : " + error.message, "error" );
+            navLogUtil.instance().log.call(self, "dbQuery","Error executing QueryString : "+ sql +", Params : "+ params +" : " + error.message, "error" );
             return Q.reject(commonUtil.getErrorObject(error, 500, "DBQUERY", navDatabaseException));
         })
         .finally(function () {
-            if (self.providedClient == undefined && client) {
+            if (self.providedClient === undefined && client) {
                 client.release();
             }
         })
@@ -128,7 +127,7 @@ function query(dbClient, sql, params) {
             .catch(function (error) {
                 return Q.reject(new navCommonUtils().getErrorObject(error, 500, "DBQUERY", navDatabaseException));
             })
-};
+}
 
 BaseDAO.prototype.startTx = startTx;
 BaseDAO.prototype.commitTx = commitTx;
@@ -140,6 +139,7 @@ function startTx() {
         navLogUtil.instance().log.call(this, "startTx", "Invalid Client", "error");
         return Q.reject(new navCommonUtils().getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
     }
+    navLogUtil.instance().log.call(this, "startTx", "Begin Transaction", "debug");
     return this.dbQuery("BEGIN");
 }
 
@@ -148,15 +148,18 @@ function commitTx() {
         navLogUtil.instance().log.call(this, "commitTx", "Invalid Client", "error");
         return Q.reject(navCommonUtils.getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
     }
+    navLogUtil.instance().log.call(this, "commitTx", "Commit Transaction", "debug");
     return this.dbQuery("COMMIT");
 }
 
 function rollbackTx(clientFromPool, savePointName) {
     if (!this.providedClient) {
-        navLogUtil,instance().log.call(this, "rollBackTx", "Invalid Client", "error");
+        navLogUtil.instance().log.call(this, "rollBackTx", "Invalid Client", "error");
         return Q.reject(new navCommonUtils().getErrorObject({message : "Invalid Client"}, 500, "DBTRANSAC", navDatabaseException));
 
-    }
+    }    
+    navLogUtil.instance().log.call(this, "rollbackTx", "Rollback Transaction", "debug");
+
     if (savePointName) {
         return this.dbQuery("ROLLBACK TO SAVEPOINT " + savePointName + ";");
     } else {

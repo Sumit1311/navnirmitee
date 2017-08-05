@@ -1,5 +1,4 @@
-var uuid = require('node-uuid'),
-    bcrypt = require('bcrypt-nodejs');
+var     bcrypt = require('bcrypt-nodejs');
 
 module.exports = class navPasswordUtil {
 

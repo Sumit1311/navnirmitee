@@ -1,8 +1,47 @@
 var that, logger;
+var navConfigParser = require(process.cwd() + '/lib/navConfigParser.js');
+
+var log4jsConfig = {
+    appenders : {
+        "web-server" : {
+            type  : "dateFile",
+            filename : process.cwd() + "/log/web-server.log",
+            compress : true
+        },
+
+        "background-processing" : {
+            type  : "dateFile",
+            filename : process.cwd() + "/log/background-processing.log",
+            compress : true
+        },
+        "out" : {
+            type : "stdout"
+        }
+    },
+    categories : {
+        "default" : {
+            appenders : ["out"],
+            level : "INFO"
+        },
+        "web-server" : {
+            appenders : ["web-server"],
+            level : "INFO"
+        },
+        "background-processing" : {
+            appenders : ["background-processing"],
+            level : "INFO"
+        }
+
+    }
+}
+
+var log4js = require('log4js');
+log4js.configure(log4jsConfig);
 
 function init(_logger) {
-    logger = require("log4js").getLogger(_logger ? _logger : "navnirmitee");
-    logger.setLevel(process.env.LOG_LEVEL || "INFO");
+    var loggingConfig =  navConfigParser.instance().getConfig("LogLevel");
+    logger = log4js.getLogger(_logger ? _logger : "navnirmitee");
+    logger.level = loggingConfig[_logger] || "INFO";
 }
 
 module.exports = class navLogUtil {

@@ -43,12 +43,15 @@ module.exports = class navChildDAO extends BaseDAO{
             params.push(gender);
         }
 
+        queryString1 += ") "
+        query2 += ") "
+        navLogUtil.instance().log.call(this, "insertChildDetails", "Insert for "+ userId + "" , "debug");
         return this.dbQuery(queryString1+query2, params)
             .then(function (result) {
                 return result.rowCount;
             })
         .catch(function (error) {
-            navLogUtil.instance().log.call(self, "insertPaymentDetails", error.message, "error");
+            navLogUtil.instance().log.call(self, "insertChildDetails", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
         });
     }

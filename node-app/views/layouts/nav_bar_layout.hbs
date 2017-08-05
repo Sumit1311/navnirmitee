@@ -54,7 +54,8 @@
                                 </div>
 
                                 <!-- Collect the nav links, forms, and other content for toggling -->
-                                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="overflow-y: scroll;
+                                    max-height: 200px; width: 100%">
                                     <ul class="nav navbar-nav nav-left">
                                         <!-- <li class="active"><a href="/">Home</a></li> -->
                                         <li><a href="/">Home</a></li>
@@ -93,7 +94,7 @@
                                         <ul class="nav navbar-nav nav-right" >
                                             <li><a href="/about">About Us</a></li> 
                                             <!-- <li><a href="/profile">Profile</a></li>-->
-                                            <li><a href="/contact">Contact</a></li>
+                                            <li><a href="/selectionGuides">Toy Selection Guides</a></li>
                                             {{#if isLoggedIn }}
                                                     <li class="dropdown"><a class="dropdown-toggle " data-toggle="dropdown"><span style="text-transform: capitalize;">My Profile </span><span class="caret"></span></a>
                                                         <ul style="width: 100%; margin-top: 0px;" class="dropdown-menu dropdown-menu-right" >
@@ -126,7 +127,7 @@
                 {{#each toysData.filters.ageGroups}}
                     <fieldset>
                         <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                            <input type="checkbox" name="ageGroup" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeAge @index}}checked{{/inArray}}><span>{{this}}</span>
+                            <input type="checkbox" name="ageGroup" value="{{add @index 0}}" {{#inArray ../toysData.filters.activeAge @index}}checked{{/inArray}}><span>{{this}}</span>
 
                             </label>
                         </fieldset>
@@ -137,7 +138,7 @@
                     {{#each toysData.filters.categories}}
                         <fieldset>
                             <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                                <input type="checkbox" name="category" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeCategories @index}}checked{{/inArray}}><span>{{this}}</span>
+                                <input type="checkbox" name="category" value="{{add @index 0}}" {{#inArray ../toysData.filters.activeCategories @index}}checked{{/inArray}}><span>{{this}}</span>
                                 </label>
                             </fieldset>
                         {{/each}}
@@ -147,7 +148,7 @@
                     {{#each toysData.filters.brands}}
                         <fieldset>
                             <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                                <input type="checkbox" name="brand" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeBrands @index}}checked{{/inArray}}><span>{{this.name}}</span>
+                                <input type="checkbox" name="brand" value="{{add @index 0}}" {{#inArray ../toysData.filters.activeBrands @index}}checked{{/inArray}}><span>{{this.name}}</span>
                                 </label>
                             </fieldset>
                         {{/each}}
@@ -157,13 +158,60 @@
                         {{#each toysData.filters.skills}}
                             <fieldset>
                                 <label class="checkbox" style="font-weight : normal; margin : 5px 0px;">
-                                    <input type="checkbox" name="skill" value="{{add @index 1}}" {{#inArray ../toysData.filters.activeSkills @index}}checked{{/inArray}}>&nbsp;{{this.name}}
+                                    <input type="checkbox" name="skill" value="{{add @index 0}}" {{#inArray ../toysData.filters.activeSkills @index}}checked{{/inArray}}>&nbsp;{{this.name}}
                                     </label>
                                 </fieldset>
                             {{/each}}
                         </form>
                 </div>
                     {{{body}}}
+    <div class="container">
+        <div class="row confirm">
+            <div class="col-md-3 chatbox" id="_nav_chatbox">
+                <div class="panel panel-green">
+                    <div class="panel-heading text-left" id="_nav_chatbox_accordion" data-toggle="collapse" data-parent="#_nav_chatbox_accordion" href="#_nav_chatbox_collapse_one">
+                        <p style="margin : 0px; font-size : 14px;">Contact Us</p> 
+                    </div>
+                    <form action="/submitEnquiry" method="post" id="_nav_enquiry_form">
+                        <div class="panel-collapse collapse" id="_nav_chatbox_collapse_one">
+                            <div class="panel-body">
+
+                                <div class="form-group">
+                                    <div class="">
+                                        <input type="text" class="form-control" placeholder="Name" name="name" length="50">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="">
+                                        <input type="email" class="form-control" placeholder="Email" name="email" length="50">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="">
+                                        <input type="text" class="form-control" placeholder="Contact No" name="contactNo" length="15">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="">
+                                        <textarea class="form-control" placeholder="Type your message here" name="message" length="100" rows="8" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="hidden" id="_nav_enquiry_error">
+                                    <div class="alert alert-danger" style="padding: 7px; font-size: 11px; margin-bottom: 0px;" role="alert">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="panel-footer">
+                                <button class="btn btn-green" style="width : 100%" type="submit" id="_nav_submit_enquiry">
+                                    Submit Enquiry</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>    
         <!-- begin:footer -->
         <div id="footer" class="nav_main_content">
             <div class="container">
@@ -217,13 +265,14 @@ var Q;
             <script src="/js/jquery.js"></script>
             <script src="/js/jquery.validate.min.js"></script>
             <script src="/js/bootstrap.js"></script>
-             <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script> 
-            <script src="/js/gmap3.js"></script>
+            <!-- <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script> -->
+            <!-- <script src="/js/gmap3.js"></script> -->>
             <script src="/js/util.js"></script>
             <script src="/js/helpers/navLogInHelper.js"></script>
             <script src="/js/helpers/navRegistrationHelper.js"></script>
             <script src="/js/helpers/navOrderHelper.js"></script>
             <script src="/js/helpers/navSearchHelper.js"></script>
+            <script src="/js/helpers/navEnquiryHelper.js"></script>
             <script src="/js/script.js"></script>
     </body>
 </html>

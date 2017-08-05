@@ -13,7 +13,7 @@ function startTransactionsProcessing() {
         pt.processPendingTransactions()
         .done(() => {
             navLogUtil.instance().log.call(self, "startTransactionsProcessing", "Done transaction processing", "info"); 
-            startTransactionsProcessing();
+            startTransactionsProcessing(); 
         }, (error) => {
             navLogUtil.instance().log.call(self,"startTransactionsProcessing", "FATAL ERROR : "+error, "error")
             process.exit(-1);

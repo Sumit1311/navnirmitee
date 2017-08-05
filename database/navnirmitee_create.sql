@@ -105,6 +105,8 @@ CREATE TABLE  nav_payments(
 )
 WITH (OIDS=FALSE);
 
+CREATE TABLE IF NOT EXISTS  nav_enquiry(_id varchar(36), name varchar(50), email varchar(50), contact_no VARCHAR(15), message varchar(500), submission_date bigint, CONSTRAINT nav_enquiry_id PRIMARY KEY (_id));
+
 -- object: nav_payments_user_id | type: CONSTRAINT -- 
 ALTER TABLE  nav_payments ADD CONSTRAINT nav_payments_user_id FOREIGN KEY (user_id)
 REFERENCES  nav_user (_id) MATCH FULL

@@ -7,6 +7,7 @@ module.exports = class navToysParser extends navConfigParser {
             super("data/toys.json");
             //console.log(this.config);
         } catch(e) {
+            super();
             this.config = {
                 "brands" :[],
                 "skills":[],
@@ -16,8 +17,9 @@ module.exports = class navToysParser extends navConfigParser {
         }
     }
     static instance() {
-            if(that)
+            if(that) {
                 return that;
+            }
             else{
                 that= new navToysParser();        
                 return that;

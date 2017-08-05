@@ -10,12 +10,10 @@ var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     moment = require('moment'),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
-    navPasswordUtil = require(process.cwd() + "/lib/navPasswordUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     Q = require("q"),
     navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
-    navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
-    util = require("util");
+    navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js");
 
 var tableName = "nav_payments";
 var STATUS = {
@@ -38,6 +36,15 @@ var TRANSACTION_TYPE = {
     CASH :"Cash on Deliver"
 }
 
+var plans = navMembershipParser.instance().getConfig('plans');
+for(var i = 0; i < plans.length; i++)
+{
+    REASON.PLANS[i] = [];
+    for(var j = 0; j < plans[0].length; j++)
+    {
+        REASON.PLANS[i][j] = "RECH_"+ i + "::" + plans[i][j].id;
+    }
+}
 module.exports = class navPaymentsDAO extends BaseDAO{
     constructor(client, persistence) {
         super(persistence);
@@ -73,13 +80,15 @@ module.exports = class navPaymentsDAO extends BaseDAO{
             queryString1 += ", next_retry_date, expiration_date"
                 query2 += ", $" + (++count);
             query2 += ", $" + (++count);
-            params.push(moment().add(navConfigParser.instance().getConfig("PaymentGateway")["RetryInterval"], "hours").valueOf() );
-            params.push(moment().add(navConfigParser.instance().getConfig("PaymentGateway")["ExpirationInterval"], "hours").valueOf());
+            params.push(moment().add(navConfigParser.instance().getConfig("PaymentGateway").RetryInterval, "hours").valueOf() );
+            params.push(moment().add(navConfigParser.instance().getConfig("PaymentGateway").ExpirationInterval, "hours").valueOf());
         }
         queryString1 += ") ";
         query2 += ")";
+        navLogUtil.instance().log.call(this, "insertPaymentDetails", " Payment for user : "+ userId + " with orderId "+ orderId +" for amount "+amount+" has status "+ transactionStatus , "debug");
         return this.dbQuery(queryString1+query2, params)
             .then(function (result) {
+                navLogUtil.instance().log.call(self, "insertPaymentDetails", " No of records inserted :  "+ result.rowCount , "debug");
                 return result.rowCount;
             })
         .catch(function (error) {
@@ -91,8 +100,11 @@ module.exports = class navPaymentsDAO extends BaseDAO{
 
     getAllPaymentTransactions(userId) {
         var self = this;
+        navLogUtil.instance().log.call(this, "getAllPaymentTransactions", " Fetching all Payment details for user : "+ userId + " except for reasons "+ this.REASON.DEPOSIT + this.REASON.REGISTRATION, "debug");
         return this.dbQuery("SELECT reason, paid_date, amount_payable, status from " + tableName + " WHERE user_id = $1 AND reason != $2 AND reason != $3", [userId, this.REASON.DEPOSIT, this.REASON.REGISTRATION])
             .then(function (result) {
+                navLogUtil.instance().log.call(self, "getAllPaymentTransactions", "No of transactions fetched : "+result.rowCount,"debug");
+
                 return result.rows;
             })
         .catch(function (error) {
@@ -107,12 +119,12 @@ module.exports = class navPaymentsDAO extends BaseDAO{
         var queryString = "UPDATE "+tableName + " SET status = $1, transaction_summary = $2, paid_date = $3";
         var params = [status, summary, paid_date];
         count = 4;
-        if(retryDate === undefined) {
+        if(retryDate !== undefined && retryDate !== null) {
             queryString += ", next_retry_date = $" + (count);
             params.push(retryDate);
             count++;
         }
-        if(expirationDate === undefined) {
+        if(expirationDate !== undefined && expirationDate !== null) {
             queryString += ", expiration_date = $" + (count);
             params.push(expirationDate);
             count++;
@@ -120,8 +132,10 @@ module.exports = class navPaymentsDAO extends BaseDAO{
         queryString += " WHERE transaction_id = $" + (count);
         params.push(orderId);
         count++;
+        navLogUtil.instance().log.call(this, "updatePaymentDetails", " Transaction Id : "+ orderId + " has status "+ status , "debug");
         return this.dbQuery(queryString, params)
             .then(function (result) {
+                navLogUtil.instance().log.call(self, "getAllPaymentTransactions", "No of records updated : "+result.rowCount,"debug");
                 return result.rows;
             })
         .catch(function (error) {
@@ -131,12 +145,14 @@ module.exports = class navPaymentsDAO extends BaseDAO{
     }
     getPaymentsByTransactionId(orderId) {        
         var self = this;
+        navLogUtil.instance().log.call(this, "getPaymentsByTransactionId", " Fetching payments for orderId "+ orderId , "debug");
         return this.dbQuery("SELECT reason, amount_payable, user_id from " + tableName + " WHERE transaction_id = $1 AND (status != $2 OR status != $3)", [orderId, this.STATUS.PENDING, this.STATUS.COMPLETED])
             .then(function (result) {
+                navLogUtil.instance().log.call(self, "getPaymentsByTransactionId", " No of payments for orderId "+ orderId + " are " + result.rowCount, "debug");
                 return result.rows;
             })
         .catch(function (error) {
-            navLogUtil.instance().log.call(self, "getAllRentTransactions", error.message, "error");
+            navLogUtil.instance().log.call(self, "getPaymentsByTransactionId", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
         });
     }
@@ -144,8 +160,12 @@ module.exports = class navPaymentsDAO extends BaseDAO{
 
     getPaymentType(paymentId) {        
         var self = this;
+        navLogUtil.instance().log.call(this, "getPaymentType", " Fetching payments for paymentId "+ paymentId , "debug");
+
         return this.dbQuery("SELECT transaction_type from " + tableName + " WHERE _id = $1", [paymentId])
             .then(function (result) {
+                navLogUtil.instance().log.call(self, "getPaymentType", " No of payments for paymentId : "+ paymentId+" are " + result.rowCount, "debug");
+                                
                 return result.rows;
             })
         .catch(function (error) {
@@ -156,8 +176,10 @@ module.exports = class navPaymentsDAO extends BaseDAO{
 
     getNextPendingTransaction() {
         var self = this;
+        navLogUtil.instance().log.call(this, "getNextPendingTransaction", "fetching next pending transaction", "debug");
         return this.dbQuery("SELECT amount_payable, transaction_id, user_id from " + tableName + " WHERE status = $1 AND next_retry_date <= $2 AND expiration_date > $2 ORDER BY next_retry_date LIMIT 1;", [this.STATUS.PENDING, new Date().getTime()])
             .then(function (result) {
+                navLogUtil.instance().log.call(self, "getNextPendingTransaction", "No of Pending transaction : " + result.rowCount, "debug");
                 return result.rows;
             })
         .catch(function (error) {
@@ -168,10 +190,11 @@ module.exports = class navPaymentsDAO extends BaseDAO{
     }
     markExpiredTransactionAsFailed() {
         var self  = this;
-        var queryString = "UPDATE "+tableName + " SET status = $1, transaction_summary = $2, expiration_date = $3 WHERE expiration_date IS NOT NULL AND expiration_date >= $3 AND status != $1";
+        var queryString = "UPDATE "+tableName + " SET status = $1, transaction_summary = $2, expiration_date = $3 WHERE expiration_date IS NOT NULL AND expiration_date <= $3 AND status != $1";
         var params = [STATUS.TRANSACTION_FAILED, "MARKING_AS_FAILED", navCommonUtil.getCurrentTime_S()];
         return this.dbQuery(queryString, params)
             .then(function (result) {
+                navLogUtil.instance().log.call(self, self.markExpiredTransactionAsFailed.name, "Marking transactions as failed "+ result.rowCount, "debug");
                 return result.rows;
             })
         .catch(function (error) {
@@ -202,7 +225,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
                 return result.rows;
             })
         .catch(function(error){
-            navLogUtil.instance().log.call(self, "getPaymentssFullList",  error.message, "error" );
+            navLogUtil.instance().log.call(self, self.getPaymentsFullList.name,  error.message, "error" );
             return Q.reject(new navCommonUtil().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
         });
 
@@ -211,7 +234,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
         var self = this;
         var query = "UPDATE "+tableName+" SET next_retry_date=$1, expiration_date=$2, status = $3 WHERE _id=$4";
         var params = [retryDate, expirationDate, status,  paymentId];
-
+        navLogUtil.instance().log.call(self, self.updatePaymentById.name, "Update payment "+ paymentId+" with status "+status, "debug")            
         return this.dbQuery(query, params)
             .then(function (result) {
                 return result.rows;

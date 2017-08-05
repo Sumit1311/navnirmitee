@@ -24,39 +24,18 @@
                 <form class="form-horizontal col-lg-offset-4 col-lg-4" role="form" action="/subscribePlan?type={{q_type}}&plan={{q_plan}}" method="post">
                     <h3 class="text-center">Transaction Summary</h3>
                     <hr>
-                    {{#if plan.deposit}}
-                    {{#compare user.deposit "!=" plan.deposit}} 
-                    <dl class="dl-horizontal text-center">
-                        <dt class="">Deposit Amount : </dt>
-                        <dd class="">&#x20b9; {{plan.deposit}}</dd>
-                    </dl>      
-                    <!--    <div class="row">
-<div style="text-align: right;" class="col-sm-offset-4 col-md-offset-4 col-xs-offset-4 ><h5 style="font-weight: bold;">Deposit Amount :</h5></div>
-<div class="col-md-6 col-sm-6 col-xs-12"><h5>&#x20b9; {{plan.deposit}}</h5></div>
-</div> -->
-                    {{/compare}}
-                    {{/if}}
-
+                    {{#each transactions}}
                         <dl class="dl-horizontal text-center">
-                            <dt class="">{{#compare q_type "===" "member"}}Membership Amount {{else}} Recharge Amount{{/compare}} : </dt>
-                            <dd class="">&#x20b9; {{plan.amount}}</dd>
+                            <dt class="">{{label}} : </dt>
+                            <dd class="">&#x20b9; {{amount}}</dd>
                         </dl>      
-                        <!-- <div style="text-align: right;" class="col-md-6 col-sm-6 col-xs-12"><h5 style="font-weight: bold;">Recharge Amount :</h5></div>
-<div class="col-md-6 col-sm-6 col-xs-12"><h5>&#x20b9; {{plan.amount}}</h5></div> -->
+                    {{/each}}
                     <hr style="margin-top: 0px;">
-                        <dl class="dl-horizontal text-center">
-                            <dt class="">Total Amount : </dt>
-                            <dd class="">&#x20b9; {{#if plan.deposit}}{{#compare user.deposit "!=" plan.deposit}}{{add plan.amount plan.deposit}}{{else}}{{plan.amount}}{{/compare}}{{else}}{{plan.amount}}{{/if}}</dd>
-                            </dl>      
-                            <!-- <div style="text-align: right;" class="col-md-6 col-sm-6 col-xs-12"><h5 style="font-weight: bold;">Recharge Amount :</h5></div>
-<div class="col-md-6 col-sm-6 col-xs-12"><h5>&#x20b9; {{plan.amount}}</h5></div> -->
-
-                        <hr style="margin-top: 0px;">
-                        <div class="form-group">
-                            <div class="text-center">
-                                <div class="radio col-md-6 col-lg-6 col-sm-6 col-xs-12">
-                                    <label class="pull-right">
-                                        <input type="radio" name="paymentMethod" value="cash"  checked>
+                    <div class="form-group">
+                        <div class="text-center">
+                            <div class="radio col-md-6 col-lg-6 col-sm-6 col-xs-12">
+                                <label class="pull-right">
+                                    <input type="radio" name="paymentMethod" value="cash"  checked>
 
                                         &nbsp; Cash On Delivery 
                                     </label>

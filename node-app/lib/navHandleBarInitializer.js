@@ -1,4 +1,6 @@
-var exphbs = require('express-handlebars');
+var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    exphbs = require('express-handlebars');
+
 var hbshelpers = require('handlebars-helpers');
 var path = require('path');
 var that;
@@ -22,9 +24,11 @@ module.exports = class navHandleBarInitializer {
     }
 
     init(){
+        var self = this;
          hbshelpers({
             handlebars: this.hbs.handlebars
          });
+         navLogUtil.instance().log.call(self,self.init.name, 'Handlebars template engine initialization done', "debug");
     }
     
     register(app) {

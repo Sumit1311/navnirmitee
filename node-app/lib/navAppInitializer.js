@@ -7,6 +7,8 @@ var flash = require('connect-flash');
 var navConfigParser = require(process.cwd() + "/lib/navConfigParser.js");
 var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
 var morgan = require('morgan');
+var rfs = require('rotating-file-stream');
+
 module.exports = class navAppInitializer {
 
     constructor() {
@@ -14,6 +16,7 @@ module.exports = class navAppInitializer {
     }
 
     init () {
+        const self = this;
             var app = express();
             // BodyParser Middleware
             app.use(bodyParser.json());
@@ -21,19 +24,20 @@ module.exports = class navAppInitializer {
             app.use(cookieParser());
             // Set Static Folder
             var staticRelPath = navConfigParser.instance().getConfig("StaticPath",'../public');
-            if(staticRelPath != "")
-            app.use(express.static(path.join(process.cwd(),staticRelPath )));
+            if(staticRelPath !== "") {
+                app.use(express.static(path.join(process.cwd(),staticRelPath )));
+            }
             // Express Validator
             app.use(expressValidator({
                 customValidators : {
-                    isValidPassword: function(input){
+                    isValidPassword: function(){
                         return true;
                     }
                 },
                 errorFormatter: function (param, msg, value) {
-                    var namespace = param.split('.')
-                    , root = namespace.shift()
-                    , formParam = root;
+                    var namespace = param.split('.'),
+                        root = namespace.shift(),
+                        formParam = root;
 
                     while (namespace.length) {
                         formParam += '[' + namespace.shift() + ']';
@@ -50,7 +54,14 @@ module.exports = class navAppInitializer {
 
             // Connect Flash
             app.use(flash());
-            app.use(morgan('combined'));
+            app.use(morgan('combined', {
+                stream : rfs('web_access.log', {
+                    interval: '1d', // rotate daily 
+                    path: process.cwd() + '/log',
+                    compress: 'gzip'
+                })
+            }));
+            navLogUtil.instance().log.call(self, self.init.name, `Express initialization done`, "info");
             return app;
 
     }
