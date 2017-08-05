@@ -1,5 +1,4 @@
 var navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
-    navPGRouter = require(process.cwd() + "/lib/navPGRouter.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     Q = require('q');
 

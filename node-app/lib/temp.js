@@ -1,9 +1,5 @@
 var express = require('express'),
-    router = express.Router(),
-    url = require("url"),
-    Q = require('q'),
-    moment = require('moment'),
-    UserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
+    router = express.Router();
 
 
 router.get('/order', function (req, res) {

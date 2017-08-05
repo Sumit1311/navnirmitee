@@ -36,10 +36,12 @@ module.exports = class navBaseRouter {
         if(req.xhr) {
             new navResponseUtil.redirect(req, res, "/login"); 
         }else {
+            //:w
+            //console.log(req.originalUrl);
             return res.render('login',{
                 layout: 'nav_bar_layout',
                 hideNavBar : true,
-                redirection : req.query.redirect ? req.query.redirect : req.originalUrl
+                redirection : req.query.redirect ? req.query.redirect : encodeURIComponent(req.originalUrl)
             });
         }
     }
@@ -61,7 +63,7 @@ module.exports = class navBaseRouter {
         }
     }
     isSessionAvailable(req, res, next) {
-        var userDetails = req.user;
+        var userDetails = req.user, self = this;
         if (userDetails && userDetails._id) {
             next();
         } else {

@@ -11,7 +11,6 @@
  *
  */
 
-"use strict";
 
 var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
@@ -22,6 +21,7 @@ var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     util = require("util");
 
 function UserDAO(client, persistence) {
+    var self = this;
     if (persistence) {
         BaseDAO.call(self, persistence);
     }
@@ -34,8 +34,7 @@ util.inherits(UserDAO, BaseDAO);
 module.exports = UserDAO;
 //private variables
 var tableName = "nav_user",
-    rootUserId = "45058a54-b3e2-4a3b-96ab-c13dcf3023e3",
-    fileName = 'user/masterDAO';
+    rootUserId = "45058a54-b3e2-4a3b-96ab-c13dcf3023e3";
 
 /**
  * Get login details for the user specified by loginName
@@ -82,7 +81,7 @@ UserDAO.prototype.getAddress = function (userId) {
  *
  * @returns {*}
  */
-UserDAO.prototype.createRootUser = function (client) {
+UserDAO.prototype.createRootUser = function () {
     var self = this;
     navLogUtil.instance().log.call(this, "createRootUser", "Create root user", "info");
     return self.dbQuery('select * from ' + tableName + ' where _id=$1', [rootUserId])

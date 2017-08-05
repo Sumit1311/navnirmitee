@@ -7,7 +7,6 @@ var flash = require('connect-flash');
 var navConfigParser = require(process.cwd() + "/lib/navConfigParser.js");
 var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
 var morgan = require('morgan');
-var fs = require('fs');
 var rfs = require('rotating-file-stream');
 
 module.exports = class navAppInitializer {
@@ -31,7 +30,7 @@ module.exports = class navAppInitializer {
             // Express Validator
             app.use(expressValidator({
                 customValidators : {
-                    isValidPassword: function(input){
+                    isValidPassword: function(){
                         return true;
                     }
                 },

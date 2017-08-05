@@ -1,10 +1,8 @@
 var that, fs = require('fs');
-var mustache = require("mustache"),
-    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
+var mustache = require("mustache");
 
 module.exports = class navConfigParser {
     constructor(fileName) {
-            var self = this;
             if(fileName) {
                 try {
                     this.config = JSON.parse(fs.readFileSync(process.cwd() + "/" + fileName));

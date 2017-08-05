@@ -1,4 +1,3 @@
-"use strict";
 
 var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     Q = require("q"),
@@ -8,8 +7,9 @@ var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     util = require("util");
 
 function navToysDAO(client, persistence) {
+    var self = this;
     if (persistence) {
-        BaseDAO.call(this, persistence);
+        BaseDAO.call(self, persistence);
     }
     this.providedClient = client ? client : undefined;
     return this;
@@ -19,9 +19,7 @@ util.inherits(navToysDAO, BaseDAO);
 
 module.exports = navToysDAO;
 //private variables
-var tableName = "nav_toys",
-    rootUserId = "45058a54-b3e2-4a3b-96ab-c13dcf3023e3",
-    fileName = 'toys/navToysDAO';
+var tableName = "nav_toys";
 
 
 navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories, query, sortBy, sortType, skills, brands) {

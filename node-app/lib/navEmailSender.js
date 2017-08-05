@@ -1,5 +1,4 @@
 var Q = require('q'),
-    htmlToText = require('html-to-text'),
     nodemailer = require('nodemailer'),
     navSendEmailException = require(process.cwd() + "/lib/exceptions/navSendEmailException.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),

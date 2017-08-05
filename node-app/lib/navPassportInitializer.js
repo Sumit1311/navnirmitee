@@ -1,5 +1,4 @@
 var LocalStrategy = require('passport-local').Strategy,
-    Q = require('q'),
     passport = require('passport'),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navUserNotFoundException = require(process.cwd() + "/lib/exceptions/navUserNotFoundException.js"),
@@ -78,7 +77,7 @@ module.exports = class navPassportHandler {
     }
 
     static authenticate(req, res, next, deferred){
-        passport.authenticate('local',function(err, user, info){
+        passport.authenticate('local',function(err, user){
             if(err) {
                 navLogUtil.log.call(that ,"authenticate", `Error occured while authenticating ${err}`, "error");
                 return deferred.reject(err);

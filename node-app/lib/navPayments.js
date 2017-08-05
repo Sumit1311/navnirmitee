@@ -81,7 +81,7 @@ module.exports = class navPayments{
             }
             return Q.resolve();
         })
-        .then((_result) => {
+        .then(() => {
                 if(self.client) {
                     return Q.resolve();
                 } else {

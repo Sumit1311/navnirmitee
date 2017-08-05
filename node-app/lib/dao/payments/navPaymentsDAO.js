@@ -10,12 +10,10 @@ var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     moment = require('moment'),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
-    navPasswordUtil = require(process.cwd() + "/lib/navPasswordUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     Q = require("q"),
     navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
-    navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
-    util = require("util");
+    navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js");
 
 var tableName = "nav_payments";
 var STATUS = {

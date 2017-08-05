@@ -1,20 +1,18 @@
 var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navPGHelper = require(process.cwd() + "/lib/navPGHelper.js"),
-    navRequester = require(process.cwd() + "/lib/navRequester.js"),
     navPayments = require(process.cwd() + "/lib/navPayments.js"),
     LogicalException = require('node-exceptions').LogicalException,
-    navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navPaytm = require(process.cwd() + "/thirdparty/pg/paytm/checksum/checksum.js"),
     Q = require('q'),
     navConfigParser = require(process.cwd() + '/lib/navConfigParser.js');
 var gatewayDetails = {};
-var GATEWAY_STATUS = {
+/*var GATEWAY_STATUS = {
     SUCCESS : "TXN_SUCCESS",
     FAILED : "TXN_FAILURE",
     PENDING : "PENDING",
     OPEN : "OPEN"
-}
+}*/
 
 var PaymentGateway = navConfigParser.instance().getConfig("PaymentGateway");
 gatewayDetails.domain = PaymentGateway.Domain;
@@ -27,9 +25,9 @@ gatewayDetails.transactionURLPath = PaymentGateway.TransactionURLPath;
 gatewayDetails.callbackURL = PaymentGateway.CallbackURLPath;
 gatewayDetails.statusAPIPath = PaymentGateway.StatusAPIPath;
 
-var that = {
+/*var that = {
     name : "navPGRouter"
-}
+}*/
 
 module.exports = class navPGRouter extends navBaseRouter {
 
@@ -55,7 +53,7 @@ module.exports = class navPGRouter extends navBaseRouter {
             transactionAmount : body.TXNAMOUNT,
             orderId : body.ORDERID
         }
-        var self = this;
+        //var self = this;
 
         var deferred = Q.defer();
 

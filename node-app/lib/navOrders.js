@@ -1,5 +1,4 @@
-var navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
-    navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
+var navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     navTransactions = require(process.cwd() + "/lib/navTransactions.js"),
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
@@ -14,7 +13,7 @@ module.exports = class navOrders {
 
     updateOrder(orderId, toyId, userId, updateFields) {
         var self = this;
-        var rDAO = new navRentalsDAO(), toyDetail, userDetail, promise = Q.resolve();
+        var rDAO = new navRentalsDAO(), toyDetail,  promise = Q.resolve();
         if(!toyId || !userId) {
             promise = rDAO.getOrderDetails(orderId)
                 .then((orderDetails) => {

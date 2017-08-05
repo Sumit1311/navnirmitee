@@ -1,8 +1,6 @@
-var navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
-    navPGCommunicator = require(process.cwd() + "/lib/navPGCommunicator.js"),
+var    navPGCommunicator = require(process.cwd() + "/lib/navPGCommunicator.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
-    Q = require('q'),
-    navPayments = require(process.cwd() + "/lib/navPayments.js");
+    Q = require('q');
     
 var GATEWAY_STATUS = {
     SUCCESS : "TXN_SUCCESS",

@@ -1,7 +1,6 @@
 var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     navProcessTransactions = require(process.cwd() + "/lib/navProcessTransactions.js"),
-    Q = require('q'),
     navProcessOrders = require(process.cwd() + "/lib/navProcessOrders.js");
 
 
@@ -12,7 +11,7 @@ function startTransactionsProcessing() {
         var pt = new navProcessTransactions();
         navLogUtil.instance().log.call(self,"startTransactionsProcessing", "Starting the pending transaction processing", "info"); 
         pt.processPendingTransactions()
-        .done((response) => {
+        .done(() => {
             navLogUtil.instance().log.call(self, "startTransactionsProcessing", "Done transaction processing", "info"); 
             startTransactionsProcessing(); 
         }, (error) => {

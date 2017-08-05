@@ -11,8 +11,7 @@ var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navCommonUtils = require(process.cwd() + "/lib/navCommonUtil.js");
 var navDbConnection = require("./pg-conn.js"),
     Q = require("q"),
-    navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
-    fileName = "baseDAO.js";
+    navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js');
 
 function BaseDAO(persistence) {
     //if some custom persistence provided use it other wise use the default postgres persistence
@@ -63,7 +62,7 @@ BaseDAO.prototype.executeTransaction = function (query, param) {
                 .then(function (results) {
                     deferred.resolve(results);
                 }, function (err) {
-                    deferred.reject();
+                    deferred.reject(err);
                 })
             .catch(function(error){
                 
@@ -128,7 +127,7 @@ function query(dbClient, sql, params) {
             .catch(function (error) {
                 return Q.reject(new navCommonUtils().getErrorObject(error, 500, "DBQUERY", navDatabaseException));
             })
-};
+}
 
 BaseDAO.prototype.startTx = startTx;
 BaseDAO.prototype.commitTx = commitTx;

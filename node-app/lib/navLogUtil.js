@@ -56,7 +56,7 @@ module.exports = class navLogUtil {
     getLogger() {
         return logger;
     }
-    static instance(_logger, logFileName) {
+    static instance(_logger) {
         if(typeof that === "object"){
             return that;
         }

@@ -4,10 +4,10 @@ var navRequester = require(process.cwd() + "/lib/navRequester.js"),
 
 var dataURL = "http://api.data.gov.in/resource/6176ee09-3d56-4a3b-8115-21841576b2f6?format=JSON&api-key=YOURKEY";
 
-var defaultBody = {
+/*var defaultBody = {
     "format" : "JSON",
     "api-key" : "YOURKEY"
-}
+}*/
 
 module.exports = class naGovtDataFetcher {
     getDetailsByPinCode(pinCode) {
@@ -20,8 +20,8 @@ module.exports = class naGovtDataFetcher {
                    if(body.status === "Error") {
                         return Q.reject(new Error(res.message)); 
                    }
-                   var response = {
-                   }
+                   /*var response = {
+                   }*/
                 } else {
                     return Q.reject(new Error());
                 }

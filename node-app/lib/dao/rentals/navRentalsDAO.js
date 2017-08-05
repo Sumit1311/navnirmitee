@@ -1,4 +1,3 @@
-"use strict";
 var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navCommonUtils = require(process.cwd() + "/lib/navCommonUtil.js"),
     navDatabaseException = require(process.cwd() + "/lib/dao/exceptions/navDatabaseException.js"),
@@ -28,9 +27,7 @@ util.inherits(navRentalsDAO, BaseDAO);
 
 module.exports = navRentalsDAO;
 //private variables
-var tableName = "nav_rentals",
-    rootUserId = "45058a54-b3e2-4a3b-96ab-c13dcf3023e3",
-    fileName = 'toys/navRentalsDAO';
+var tableName = "nav_rentals";
 
 navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, startDate, endDate, status) {
     var self = this;

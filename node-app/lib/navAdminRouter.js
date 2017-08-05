@@ -1,14 +1,7 @@
 var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
-    navPGRouter = require(process.cwd() + "/lib/navPGRouter.js"),
     querystring = require("querystring"),
     repeatHelper = require('handlebars-helper-repeat'),
-    navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
-    navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
-    navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
-    navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
-    navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
-    navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navOrders = require(process.cwd() + "/lib/navOrders.js"),
     navPayments = require(process.cwd() + "/lib/navPayments.js"),
@@ -96,9 +89,9 @@ module.exports = class navAdminRouter extends navBaseRouter {
         var body = req.body;
         var updateFields = [];
         var deferred = Q.defer(), self = this;
-        var respUtil =  new navResponseUtil(), cancelledOrders = [];
+        var respUtil =  new navResponseUtil();
         deferred.promise
-            .done(function(result){
+            .done(function(){
                 respUtil.redirect(req, res, "/admin/orders");
             },function(error){
                 var response = respUtil.generateErrorResponse(error);
@@ -111,9 +104,9 @@ module.exports = class navAdminRouter extends navBaseRouter {
 
                 });
             });
-        for(var i in body) {
+        for(var i = 0; i< body.length; i++) {
             var tmp = {};
-            for(var j in body[i]){
+            for(var j = 0; j < body[i].length; j++){
                 tmp[body[i][j].name] = body[i][j].value;
             }
             updateFields.push(tmp);
@@ -147,7 +140,6 @@ module.exports = class navAdminRouter extends navBaseRouter {
         var columnOrdering = ["email_address", "amount_payable", "reason", "credit_date", "paid_date", "status", "transaction_summary", "next_retry_date", "expiration_date", "transaction_type"];
         var columnLabel = ["Customer Email", "Amount", "Payment Reason", "Initiate Date", "Success Date", "Status", "Summary", "Next Attempt", "Expiration Date", "Trasaction Type"];
         var sortOrdering = ["ASC", "DESC"];
-        var toysList, customerList, paymentList, statusList, noOfOrders = 0, noOfPages;
 
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil();
@@ -204,7 +196,7 @@ module.exports = class navAdminRouter extends navBaseRouter {
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil();
         deferred.promise
-            .done(function(result){
+            .done(function(){
                 respUtil.redirect(req, res, "/admin/payments");
             },function(error){
                 var response = respUtil.generateErrorResponse(error);
@@ -217,9 +209,9 @@ module.exports = class navAdminRouter extends navBaseRouter {
 
                 });
             });
-        for(var i in body) {
+        for(var i = 0; i < body.length; i++) {
             var tmp = {};
-            for(var j in body[i]){
+            for(var j = 0; j < body[i].length; j++){
                 tmp[body[i][j].name] = body[i][j].value;
             }
             updateFields.push(tmp);

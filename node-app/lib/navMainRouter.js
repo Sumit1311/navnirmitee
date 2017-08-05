@@ -1,9 +1,5 @@
 var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
-    navPGRouter = require(process.cwd() + "/lib/navPGRouter.js"),
-    navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
-    navSkillsDAO = require(process.cwd() + "/lib/dao/skills/navSkillsDAO.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
-    navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
@@ -12,10 +8,8 @@ var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navEnquiry = require(process.cwd() + "/lib/navEnquiry.js"),
     navAccount = require(process.cwd() + "/lib/navAccount.js"),
     navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
-    navLogicalException = require("node-exceptions").LogicalException,
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     helpers = require('handlebars-helpers')(),
-    moment =require('moment'),
     Q = require('q');
 
 module.exports = class navMainRouter extends navBaseRouter {
@@ -30,7 +24,7 @@ module.exports = class navMainRouter extends navBaseRouter {
         this.router.post('/submitEnquiry',this.postEnquiry.bind(this) );
         this.router.get('/pricing', this.getPricing.bind(this) );
         this.router.get('/howItWorks', this.getHowItWorks.bind(this) );
-        this.router.get('/rechargeConfirmation', this.getRechargeConfirmation.bind(this) );
+        this.router.get('/rechargeConfirmation',this.ensureVerified.bind(this),this.ensureAuthenticated.bind(this),this.getRechargeConfirmation.bind(this) );
         this.router.post('/subscribePlan', this.ensureVerified.bind(this), 
                         this.ensureAuthenticated.bind(this), 
                         this.isSessionAvailable.bind(this), 
@@ -43,7 +37,7 @@ module.exports = class navMainRouter extends navBaseRouter {
         var respUtil =  new navResponseUtil();
         deferred.promise
             .done(function(){
-                debugger;
+                //debugger;
                 respUtil.sendAjaxResponse(res, {
                     "message" : "Enquiry successfully submitted."
                 })

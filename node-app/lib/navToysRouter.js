@@ -2,7 +2,6 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navAccount = require(process.cwd() + "/lib/navAccount.js"),
     navOrders = require(process.cwd() + "/lib/navOrders.js"),
-    navSystemUtil = require(process.cwd() + "/lib/navSystemUtil.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
@@ -14,13 +13,9 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navPendingReturnException = require(process.cwd() + "/lib/exceptions/navPendingReturnException.js"),
     repeatHelper = require('handlebars-helper-repeat'),
     helpers = require('handlebars-helpers')(),
-    passport = require('passport'),
-    navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
-    navSkillsDAO = require(process.cwd() + "/lib/dao/skills/navSkillsDAO.js"),
     navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
-    url = require("url"),
     Q = require('q'),
     querystring = require("querystring"),
     moment = require('moment');
@@ -108,7 +103,6 @@ module.exports = class navToysRouter extends navBaseRouter {
 
         var validationErrors = req.validationErrors();
         //console.log(validationErrors);
-        var response;
         if(validationErrors)
         {
             return deferred.reject(new navValidationException(validationErrors));
@@ -139,11 +133,11 @@ module.exports = class navToysRouter extends navBaseRouter {
     }
     placeOrder(req, res){
         var self = this;
-        var id = req.query.id, dbClient; 
+        var id = req.query.id;
         var deferred = Q.defer();
         var respUtil =  new navResponseUtil();
         deferred.promise
-            .done((result) => {
+            .done(() => {
                 respUtil.redirect(req, res, '/toys/orderPlaced');
             },(error) => {
                 var response = respUtil.generateErrorResponse(error);
@@ -273,33 +267,35 @@ module.exports = class navToysRouter extends navBaseRouter {
             offset = 0;
         }
         
-        for(var key in req.query) {
            var index;
-            if((key === "category") && req.query.hasOwnProperty(key)) {
-                for(index = 0; index < req.query[key].length; index++) {
-                   activeCategories.push(parseInt(req.query[key][index]));
+        for(var key in req.query) {
+            if(req.query.hasOwnProperty(key)) {
+                if(key === "category") {
+                    for(index = 0; index < req.query[key].length; index++) {
+                        activeCategories.push(parseInt(req.query[key][index]));
+                    }
                 }
-            }
-            if((key == "ageGroup") && req.query.hasOwnProperty(key)) {
-                for(index = 0; index < req.query[key].length; index++) {
-                   activeAgeGroups.push(parseInt(req.query[key][index]));
+                if(req.query.hasOwnProperty(key) && (key == "ageGroup")) {
+                    for(index = 0; index < req.query[key].length; index++) {
+                        activeAgeGroups.push(parseInt(req.query[key][index]));
+                    }
                 }
-            }
-            if((key === "skill") && req.query.hasOwnProperty(key)) {
-                for(index = 0; index < req.query[key].length; index++) {
-                   activeSkills.push(parseInt(req.query[key][index]));
+                if(req.query.hasOwnProperty(key) && (key === "skill")) {
+                    for(index = 0; index < req.query[key].length; index++) {
+                        activeSkills.push(parseInt(req.query[key][index]));
+                    }
                 }
-            }
-            if((key === "brand") && req.query.hasOwnProperty(key)) {
-                for(index = 0; index < req.query[key].length; index++) {
-                   activeBrands.push(parseInt(req.query[key][index]));
+                if(req.query.hasOwnProperty(key) && (key === "brand")) {
+                    for(index = 0; index < req.query[key].length; index++) {
+                        activeBrands.push(parseInt(req.query[key][index]));
+                    }
                 }
             }
         }
         req.assert("q"," Bad Request").isByteLength({min :0, max :128});
         //req.assert("shippingAddress","Bad Request").notEmpty();
         var deferred = Q.defer();
-        var respUtil =  new navResponseUtil(), toyList, categories, ageGroups, skills, brands, noOfPages, perPageToys = 4;
+        var respUtil =  new navResponseUtil(), categories, ageGroups, skills, brands, perPageToys = 4;
         var sortColumns = ["name", "price", "age_group"];
         var sortLabels = ["Name", "Price", "Age Group"];
         var sortTypes = ["ASC", "DESC"];
@@ -391,7 +387,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         var deferred = Q.defer();
         var respUtil =  new navResponseUtil();
         deferred.promise
-            .done((result) => {
+            .done(() => {
                 respUtil.redirect(req, res, '/user/orderDetails');
             },(error) => {
                 var response = respUtil.generateErrorResponse(error);
@@ -417,7 +413,6 @@ module.exports = class navToysRouter extends navBaseRouter {
 
         var validationErrors = req.validationErrors();
         //console.log(validationErrors);
-        var response, user = req.user;
         if(validationErrors)
         {
             return deferred.reject(new navValidationException(validationErrors));

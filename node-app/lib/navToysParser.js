@@ -17,8 +17,9 @@ module.exports = class navToysParser extends navConfigParser {
         }
     }
     static instance() {
-            if(that)
+            if(that) {
                 return that;
+            }
             else{
                 that= new navToysParser();        
                 return that;

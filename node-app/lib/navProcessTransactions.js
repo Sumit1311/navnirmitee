@@ -18,7 +18,7 @@ module.exports = class navProcessTransactions {
             })
             .then(function(transactionDetails){
                 navLogUtil.instance().log.call(self, self.processPendingTransactions.name,`Got ${transactionDetails.length} transactions for processing` ,"info");
-                debugger;
+                //debugger;
                 if(transactionDetails.length !== 0) {
                     return new navPGHelper().handlePaymentResponse({ 
                         orderId : transactionDetails[0].transaction_id

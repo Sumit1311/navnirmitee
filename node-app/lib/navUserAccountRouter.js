@@ -3,7 +3,6 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navAccount = require(process.cwd() + "/lib/navAccount.js"),
     navCommonUtil = require(process.cwd() + '/lib/navCommonUtil.js'),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
-    navTransactions = require(process.cwd() + "/lib/navTransactions.js"),
     navOrders = require(process.cwd() + "/lib/navOrders.js"),
     navPayments = require(process.cwd() + "/lib/navPayments.js"),
     navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
@@ -24,7 +23,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
         return this;
     }
 
-    getRechargeDetails(req, res, next) {
+    getRechargeDetails(req, res) {
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil();
         var user = req.user, userDetails, debitTransactions = [], creditTransactions = [], plans, membershipPlans;
@@ -52,7 +51,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                     plans : plans,
                     membershipPlans : membershipPlans,
                     helpers : {
-                        getClass : function(status, options) {
+                        getClass : function(status) {
                             var lableClass;
                             switch(status) {
                                 case navPaymentsDAO.getStatus().PENDING :
@@ -124,7 +123,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                     layout : 'nav_bar_layout',
                     orders : orders,
                     helpers : {
-                        getClass : function(status, options) {
+                        getClass : function(status) {
                             var lableClass;
                             console.log(status);
                             switch(status) {

@@ -26,10 +26,11 @@ module.exports = class navDbConnectionHandler {
     }
 
     instance(persistence) {
-        if(that)
+        if(that) {
             return that;
-        else
+        } else {
             return (that = new navDbConnectionHandler(persistence));
+        }
 
     }
 }

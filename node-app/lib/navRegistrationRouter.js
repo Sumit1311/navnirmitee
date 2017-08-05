@@ -1,15 +1,12 @@
 var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     Q = require('q'),
-    moment = require('moment'),
     navResponseUtil = require(process.cwd() + '/lib/navResponseUtil.js'),
     navValidationException = require(process.cwd() + '/lib/exceptions/navValidationException.js'),
     navLogicalException = require("node-exceptions").LogicalException,
     navEmailVerification= require(process.cwd() + "/lib/navEmailVerification.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
-    navAccount = require(process.cwd() + "/lib/navAccount.js"),
-    navUserDAO = require(process.cwd() + '/lib/dao/user/userDAO.js'),
-    navChildDAO = require(process.cwd() + '/lib/dao/child/navChildDAO.js');
+    navAccount = require(process.cwd() + "/lib/navAccount.js");
 
 module.exports = class navRegistration extends navBaseRouter {
     constructor() {
@@ -23,7 +20,7 @@ module.exports = class navRegistration extends navBaseRouter {
         this.router.get("/registrationSuccess",this.getRegistrationSuccess.bind(this));
         return this;
     }
-    doRegistration(req, res, next){
+    doRegistration(req, res){
         var email = req.body.email, password = req.body.password, contactNo = req.body.mobileNo = req.body.mobileNo, passwordConf = req.body.passwordConf;
         var verificationCode;
         var deferred = Q.defer(), self = this;
