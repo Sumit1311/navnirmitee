@@ -65,8 +65,8 @@ function getDefaultConfig() {
             ExpirationInterval : 72 //hours
         },
         BackgroundProcessing : {
-            TransactionInterval : 1000, // ms,
-            OrderInterval : 1000
+            TransactionInterval : 60000, // ms,
+            OrderInterval : 60000
         },
         LogLevel : {
             "web-server" : "DEBUG"
