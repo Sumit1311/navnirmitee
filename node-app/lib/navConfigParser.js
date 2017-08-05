@@ -53,9 +53,9 @@ function getDefaultConfig() {
         HostName : process.env.HOST_NAME || "localhost",
         PaymentGateway : {
             Domain : "https://pguat.paytm.com",
-            MerchantID : "WorldP64425807474247",
-            MerchantKey : "kbzk1DSbJiV_O3p5",
-            Website : "worldpressplg",
+            MerchantID : "Navnir15330216551133",
+            MerchantKey : "arT6cMm%V#qgIy#X",
+            Website : "WEB_STAGING",
             ChannelID : "WEB",
             IndustryType : "Retail",
             CallbackURLPath : "/callback", 
