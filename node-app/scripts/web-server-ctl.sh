@@ -18,9 +18,14 @@ start() {
         return 1
     fi
     echo 'Starting service…' >&2
-    local CMD="$EXECUTABLE $SCRIPT > \"$LOGFILE\" 2>&1 & echo \$!"
+    #local CMD="$EXECUTABLE $SCRIPT > \"$LOGFILE\" 2>&1 & echo \$!"
+    local CMD="$EXECUTABLE $SCRIPT > \"$LOGFILE\" 2>&1"
     echo $CMD
-    su -c "$CMD" $USER > "$PIDFILE"
+    #su -c "$CMD" $USER > "$PIDFILE"
+    $CMD &
+    echo $! > "$PIDFILE"
+    echo "disown"
+    disown
     echo 'Service started' >&2
 }
 
