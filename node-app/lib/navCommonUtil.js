@@ -7,6 +7,10 @@ var COUNTRIES =["INDIA"], STATES = { "INDIA" : ["Maharashtra"] }, DISTRICTS = {"
 var navToysParser = require(process.cwd() + "/lib/navToysParser.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
 
+var that = {
+    name : "navCommonUtil"
+}
+
 function readCategories() {
     var categories = navToysParser.instance().config.categories;
     for(var i =0; i < categories.length; i++) {
@@ -76,6 +80,13 @@ module.exports = class navCommonUtils {
         base.protocol = req.protocol;
         base.host = req.get("host");
         navLogUtil.instance().log.call(self, self.getBaseURL.name, "Server base url is "+base, "debug")
+        return base;
+    }    
+    static getBaseURL_S(req) {
+        var base = new url.Url();
+        base.protocol = req.protocol;
+        base.host = req.get("host");
+        navLogUtil.instance().log.call(that, "getBaseURL_S", "Server base url is "+base, "debug")
         return base;
     }    
 

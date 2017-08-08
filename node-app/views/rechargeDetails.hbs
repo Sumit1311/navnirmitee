@@ -1,155 +1,152 @@
 
 <div class="heads" style="background: url(/img/img02.jpg) center center;">
-<div class="container">
-<div class="row">
-<div class="col-md-12">
-<h2><span>//</span> Recharge Confirmation</h2>
-</div>
-</div>
-</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2><span>//</span> Recharge Confirmation</h2>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="page-content">
-<div class="container">
+    <div class="container">
 
-<div class="row">
-<div class="col-md-12">
-<ol class="breadcrumb">
-<li><a href="#">Home</a></li>
-<li class="active">Order</li>
-</ol>
-</div>
-</div>
-
-<div class="row confirm">
-<div class="col-md-12">
-<h3 class="">Account Summary</h3>
-</div>
-</div>
-<hr>
-
-
-<div class="row">
-<div class="col-md-6">
-<dl class="dl-horizontal">
-  <dt>Enrollment Date</dt>
-  <dd>{{userDetails.enrollmentDate}}</dd>
-</dl>
-</div>
-<div class="col-md-6">
-<dl class="dl-horizontal">
-  <dt>Membership Status</dt>
-  <dd>{{#if userDetails.membershipStatus}}<span class="label label-success">Active</span>{{else}}<span class="label label-danger">Expired</span>{{/if}}<dd>
-</dl>
-</div>
-</div>
-
-
-<div class="row">
-<div class="col-md-6">
-<dl class="dl-horizontal">
-  <dt>Membership Expiry Date</dt>
-  <dd>{{#if userDetails.membershipExpiryDate}}{{userDetails.membershipExpiryDate}}{{else}}Lifetime{{/if}}</dd>
-</dl>
-</div>
-<div class="col-md-6">
-<dl class="dl-horizontal">
-  <dt>Deposit</dt>
-  <dd>{{userDetails.deposit}}</dd>
-</dl>
-</div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="table-responsive">
-<table class="table table-hover">
-<thead>
-      <tr>
-        <th>Date</th>
-        <th>Particular</th>
-        <th>Amount Deducted</th>
-        <th>Amount paid</th>
-        <th>Payment Status</th>
-      </tr>
-    </thead>
-<tbody >
-    {{#each transactions}}
-      <tr>
-        <td>{{transactionDate}}</td>
-        <td>{{summary}}</td>
-        <td>{{#if amountDeducted}}{{amountDeducted}}{{/if}}</td>
-        <td>{{#if amountPaid}}{{amountPaid}}{{/if}}</td>
-        <td><span class="label label-{{#getClass transactionStatus}}{{/getClass}}">{{transactionStatus}}</span></td>
-      </tr>
-    {{/each}}
-</tbody>
-<tfoot>
-      <tr class=" table-bordered" style="border-right-width: 0px; border-left-width: 0px;" >
-        <th></th>
-        <th></th>
-        <th>Balance</th>
-        <th>{{userDetails.balance}}</th>
-      </tr>
-</tfoot>
-</table>
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="#">Home</a></li>
+                    <li class="active">Order</li>
+                </ol>
+            </div>
         </div>
-</div>
-</div>
 
-<hr>
+        <div class="row confirm">
+            <div class="col-md-12">
+                <h3 class="">Account Summary</h3>
+            </div>
+        </div>
+        <hr>
 
-{{#if userDetails.membershipExpiryDate}}
-<div class="row padd20-top-btm">
+
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="dl-horizontal">
+                    <dt>Enrollment Date</dt>
+                    <dd>{{userDetails.enrollmentDate}}</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="dl-horizontal">
+                    <dt>Membership Status</dt>
+                    <dd>{{#if userDetails.membershipStatus}}<span class="label label-success">Active</span>{{else}}<span class="label label-danger">Expired</span>{{/if}}<dd>
+                    </dl>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="dl-horizontal">
+                        <dt>Membership Expiry Date</dt>
+                        <dd>{{#if userDetails.membershipExpiryDate}}{{userDetails.membershipExpiryDate}}{{else}}Lifetime{{/if}}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="dl-horizontal">
+                            <dt>Deposit</dt>
+                            <dd>{{userDetails.deposit}}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Withdrawal</th>
+                                        <th>Deposit</th>
+                                        <th>Payment Status</th>
+                                        <th>Summary</th>
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                {{#each transactions}}
+                                    <tr>
+                                        <td>{{transactionDate}}</td>
+                                        <td>{{#if amountDeducted}}{{amountDeducted}}{{/if}}</td>
+                                            <td>{{#if amountPaid}}{{amountPaid}}{{/if}}</td>
+                                                <td><span class="label label-{{#getClass transactionStatus}}{{/getClass}}">{{transactionStatus}}</span></td>
+                                        <td>{{summary}}</td>
+                                                </tr>
+                                            {{/each}}
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class=" table-bordered" style="border-right-width: 0px; border-left-width: 0px;" >
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th>Balance</th>
+                                                    <th>{{userDetails.balance}}</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            {{#if userDetails.membershipExpiryDate}}
+                                <div class="row padd20-top-btm">
+                                    <div class="col-md-12 text-center">
+                                        <h2>Membership Plans</h2>
+                                    </div>
+                                </div>
+                            {{/if}}
+                            {{#if userDetails.membershipExpiryDate}}
+                                <div class="row">
+                                    {{#each membershipPlans}}
+                                        <div class="col-md-3 col-sm-6 col-xs-12 pricing-table">
+                                            <ul class="list-unstyled">
+                                                <li class="head"></li>
+                                                <li class="price">&#x20b9; {{amount}} <!-- <p>{{duration}}</p> --><p></p></li>
+                                                <li>With lifetime validity</li>
+                                                <li class="foot"><a href="/rechargeConfirmation?type=member&plan={{@index}}" class="btn btn-green btn-larges" >Recharge Account</a></li>
+                                            </ul>
+                                            <!-- </form> -->
+                                        </div>
+
+                                    {{/each}}
+                                </div>
+                            {{/if}}
+
+                            <!-- {{#each plans}}
+   <div class="row padd20-top-btm">
     <div class="col-md-12 text-center">
-		<h2>Membership Plans</h2>
-	</div>
-</div>
-{{/if}}
-{{#if userDetails.membershipExpiryDate}}
-<div class="row">
-{{#each membershipPlans}}
-<div class="col-md-3 col-sm-6 col-xs-12 pricing-table">
-<ul class="list-unstyled">
-<li class="head"></li>
-<li class="price">&#x20b9; {{amount}} <!-- <p>{{duration}}</p> --><p></p></li>
-<li>With lifetime validity</li>
-<li class="foot"><a href="/rechargeConfirmation?type=member&plan={{@index}}" class="btn btn-green btn-larges" >Recharge Account</a></li>
-</ul>
-<!-- </form> -->
-</div>
-
-{{/each}}
-</div>
-{{/if}}
-
-{{#each plans}}
-<div class="row padd20-top-btm">
-    <div class="col-md-12 text-center">
-		<h2>Basic Recharges</h2>
-	</div>
+        <h2>Basic Recharges</h2>
+    </div>
 </div>
 
 <div class="row">
 {{#each this}} 
-<div class="col-md-3 col-sm-6 col-xs-12 pricing-table">
-<!--<form method="post" action="/subscribePlan?type={{@../index}}&plan={{@index}}">-->
+   <div class="col-md-3 col-sm-6 col-xs-12 pricing-table">
 <ul class="list-unstyled">
 <li class="head"></li>
-<li class="price">&#x20b9; {{amount}} <!-- <p>{{duration}}</p> --><p></p></li>
-<!-- <li>Get {{points}} points to use</li> -->
+<li class="price">&#x20b9; {{amount}} <p></p></li>
 <li>Rent {{noOfToys}} Toy(s) at a time<p></p> with duration of {{rentDuration}} Days</li>
 {{!-- {{#if userDetail.deposit}} --}}
-{{!-- {{else}} --}}
+   {{!-- {{else}} --}}
  <li>With Deposit of &#x20b9; {{deposit}} <p></p></li>
 {{!--/if--}}
 <li class="foot"><a href="/rechargeConfirmation?type={{@../index}}&plan={{@index}}" class="btn btn-green btn-larges" >Recharge Account</a></li>
 </ul>
-<!-- </form> -->
 </div>
 {{/each}}
 </div>
 {{/each}}
-
-</div>
-</div>
+ -->
+                        </div>
+                    </div>

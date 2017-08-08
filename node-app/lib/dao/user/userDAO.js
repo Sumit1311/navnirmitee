@@ -336,3 +336,37 @@ UserDAO.prototype.getAllUsers = function() {
         })
 
 }
+
+UserDAO.prototype.transferFromDepositToBalance = function(userId , amount) {
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET deposit = deposit - $1, balance = balance + $1 WHERE _id = $2;",
+    [amount, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "transferFromDepositToBalance", error.stack, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+    
+
+
+}
+
+UserDAO.prototype.doTransfer = function(userId, from, to, amount) {
+    var query = "UPDATE "+tableName + " SET "+from + " =  " + from + " - $1, "+ to + " = "+to+" + $1 WHERE _id = $2";
+
+    var self = this;
+    return this.dbQuery(query,
+    [amount, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "transferFromDepositToBalance", error.stack, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+}

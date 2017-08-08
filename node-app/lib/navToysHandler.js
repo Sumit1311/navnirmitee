@@ -1,5 +1,6 @@
 var navToysDAO = require(process.cwd() + "/lib/dao/toys/navToysDAO.js"),
     navSkillsDAO = require(process.cwd() + "/lib/dao/skills/navSkillsDAO.js"),
+    navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     navSystemUtil = require(process.cwd() + "/lib/navSystemUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navLogicalException = require("node-exceptions").LogicalException,
@@ -88,8 +89,12 @@ module.exports = class navToysHandler {
                 imageCount = count;
                 return new navSkillsDAO().getSkillsForToy(toyId);
             })
-            .then(function(n_skills){
+            .then((n_skills) => {
                 toy[0].skills = n_skills
+                return new navRentalsDAO().getCountOfPendingOrders(toyId); 
+            })
+            .then(function(count){
+                toy[0].stock = toy[0].stock - parseInt(count);
                 return Q.resolve({
                     toyDetail : toy[0],
                     imageCount : imageCount

@@ -125,7 +125,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                     helpers : {
                         getClass : function(status) {
                             var lableClass;
-                            console.log(status);
+                            //console.log(status);
                             switch(status) {
                                 case navRentalsDAO.getStatus().DELIVERED:
                                     lableClass = "success";

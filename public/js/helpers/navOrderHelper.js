@@ -15,6 +15,9 @@ navOrderHelper.prototype.orderHandler=function(event, that){
     $("#_nav_order_button").prop('disabled', true);;
     var self = this;
     this.placeOrder(form)
+        .then((result) => {
+            $("#_nav_order_div").parent().parent().html(result);    
+        })
         .catch(function(error){
             if(typeof error == "string") {
                 self.showError(error);
@@ -28,7 +31,7 @@ navOrderHelper.prototype.orderHandler=function(event, that){
 navOrderHelper.prototype.placeOrder= function(form){
     var body = form.serialize();
     //console.log(body);
-    return navRequestHandler().doRequest(form.attr('action'), 'POST', body);
+    return navRequestHandler().doRequest(form.attr('action'), 'POST', body, "html");
 }
 
 navOrderHelper.prototype.showError = function(message) {

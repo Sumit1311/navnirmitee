@@ -2,13 +2,16 @@ var navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js")
     navTransactions = require(process.cwd() + "/lib/navTransactions.js"),
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
+    navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     Q = require('q'), 
+    moment = require('moment'), 
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
 
 module.exports = class navOrders {
-    constructor() {
+    constructor(client) {
+        this.client = client;
     }
 
     updateOrder(orderId, toyId, userId, updateFields) {
@@ -150,4 +153,53 @@ module.exports = class navOrders {
 
     }
 
+    getActiveOrders(userId) {
+            return new navRentalsDAO(this.client).getOrdersByUserId(userId);
+    } 
+
+    placeAnOrder(userDetail, toyDetail) {
+        var promises = [], self = this;
+        /*
+        for(var i = 0; i < transfers.length ; i++) {
+            promises.push(new navUserDAO(this.client).transferFromDepositToBalance(userDetail._id, transfers[i].amount));
+        }*/
+        return Q.allSettled(promises)
+            .then((results) => {
+                for(var i = 0; i < results.length; i++) {
+                    if(results[i].state == 'rejected') {
+                        return Q.reject(results[i].reason)
+                    }
+                }
+                return new navRentalsDAO(self.client).saveAnOrder(userDetail._id, toyDetail._id, userDetail.shippingAddress, new Date().getTime(), moment().add(toyDetail.rent_duration,'days').valueOf(), navRentalsDAO.getStatus().PENDING_GATEWAY, moment().add(navConfigParser.instance().getConfig("ReleaseInterval",30),'minutes').valueOf());
+
+            })
+            .catch((error) => {
+                navLogUtil.instance().log.call(self, self.placeAnOrder.name, "Error occured "+ error.stack, "error");
+                return Q.reject(error);
+            })
+
+    }
+    completeOrder(orderId, status) {
+        if(status === "success") {
+            return this.markSuccess(orderId); 
+        } else if(status === "failure") {
+            return new navRentalsDAO(this.client).updateStatus(orderId, navRentalsDAO.getStatus().FAILED, null);
+        }
+    }
+
+    markSuccess(orderId) {
+        const self = this;
+        return new navRentalsDAO(this.client).getOrderDetails(orderId)
+            .then((orders) => {
+                if(orders.length !== 0){
+                    var order = orders[0];
+                    if(order.release_date > navCommonUtil.getCurrentTime_S() ) {
+                        return new navRentalsDAO(self.client).updateStatus(orderId, navRentalsDAO.getStatus().PLACED, null);
+                    } else {
+                        return new navRentalsDAO(self.client).updateStatus(orderId, navRentalsDAO.getStatus().FAILED, null);
+                    }
+
+                }
+            })
+    }
 } 

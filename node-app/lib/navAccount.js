@@ -28,6 +28,10 @@ module.exports = class navAccount {
                 return userDAO.updateDeposit(transaction.user_id,transaction.amount_payable);
             case navPaymentsDAO.getReason().REGISTRATION:
                 return userDAO.updateMembershipExpiry(transaction.user_id, null);
+            case navPaymentsDAO.getReason().DEPOSIT_TRANSFER:
+                return userDAO.doTransfer(transaction.user_id, "deposit", "balance", transaction.amount_payable);
+            case navPaymentsDAO.getReason().BALANCE_TRANSFER:
+                return userDAO.doTransfer(transaction.user_id, "balance", "deposit", transaction.amount_payable);
             default :   
                 return userDAO.updateBalance(transaction.user_id,transaction.amount_payable);
         }
@@ -42,8 +46,12 @@ module.exports = class navAccount {
             case navPaymentsDAO.getReason().REGISTRATION:
                 //TODO : Add a proper logic here
                 return userDAO.updateMembershipExpiry(transaction.user_id, new Date().getTime());
+            case navPaymentsDAO.getReason().DEPOSIT_TRANSFER:
+                return userDAO.doTransfer(transaction.user_id, "balance", "deposit", transaction.amount_payable);
+            case navPaymentsDAO.getReason().BALANCE_TRANSFER:
+                return userDAO.doTransfer(transaction.user_id, "deposit", "balance", transaction.amount_payable);
             default :   
-                return userDAO.updateBalance(transaction.user_id,transaction.amount_payabe, true);
+                return userDAO.updateBalance(transaction.user_id,transaction.amount_payable, true);
         }
     }
 
@@ -96,6 +104,64 @@ module.exports = class navAccount {
         return Q.resolve({
             transactions : transactions,
             transactionId : transactionId
+        });
+    }
+
+    getTransactions(userDetail, toyDetail) {
+        var transactions = [], transfers = [];
+
+        var plans =  navMembershipParser.instance().getConfig("membership",[]);
+        var p = plans[0];
+        var bal = 0;
+
+        if(userDetail.deposit === null || userDetail.deposit < toyDetail.deposit) {
+            if(userDetail.balance !== null && userDetail.balance > toyDetail.deposit) {
+                userDetail.balance -= (toyDetail.deposit - userDetail.deposit);
+                transfers.push({
+                    reason : navPaymentsDAO.getReason().BALANCE_TRANSFER,
+                    amount : (toyDetail.deposit - userDetail.deposit),
+                    label : "Transfer Balance",
+                    from : "balance",
+                    to : "deposit"
+                });
+            } else {
+                transactions.push({
+                    reason : navPaymentsDAO.getReason().DEPOSIT,
+                    amount : userDetail.deposit === null ? toyDetail.deposit : toyDetail.deposit - userDetail.deposit,
+                    label : "Deposit"
+                });
+            }
+        } else {
+            bal = userDetail.deposit - toyDetail.deposit;
+            if(bal !== 0) {
+                transfers.push({
+                    reason : navPaymentsDAO.getReason().DEPOSIT_TRANSFER,
+                    amount : bal,
+                    label : "Transfer Deposit",
+                    from : "deposit",
+                    to : "balance"
+                });
+            }
+        }
+
+        if(userDetail.membership_expiry !== null && userDetail.membership_expiry < new navCommonUtil().getCurrentTime()) {
+            transactions.push({
+                reason : navPaymentsDAO.getReason().REGISTRATION,
+                amount : p.amount,
+                label : "Registration Fees"
+            });
+        }
+        if(userDetail.balance === null || (bal + userDetail.balance) < toyDetail.price) {
+            transactions.push({
+                reason : navPaymentsDAO.getReason().TOY_RENTAL,
+                amount : toyDetail.price - bal - userDetail.balance,
+                label : "Rental Amount"
+            });
+            
+        }
+        return Q.resolve({
+            transactions : transactions,
+            transfers : transfers
         });
     }
 
@@ -216,5 +282,6 @@ module.exports = class navAccount {
         navLogUtil.instance().log.call(self, self.rentToy.name, "Updating balance of user "+ userDetails.email_address +" to : " + ((userDetails.balance) - (toyDetails.price)) , "info");
         return new navUserDAO(this.client).updatePoints(userId, (userDetails.balance) - (toyDetails.price), membershipExpiry);
     }
+
 }
 
