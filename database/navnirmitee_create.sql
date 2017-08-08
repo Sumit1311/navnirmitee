@@ -22,6 +22,7 @@ CREATE TABLE  nav_user(
 	mobile_no varchar(15),
 	password text,
 	email_verification VARCHAR(36),
+	reset_password VARCHAR(36),
     subscribed_plan VARCHAR(10),
     points integer,
     balance integer,

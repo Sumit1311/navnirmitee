@@ -108,13 +108,22 @@ module.exports = class navAccount {
             return Q.resolve();
         })
     }
+    checkIfUserExistsWithoutExp(email) {
+        return new navUserDAO().getLoginDetails(email)
+        .then((user) => {
+            if(user.length !== 0) {
+                return true;
+            }
+            return false;
+        })
+    }
 
     registerUser(userDetails) {
         return new navUserDAO().insertRegistrationData(userDetails.email, userDetails.contactNo, new navPasswordUtil().encryptPassword(userDetails.password), userDetails.verificationCode);
     }
 
-    getDetailsForCode(code) {
-        return (new navUserDAO()).getUserDetailsByCode(code)
+    getDetailsForCode(code, isResetPassword) {
+        return (new navUserDAO()).getUserDetailsByCode(code, isResetPassword)
         .then(function(userDetails){
             if(userDetails.length === 0) {
                 return Q.reject(new navLogicalException("Invalid Code"));
@@ -215,6 +224,64 @@ module.exports = class navAccount {
         }
         navLogUtil.instance().log.call(self, self.rentToy.name, "Updating balance of user "+ userDetails.email_address +" to : " + ((userDetails.balance) - (toyDetails.price)) , "info");
         return new navUserDAO(this.client).updatePoints(userId, (userDetails.balance) - (toyDetails.price), membershipExpiry);
+    }
+
+    resetUserPassword(userDetail) {
+        return new navUserDAO().updateResetPassword(userDetail.email, userDetail.verificationCode);
+    }
+
+    completeResetPassword(code, userDetail) {
+        var self = this;
+        var userDAO = new navUserDAO(), user; 
+        return userDAO.getClient()
+            .then(function (_client) {
+            userDAO.providedClient = _client;
+            return userDAO.startTx();
+        })
+        .then(function () {
+            return userDAO.getUserDetailsByCode(code, true);
+        })
+        //todo : uncomment once email verification done and comment above then
+        .then(function (userDetails) {
+            if(userDetails.length === 0) {
+                return Q.reject(new navLogicalException());
+            }
+
+            user = userDetails[0];
+            if (user.reset_password == code) {
+                return userDAO.resetPassword(user._id, new navPasswordUtil().encryptPassword(userDetail.password));
+            } else {
+                return Q.reject(new navLogicalException());
+            }
+        })
+        .then(function () {
+            return userDAO.commitTx();
+        })
+        .then(() => {
+            return Q.resolve(user);
+        })
+        .catch(
+        function (error) {
+            //logg error
+            navLogUtil.instance().log.call(self,self.saveAdditionalDetails.name, 'Error while doing registration step 2' + error, "error");
+            return userDAO.rollBackTx()
+                .then(function () {
+                    return Q.reject(error);
+                    //res.status(500).send("Internal Server Error");
+                })
+                .catch(function (err) {
+                    //log error
+                    navLogUtil.instance().log.call(self,self.saveAdditionalDetails.name, 'Error while doing registration step 2' + err, "error");
+                    return Q.reject(err)
+                })
+        })
+        .finally(function () {
+            if (userDAO.providedClient) {
+                userDAO.providedClient.release();
+                userDAO.providedClient = undefined;
+            }
+        })
+    
     }
 }
 

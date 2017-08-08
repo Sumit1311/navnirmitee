@@ -29,7 +29,7 @@ module.exports = navDatabaseInitializer;
  */
 navDatabaseInitializer.prototype.init = function () {
     var self = this;
-    return this.dbQuery('CREATE TABLE IF NOT EXISTS nav_user( _id varchar(36) NOT NULL, first_name text, last_name text, email_address varchar(100), mobile_no varchar(15), password text, email_verification VARCHAR(36), subscribed_plan VARCHAR(10), points integer,balance integer DEFAULT 0, deposit integer DEFAULT 0, address text, city varchar(50), state varchar(30), membership_expiry bigint, enrollment_date bigint, pin_code VARCHAR(10), user_type smallint, CONSTRAINT nav_user_id_pk PRIMARY KEY (_id));')
+    return this.dbQuery('CREATE TABLE IF NOT EXISTS nav_user( _id varchar(36) NOT NULL, first_name text, last_name text, email_address varchar(100), mobile_no varchar(15), password text, email_verification VARCHAR(36), subscribed_plan VARCHAR(10), points integer,balance integer DEFAULT 0, deposit integer DEFAULT 0, address text, city varchar(50), state varchar(30), membership_expiry bigint, enrollment_date bigint, pin_code VARCHAR(10), user_type smallint, reset_password VARCHAR(36), CONSTRAINT nav_user_id_pk PRIMARY KEY (_id));')
         .then(function () {
             //create the root user who is super admin and have all the accesses by default
             var userDAO = new UserDAO();

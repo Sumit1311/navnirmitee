@@ -198,12 +198,12 @@ UserDAO.prototype.clearVerificationCode = function (_id) {
  * @param verifCode
  * @returns {*}
  */
-UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
+UserDAO.prototype.getUserDetailsByCode = function (verifCode, isResetPassword) {
     var self = this;
     navLogUtil.instance().log.call(this, "getUserDetailsByCode", "Get details for verification code : "+ verifCode , "debug");
-    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type" +
+    return this.dbQuery("SELECT _id,password," + (isResetPassword ? "reset_password, " :  " email_verification," )+"email_address,mobile_no,first_name,last_name,user_type" +
     " FROM " + tableName +
-    " WHERE email_verification=$1", [verifCode])
+    " WHERE "+ (isResetPassword ? "reset_password" : "email_verification") +"=$1", [verifCode])
         .then(function (result) {
             navLogUtil.instance().log.call(self, "getUserDetailsByCode", "Details for verification code : "+ verifCode, "debug");
             return result.rows;
@@ -335,4 +335,34 @@ UserDAO.prototype.getAllUsers = function() {
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         })
 
+}
+
+UserDAO.prototype.updateResetPassword = function(email, code) {
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET reset_password = $1 WHERE email_address = $2;",
+    [code, email])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "updateResetPassword", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+}
+
+UserDAO.prototype.resetPassword = function(userId, password) {
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET reset_password = $1, password=$2 WHERE _id = $3;",
+    [null, password, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "resetPassword", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
 }

@@ -16,8 +16,13 @@ module.exports = class navRegistration extends navBaseRouter {
         var self = this;
         this.router.post('/register', function(req,res, next) {self.doRegistration(req,res,next)});
         this.router.get('/verify', function(req,res, next) {self.doEmailVerification(req,res,next)}); 
+        this.router.get('/resetPassword', function(req,res, next) {self.getResetPasswordInfo(req,res,next)}); 
+        this.router.post('/resetPassword', function(req,res, next) {self.resetPassword(req,res,next)}); 
+        this.router.post('/reset', function(req,res, next) {self.doResetPassword(req,res,next)}); 
+        this.router.get('/reset', function(req,res, next) {self.getResetPassword(req,res,next)}); 
         this.router.post("/registrationDetails", function(req,res, next) {self.saveAdditionalDetails(req,res,next)});
         this.router.get("/registrationSuccess",this.getRegistrationSuccess.bind(this));
+        this.router.get("/resetPasswordSuccess",this.getResetPasswordSuccess.bind(this));
         return this;
     }
     doRegistration(req, res){
@@ -215,5 +220,191 @@ module.exports = class navRegistration extends navBaseRouter {
                     layout : 'nav_bar_layout',
                     isLoggedIn : req.user ? true : false,
                 });
+    }
+    getResetPasswordSuccess(req, res) {
+        res.render('resetPasswordSuccess',{
+            layout : 'nav_bar_layout',
+            isLoggedIn : req.user ? true : false,
+        });
+    }
+
+    getResetPasswordInfo(req, res) {
+        res.render('resetPasswordInfo',{
+            layout : 'nav_bar_layout',
+            isLoggedIn : req.user ? true : false,
+        });
+    }
+
+    resetPassword(req, res) {
+        var email = req.body.email;
+        var verificationCode;
+        var deferred = Q.defer(), self = this;
+        var respUtil =  new navResponseUtil();
+        deferred.promise
+            .done(function(){
+                respUtil.redirect(req, res, "/resetPassword");
+        },function(error){
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+            /*response = new navResponseUtil().generateErrorResponse(error);
+            res.status(response.status).render("errorDocument",{
+                errorResponse : response,
+                user : req.user,
+                isLoggedIn : false,
+                layout : 'nav_bar_layout',
+            });*/
+
+        })
+        req.assert("email","Email is Required").notEmpty();
+        req.assert("email","Valid Email Required").isEmail();
+
+        var validationErrors = req.validationErrors();
+        //console.log(validationErrors);
+        if(validationErrors) {
+            return deferred.reject(new navValidationException(validationErrors));
+        }
+        navLogUtil.instance().log.call(self, self.resetPassword.name, "Reset User Password : " + email, "info")
+
+        new navAccount().checkIfUserExistsWithoutExp(email)
+        .then(function(flag){
+            if(flag) {
+            var emailVer = new navEmailVerification();
+            verificationCode = emailVer.generateCode();
+            var base = new navCommonUtil().getBaseURL(req);
+            base.pathname = "/reset";
+            base.search = "?id=" + verificationCode;
+            var verificationLink = base.format();
+            navLogUtil.instance().log.call(self, self.resetPassword.name, "Reset Password link for user : " + email + " "+ verificationLink, "info");
+
+             //return userDAO.insertRegistrationData(email, contactNo, password,verificationCode);
+             //todo : uncomment when want to send verification email
+             return emailVer.sendResetPassword(email, null, verificationLink)
+            } else {
+                return Q.reject(new navLogicalException());
+            }
+
+        })
+        .then(function (response) {
+             navLogUtil.instance().log.call(self, self.resetPassword.name," Sent reset password email" + response, 'info');
+             return new navAccount().resetUserPassword({ 
+                 email :email, 
+                 verificationCode : verificationCode
+             });
+        })
+        .done(function(){
+             return deferred.resolve();
+        },
+        function (error) {
+             navLogUtil.instance().log.call(self, self.resetPassword.name,"Error Occured : " + error, 'error');
+             return deferred.reject(error);
+        });
+    
+    }
+
+    getResetPassword(req, res) {
+        var self = this;
+        var code = req.query.id;
+        var deferred = Q.defer();
+
+        deferred.promise
+            .done((user) => {
+                res.render('resetPasswordPage',{
+                    layout : "nav_bar_layout",
+                    isLoggedIn : false,
+                    user : user,
+                    verificationCode : user.reset_password
+                } );
+            },(error) => {
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+        
+            });
+        req.assert("id","Id is Required").notEmpty();
+        req.assert("id","Id not valid").isUUID();
+
+        var validationErrors = req.validationErrors();
+        if(validationErrors)
+        {
+            return deferred.reject(new navLogicalException());
+        }
+        (new navAccount()).getDetailsForCode(code, true)
+            .done(function (userDetails) {
+                deferred.resolve(userDetails);
+            }, (error) => {
+                navLogUtil.instance().log.call(self, self.getResetPassword.name, "Error Occured  Reason : " + error.stack, "error");
+                deferred.reject(error);
+            })
+         
+    }
+    doResetPassword(req, res) {
+        var self = this;
+        var body = req.body;
+        var code = req.query.code,
+            password = body.password,
+            passwordConf = body.passwordConf;
+
+        var deferred = Q.defer();
+        deferred.promise
+            .done(() => {
+                new navResponseUtil().redirect(req, res, "/resetPasswordSuccess");
+            },(error) => {
+                var respUtil =  new navResponseUtil();
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+
+                });
+
+            })
+        req.assert("code","Email is Required").notEmpty();
+        req.assert("code","Email is Required").isUUID();
+        req.assert("password","Password not provided").notEmpty();
+        req.assert("passwordConf","Password Confirmation necessary").notEmpty();
+
+
+        var validationErrors = req.validationErrors();
+        if(validationErrors)
+        {
+            return deferred.reject(new navValidationException(validationErrors));
+        }
+        if(password != passwordConf) {
+            return deferred.reject(new navLogicalException());
+        }
+        new navAccount().completeResetPassword(code, {
+            password : password,
+            passwordConf : passwordConf,
+        })
+            .done(() => {
+                /*req.logIn(user, err => {
+                    if (err) {
+                        return deferred.reject(err);
+                    }
+                    // Redirect to homepage
+                },(error) => {
+                    navLogUtil.instance().log.call(self,self.saveAdditionalDetails.name, 'Error while doing registration step 2' + error, "error");
+                    return deferred.reject(error);
+                });*/
+                    return deferred.resolve();
+            }, (error) => {
+                    navLogUtil.instance().log.call(self,self.doResetPassword.name, 'Error while doing registration step 2' + error, "error");
+                    return deferred.reject(error);
+            
+            })
     }
 }

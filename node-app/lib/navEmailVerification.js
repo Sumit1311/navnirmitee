@@ -20,6 +20,18 @@ module.exports = class navEmailVerification extends navEmailSender {
                }
         });
     }
+    sendResetPassword(to, user, resetPasswordLink) {
+        var self = this;
+        navLogUtil.instance().log.call(self,self.sendResetPassword.name, 'Sending reset password email to '+ to + 'with reset password link '+resetPasswordLink, "debug");
+
+        return this.sendMail(to, "Reset Password",{
+            template: "resetPasswordEmail",
+               context: {
+                   userName: user ? user : "",
+                   resetPasswordLink : resetPasswordLink
+               }
+        });
+    }
 
     generateCode() {
         return new navCommonUtil().generateUuid();

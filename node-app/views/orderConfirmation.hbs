@@ -1,0 +1,75 @@
+<!-- <div class="heads" style="background: url(img/img02.jpg) center center;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2><span>//</span> Order Confirmation</h2>
+            </div>
+        </div>
+    </div>
+</div> 
+
+<div class="page-content">
+    <div class="container"> -->
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="#">Home</a></li>
+                    <li class="active">Order</li>
+                </ol>
+            </div>
+        </div>
+
+        <form class="form-horizontal col-lg-offset-4 col-lg-4" role="form" action="/toys/confirmTransaction?ref={{orderId}}" method="post">
+        <div class="row confirm">
+            <div class="col-md-12 col-sm-12">
+                    <h3 class="text-center">Transfer Summary</h3>
+                    <hr>
+                    {{#each transfers}}
+                        <dl class="text-center">
+                            <dt class="">Trasnferring from {{from}} to {{to}} : </dt>
+                            <dd class="">&#x20b9; {{amount}}</dd>
+                        </dl>      
+                    {{/each}}
+                    <hr style="margin-top: 0px;">
+            </div>
+        <div class="row confirm">
+            <div class="col-md-12 col-sm-12">
+                {{#compare (length transactions) "!==" 0}}
+                    <h3 class="text-center">Transaction Summary</h3>
+                    <hr>
+                    {{#each transactions}}
+                        <dl class="dl-horizontal text-center">
+                            <dt class="">{{label}} : </dt>
+                            <dd class="">&#x20b9; {{amount}}</dd>
+                        </dl>      
+                    {{/each}}
+                    <hr style="margin-top: 0px;">
+                    <div class="form-group">
+                        <div class="text-center">
+                            <div class="radio col-md-6 col-lg-6 col-sm-6 col-xs-12">
+                                <label class="pull-right">
+                                    <input type="radio" name="paymentMethod" value="cash"  checked>
+
+                                        &nbsp; Cash On Delivery 
+                                    </label>
+                                </div>
+                                <div class="radio col-md-6 col-lg-6 col-sm-6 col-xs-12">
+                                    <label class="pull-left">
+                                        <input type="radio" name="paymentMethod"  value="paytm">
+                                        &nbsp;Pay By Paytm
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {{/compare}}
+                        <div class="text-center">
+
+                            <button style="" type="submit" class="btn btn-green">Confirm</button>
+                        </div>
+                    </div>
+            </div>
+
+        </div>
+                </form>
+<!--    </div>
+</div> -->
