@@ -55,4 +55,37 @@ module.exports = class navChildDAO extends BaseDAO{
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
         });
     }
+
+    getChildren(userId) {
+        var self = this;
+        
+        var queryString = "SELECT _id, age_group, gender, hobbies FROM  "+ tableName + " WHERE user_id = $1 ";
+        var params = [userId];
+        
+        return this.dbQuery(queryString, params)
+            .then(function (result) {
+                return result.rows;
+            })
+        .catch(function (error) {
+            navLogUtil.instance().log.call(self, self.getChildren.name, error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
+        });
+    }
+
+    updateChildDetail(childId, ageGroup, gender, hobbies) {
+        var self = this;
+        
+        var queryString = "UPDATE "+ tableName + " SET age_group = $1, gender = $2, hobbies = $3 WHERE _id = $4";
+        var params = [ageGroup, gender, hobbies,childId];
+        
+        return this.dbQuery(queryString, params)
+            .then(function (result) {
+                return result.rowCount;
+            })
+        .catch(function (error) {
+            navLogUtil.instance().log.call(self, self.getChildren.name, error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
+        });
+        
+    }
 }

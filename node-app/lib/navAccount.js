@@ -179,7 +179,7 @@ module.exports = class navAccount {
         .catch(
         function (error) {
             //logg error
-            navLogUtil.instance().log.call(self,self.saveAdditionalDetails.name, 'Error while doing registration step 2' + error, "error");
+            navLogUtil.instance().log.call(self,self.completeVerification.name, 'Error while doing registration step 2' + error, "error");
             return userDAO.rollBackTx()
                 .then(function () {
                     return Q.reject(error);
@@ -187,7 +187,7 @@ module.exports = class navAccount {
                 })
                 .catch(function (err) {
                     //log error
-                    navLogUtil.instance().log.call(self,self.saveAdditionalDetails.name, 'Error while doing registration step 2' + err, "error");
+                    navLogUtil.instance().log.call(self,self.completeVerification.name, 'Error while doing registration step 2' + err, "error");
                     return Q.reject(err)
                 })
         })
@@ -282,6 +282,69 @@ module.exports = class navAccount {
             }
         })
     
+    }
+
+    getChildDetails(userId) {
+        return new navChildDAO().getChildren(userId);
+    }
+
+    updateChildrenDetails(userId, children) {
+        var promises = [];
+        var self = this;
+        var cDAO = new navChildDAO();
+        return cDAO.getClient()
+            .then((client) => {
+                cDAO.providedClient = client;
+                return cDAO.startTx()
+            })
+            .then(() => {
+                for(var i = 0; i < children.length; i++) {
+                    promises.push(cDAO.updateChildDetail(children[i].childId, children[i].ageGroup, children[0].gender, children[i].hobbies));
+                }
+                return Q.allSettled(promises); 
+            })
+            .then((results) => {
+                for(var i = 0; i < results.length; i++) {
+                    if(results[i].state === 'rejected') {
+                        return Q.reject(results[i].reason);
+                    }
+                }
+
+                return cDAO.commitTx();
+            })
+            .catch(
+            
+        function (error) {
+            //logg error
+            navLogUtil.instance().log.call(self,self.updateChildrenDetails.name, 'Error while doing registration step 2' + error, "error");
+            return cDAO.rollBackTx()
+                .then(function () {
+                    return Q.reject(error);
+                    //res.status(500).send("Internal Server Error");
+                })
+                .catch(function (err) {
+                    //log error
+                    navLogUtil.instance().log.call(self,self.updateChildrenDetails.name, 'Error while doing registration step 2' + err, "error");
+                    return Q.reject(err)
+                })
+        })
+        .finally(function () {
+            if (cDAO.providedClient) {
+                cDAO.providedClient.release();
+                cDAO.providedClient = undefined;
+            }
+        })
+    
+       
+
+    }
+
+    updateAccountDetails(userId, userDetail) {
+        var p;
+        if(userDetail.password !== "") {
+            p = new navPasswordUtil().encryptPassword(userDetail.password);
+        }
+            return new navUserDAO().updateUserDetails(userId, userDetail.firstName, userDetail.lastName, userDetail.address, null, null, userDetail.pinCode, p);
     }
 }
 

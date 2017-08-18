@@ -152,18 +152,38 @@ UserDAO.prototype.insertRegistrationData = function (email, phone, password, ver
  * @param userType
  * @returns {*}
  */
-UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address, membershipExpiry, enrollmentDate, pinCode) {
+UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address, membershipExpiry, enrollmentDate, pinCode, password) {
     var self = this;
     navLogUtil.instance().log.call(this, "updateUserDetails", "Update user details for : "+ pkey , "debug");
-    return this.dbQuery("UPDATE " + tableName +
-    " SET " +
-    " first_name=$1," +
-    " last_name=$2," +
-    " address = $3," +
-    " membership_expiry = $4," +
-    " enrollment_date = $5," +
-    " pin_code = $7" +
-    " WHERE _id=$6", [ firstName, lastName, address, membershipExpiry, enrollmentDate, pkey, pinCode])
+    var queryString = "UPDATE " + tableName +
+            " SET " +
+            " first_name=$1," +
+            " last_name=$2," +
+            " address = $3," +
+            " pin_code = $4 ";
+    var params = [firstName, lastName, address,  pinCode]
+    var count = 5;
+    if(membershipExpiry) {
+        queryString += " ,membership_expiry = $" + count+" ";
+        count++;
+        params.push(membershipExpiry);
+    }
+
+    if(password) {
+        queryString += " ,password = $" + count+" ";
+        count++;
+        params.push(password); 
+    }
+    if(enrollmentDate) {
+        queryString += ", enrollment_date = $" +count + " ";
+        count++
+        params.push(enrollmentDate);
+    }
+
+    queryString += " WHERE _id=$"+count;
+    params.push(pkey);
+
+    return this.dbQuery(queryString, params)
         .catch(function (error) {
             navLogUtil.instance().log.call(self, "updateUserDetails", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
