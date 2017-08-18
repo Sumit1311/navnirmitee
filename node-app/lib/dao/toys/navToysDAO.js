@@ -1,5 +1,6 @@
 
 var BaseDAO = require(process.cwd() + "/lib/dao/base/baseDAO.js"),
+    navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     Q = require("q"),
     navDatabaseException = require(process.cwd()+'/lib/dao/exceptions/navDatabaseException.js'),
     navCommonUtils = require(process.cwd() + "/lib/navCommonUtil.js"),
@@ -177,7 +178,7 @@ navToysDAO.prototype.getToyDetailById = function (toyId) {
     var self = this;
     navLogUtil.instance().log.call(self, self.getToyDetailById.name, "Fetch toys details by id " + toyId, "debug");
 
-    return this.dbQuery("SELECT _id, name, stock , price, points , age_group , category , parent_toys_id, short_description, long_description, rent_duration, brand" +
+    return this.dbQuery("SELECT _id, name, stock , price, points , age_group , category , parent_toys_id, short_description, long_description, rent_duration, brand, deposit" +
             " FROM " + tableName + " WHERE _id = $1",[toyId])
         .then(function (result) {
 
@@ -191,7 +192,7 @@ navToysDAO.prototype.getToyDetailById = function (toyId) {
 
 navToysDAO.prototype.getAllRentalTransactions = function(userId) {
     var self = this;
-    return this.dbQuery("SELECT t.name, t.price, r.transaction_date, r.status FROM nav_toys t INNER JOIN nav_rentals r ON (t._id = r.toys_id) WHERE r.user_id = $1",[userId])
+    return this.dbQuery("SELECT t.name, t.price, r.transaction_date, r.status FROM nav_toys t INNER JOIN nav_rentals r ON (t._id = r.toys_id) WHERE r.user_id = $1 AND r.status = $2",[userId, navRentalsDAO.getStatus().CANCELLED])
         .then(function (result) {
             return result.rows;
         })

@@ -29,6 +29,11 @@ module.exports = class navMainRouter extends navBaseRouter {
                         this.ensureAuthenticated.bind(this), 
                         this.isSessionAvailable.bind(this), 
                         this.subscribePlan.bind(this));
+        this.router.get('/transactionDetails',this.ensureVerified.bind(this),this.ensureAuthenticated.bind(this),this.getTransactionDetails.bind(this) );
+        this.router.post('/process', this.ensureVerified.bind(this), 
+                        this.ensureAuthenticated.bind(this), 
+                        this.isSessionAvailable.bind(this), 
+                        this.processTransactions.bind(this));
         return this;
     }
 
@@ -230,6 +235,103 @@ module.exports = class navMainRouter extends navBaseRouter {
         
     }
 
+    processTransactions(req, res){
+        var deferred = Q.defer(), self = this;
+        var respUtil =  new navResponseUtil();
+        deferred.promise
+            .done(function(result){
+                if(result) {
+                    res.render(result.pageToRender, {data : result.context, redirectURL : result.redirectURL});
+                } else {
+                    respUtil.redirect(req, res, '/user/rechargeDetails');
+                }
+                //respUtil.redirect(req, res, "/");
+            },function(error){
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+        });
+
+        req.assert("type","type is required").notEmpty();
+        req.assert("plan","Plan is  Required").notEmpty();
+        //req.assert("type","Type is not a number").isInt();
+        req.assert("plan","Plan is not a number").isInt();
+        req.assert("paymentMethod","paymentMethod is required").notEmpty();
+
+        var validationErrors = req.validationErrors();
+        if(validationErrors) {
+            return deferred.reject(new navValidationException(validationErrors));
+        }
+        var type = req.query.type, plan = req.query.plan, paymentMethod = req.body.paymentMethod;
+
+        /*if(type == "member") {
+            plans =  navMembershipParser.instance().getConfig("membership",[]);
+        } else {
+            plans = navMembershipParser.instance().getConfig("plans",[])[type];
+        }
+
+        if(!plans || plans[plan] === undefined) {
+            return deferred.reject(new navLogicalException());
+        }
+        var p=plans[plan];
+        navLogUtil.instance().log.call(self, self.subscribePlan.name, "Plan details : " + p +", type : "+type, "info");*/
+
+        var user = req.user;
+        var uDAO = new navUserDAO();
+        var result;
+        uDAO.getClient()
+            .then((_client) => {
+                uDAO.providedClient = _client;
+                return uDAO.startTx();
+            })
+            .then(() => {
+                return new navAccount().getRechargeDetails(user, type, plan);
+            })
+            .then((transactions) => {
+                navLogUtil.instance().log.call(self, self.subscribePlan.name, "Initiating payment for TransactionId : "+ transactions.transactionId +", for User : "+user._id + ", with PaymentMethod : " + paymentMethod, "info");
+                return new navPayments(uDAO.providedClient).doPayments(transactions.transactionId, user._id, transactions.transactions, paymentMethod, new navCommonUtil().getBaseURL(req));
+            })
+            .then((_result) => {
+                result = _result;
+                return uDAO.commitTx();
+            })
+
+            .catch(function (error) {
+                //logg error
+                navLogUtil.instance().log.call(self, self.subscribePlan.name, "Error occured , Reason : "+error , "error");
+                return uDAO.rollBackTx()
+                .then(function () {
+                    return Q.reject(error);
+                    //res.status(500).send("Internal Server Error");
+                })
+                .catch(function (err) {
+                    //log error
+                    navLogUtil.instance().log.call(self, self.subscribePlan.name, "Error occured , Reason : "+err , "error");
+                    return Q.reject(err)
+                })
+            })
+            .finally(function () {
+                if (uDAO.providedClient) {
+                    uDAO.providedClient.release();
+                    uDAO.providedClient = undefined;
+                }
+            })
+            .done(() => {
+                return deferred.resolve(result);
+
+                //res.redirect("/login");
+            },(error) => {
+                navLogUtil.instance().log.call(self, self.subscribePlan.name, "Error occured , Reason : "+error.stack , "error");
+                return deferred.reject(error);
+            });
+
+        
+    }
     getRechargeConfirmation(req, res) {
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil();
@@ -276,6 +378,50 @@ module.exports = class navMainRouter extends navBaseRouter {
 
     }
 
+    getTransactionDetails(req, res) {
+        var deferred = Q.defer(), self = this;
+        var respUtil =  new navResponseUtil();
+        var type = req.query.type, plan = req.query.plan;
+        deferred.promise
+            .done(function(result){
+                res.render('rechargeConfirmation', {
+                    user : req.user,
+                    transactions : result.transactions,
+                    transfers : result.transfers,
+                    isLoggedIn : req.user ? true : false,
+                    layout : 'nav_bar_layout',
+                    helpers : {
+                        helper : helpers
+                    }
+                });
+            },function(error){
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+            
+                });
+        });
+        req.assert("type","Type is Required").notEmpty();
+        req.assert("plan","Plan is  Required").notEmpty();
+        //req.assert("type","Type is not a number").isInt();
+        req.assert("plan","Plan is not a number").isInt();
+
+        var validationErrors = req.validationErrors();
+        if(validationErrors) {
+            return deferred.reject(new navValidationException(validationErrors));
+        }
+        return new navAccount().getRechargeDetails(req.user, type, plan)
+            .done((result) => {
+                deferred.resolve(result.transactions);
+            },(error) => {
+                navLogUtil.instance().log.call(self, self.getRechargeConfirmation.name, "Error occured , Reason : "+error.stack , "error");
+                deferred.reject(error);
+            })
+
+    }
     /* subscribeMembership(req, res) {
         var deferred = Q.defer(), self = this;
         var respUtil =  new navResponseUtil(), result;

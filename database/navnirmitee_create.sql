@@ -59,6 +59,7 @@ CREATE TABLE  nav_toys(
     brand integer,
     category smallint,
 	parent_toys_id varchar(36),
+    deposit integer,
 	CONSTRAINT _id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
@@ -83,6 +84,7 @@ CREATE TABLE  nav_rentals(
     status VARCHAR(30),
     delivery_date bigint,
     returned_date bigint,
+    release_date bigint,
 	CONSTRAINT nav_rentals_id_pk PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
@@ -101,7 +103,8 @@ CREATE TABLE  nav_payments(
     transaction_date bigint,
     next_retry_date bigint,
     expiration_date bigint,
-    transaction_type VARCHAR(20)
+    is_order smallint,
+    transaction_type VARCHAR(20),
 	CONSTRAINT nav_payments_id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);

@@ -12,6 +12,7 @@ module.exports = class navTransactions {
     static createObject(context, type){
         if(type == TYPE.RENT) {
             var rentObj = {
+                _id : context._id,
                 dateMilis : parseInt(context.transaction_date),
                 transactionDate : new navCommonUtil().getDateString(parseInt(context.transaction_date)),
                 summary : "Rented Toy : "+context.name,
