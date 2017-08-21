@@ -54,7 +54,6 @@ module.exports = class navEmailSender {
         }
         var def = Q.defer();
         var mailOptions = {
-            from: 'sumittoshniwal92@gmail.com', // sender address
             to: to, // list of receivers
             subject: subject, // Subject line
             //text: htmlToText(htmlText), // plaintext body
