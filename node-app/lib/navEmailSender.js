@@ -21,7 +21,7 @@ module.exports = class navEmailSender {
                 debug:true
             });
         } else {
-            this.transporter = nodemailer.createTransport('smtps://postmaster%40sandboxc22cd49475a84fb084112d1ae7fc171e.mailgun.org:7d79211555e00c458bd6ca5bea33f527@smtp.mailgun.org');
+            this.transporter = nodemailer.createTransport(smtpServerURL);
         }
 
         this.transporter.use('compile', handleBars({
