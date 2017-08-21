@@ -1,0 +1,31 @@
+{
+    "DatabaseHost": "{{{DB_HOST}}}",
+    "DatabaseUser": "{{{DB_USER}}}",
+    "DatabasePassword": "{{{DB_PASS}}}",
+    "DatabaseName": "{{{DB_NAME}}}",
+    "DatabasePort": "{{{DB_PORT}}}",
+    "RedisServerURL": "{{{REDISCLOUD_URL}}}",
+    "ListeningPort": "{{{PORT}}}",
+    "HostName" : "{{{HOST_NAME}}}",
+    "PaymentGateway" : {
+        "Domain" : "https://pguat.paytm.com",
+            "MerchantID" : "Navnir15330216551133",
+            "MerchantKey" : "arT6cMm%V#qgIy#X",
+            "Website" : "WEB_STAGING",
+            "ChannelID" : "WEB",
+            "IndustryType" : "Retail",
+            "CallbackURLPath" : "/callback", 
+            "TransactionURLPath" : "/oltp-web/processTransaction",
+            "StatusAPIPath" : "/oltp/HANDLER_INTERNAL/getTxnStatus",
+            "RetryInterval" : 8, 
+            "ExpirationInterval" : 72 
+    },
+    "BackgroundProcessing" : {
+        "TransactionInterval" : 1000,
+        "OrderInterval" : 1000
+    },
+    "LogLevel" : {
+        "web-server" : "INFO"
+    }
+}
+
