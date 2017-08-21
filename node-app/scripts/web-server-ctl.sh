@@ -4,17 +4,20 @@ EXECUTABLE='node'
 SCRIPT='app.js'
 USER=`whoami`
 
-PIDFILE=$APP_DIR/navnirmitee.pid
-LOGFILE=$APP_DIR/navnirmitee.log
-DEBUG=0
-
-touch $PIDFILE
-touch $LOGFILE
 if [ $APP_DIR ]; then
+    echo "Using app root $APP_DIR"
+else
     APP_DIR='/home/geek/workspace/navnirmitee/node-app'
 fi
 
 
+PIDFILE=$APP_DIR/navnirmitee.pid
+LOGFILE=$APP_DIR/navnirmitee.log
+
+touch $PIDFILE
+touch $LOGFILE
+
+DEBUG=0
 
 start() {
     echo $(cat "$PIDFILE");
