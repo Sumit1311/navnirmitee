@@ -7,6 +7,7 @@
     "RedisServerURL": "{{{REDISCLOUD_URL}}}",
     "ListeningPort": "{{{PORT}}}",
     "HostName" : "{{{HOST_NAME}}}",
+    "SmtpURL" : "smtps://postmaster@ajab-gajab.com:4856b99f073478acc688acb838f87044@smtp.mailgun.org",
     "PaymentGateway" : {
         "Domain" : "https://pguat.paytm.com",
             "MerchantID" : "Navnir15330216551133",
