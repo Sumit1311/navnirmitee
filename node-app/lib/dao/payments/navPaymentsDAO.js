@@ -20,7 +20,7 @@ var STATUS = {
     PENDING : "PENDING",
     PENDING_COD : "CASH",
     COMPLETED : "COMPLETED",
-    COMPLETED_CASH : "COMPLETED",
+    COMPLETED_CASH : "COMPLETED_CASH",
     CANCELLED : "CANCELLED",
     FAILED : "FAILED",
     TRANSACTION_FAILED : "TXN_FAILED"
@@ -104,8 +104,8 @@ module.exports = class navPaymentsDAO extends BaseDAO{
 
     getAllPaymentTransactions(userId) {
         var self = this;
-        navLogUtil.instance().log.call(this, "getAllPaymentTransactions", " Fetching all Payment details for user : "+ userId + " except for reasons "+ this.REASON.DEPOSIT + this.REASON.REGISTRATION, "debug");
-        return this.dbQuery("SELECT reason, paid_date, amount_payable, status from " + tableName + " WHERE user_id = $1 AND reason != $2 AND reason != $3", [userId, this.REASON.DEPOSIT, this.REASON.REGISTRATION])
+        navLogUtil.instance().log.call(this, "getAllPaymentTransactions", " Fetching all Payment details for user : "+ userId + " except for reasons ", "debug");
+        return this.dbQuery("SELECT reason, paid_date, amount_payable, status from " + tableName + " WHERE user_id = $1", [userId])
             .then(function (result) {
                 navLogUtil.instance().log.call(self, "getAllPaymentTransactions", "No of transactions fetched : "+result.rowCount,"debug");
 

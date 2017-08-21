@@ -515,11 +515,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                 transactions = result.transactions;
                 transfers = result.transfers;
                 if(transfers.length === 0 && transactions.length === 0) {
-                    return new navOrders(client).completeOrder(orderId, "success")
-                        .then(() => {
-                            return new navToysHandler(client).getOnRent(toyDetail._id);
-                        })
-
+                    return new navOrders(client).completeOrder(orderId, "success");
                 }
                 if(transfers.length !== 0 ) {
                     return new navPayments(client).doPayments(orderId, user._id, transfers, "transfer", null, true, transactions.length > 0);

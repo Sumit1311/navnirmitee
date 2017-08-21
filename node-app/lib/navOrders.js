@@ -4,6 +4,7 @@ var navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js")
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
+    navAccount = require(process.cwd() + "/lib/navAccount.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     Q = require('q'), 
     moment = require('moment'), 
@@ -16,14 +17,16 @@ module.exports = class navOrders {
 
     updateOrder(orderId, toyId, userId, updateFields) {
         var self = this;
-        var rDAO = new navRentalsDAO(), toyDetail,  promise = Q.resolve();
-        if(!toyId || !userId) {
+        var rDAO = new navRentalsDAO(), toyDetail,  orderDetail;
+        var updateStatusFlag = true, rollbackFlag = false, returnFlag = false, validationFlag = true, deliveryFlag = false; 
+        /*if(!toyId || !userId) {
             promise = rDAO.getOrderDetails(orderId)
                 .then((orderDetails) => {
                     if(orderDetails.length === 0) {
                         return Q.reject(new navValidationException()) 
                     } else {
-                        if(orderDetails[0].status != navRentalsDAO.getStatus().PLACED) {
+                        //check if this condition needed at all
+                        if(orderDetails[0].status !== navRentalsDAO.getStatus().PLACED && orderDetails[0].status !== navRentalsDAO.getStatus().PENDING_GATEWAY) {
                            return Q.reject(new navValidationException()) 
                         }
                         toyId = orderDetails[0].toys_id;
@@ -31,18 +34,67 @@ module.exports = class navOrders {
                         return Q.resolve();
                     }
                 })
-        }
-        return promise
-            .then(() => {
-                return rDAO.getClient()
-            })
+        }*/
+        return rDAO.getClient()
             .then((_client) => {
                 rDAO.providedClient = _client;
                 return rDAO.startTx();
             })
             .then(() => {
-                if(updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED || updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
+                return rDAO.getOrderDetails(orderId)
 
+            })
+            .then((orderDetails) => {
+                if(orderDetails.length === 0) {
+                    return Q.reject(new navValidationException()) 
+                } else {
+                    //check if this condition needed at all (Cancellation is valid only when order is not delivered or returned)
+                    /*if(orderDetails[0].status !== navRentalsDAO.getStatus().PLACED && orderDetails[0].status !== navRentalsDAO.getStatus().PENDING_GATEWAY) {
+                        return Q.reject(new navValidationException()) 
+                    }*/
+                    toyId = orderDetails[0].toys_id;
+                    userId = orderDetails[0].user_id;
+                    orderDetail = orderDetails[0];
+                    return Q.resolve();
+                }
+            })
+            .then(() => {
+                //if existing status is same as current
+                if(orderDetail.status === updateFields.orderStatus) {
+                    //return Q.reject(new navValidationException("New status is same as existing status")); 
+                    updateStatusFlag = false;
+                }
+
+                if(updateFields.deliveryDate && updateFields.deliveryDate !== "") {
+                    deliveryFlag = true;
+                }
+               
+
+                if(updateFields.orderStatus === navRentalsDAO.getStatus().CANCELLED) {
+                    if(orderDetail.status === navRentalsDAO.getStatus().PLACED) {
+                        rollbackFlag = true;
+                    }
+                    else if(orderDetail.status === navRentalsDAO.getStatus().PENDING_GATEWAY) {
+                        updateFields.releaseDate = navCommonUtil.getCurrentTime_S(); 
+                    }
+                    else {
+                        validationFlag = false;
+                    }                    
+                }
+
+                if(updateFields.orderStatus === navRentalsDAO.getStatus().RETURNED) {
+                    if(orderDetail.status === navRentalsDAO.getStatus().DELIVERED || 
+                        orderDetail.status === navRentalsDAO.getStatus().DUE_RETURN) {
+                        returnFlag = true;
+                    } else {
+                        validationFlag = false;
+                    }
+                }
+
+                if(!validationFlag) {
+                        return Q.reject(new navValidationException()) 
+                }
+                if(rollbackFlag || returnFlag || deliveryFlag) {
                     return new navToysHandler(rDAO.providedClient).getToyDetail(toyId);
                 } else {
                     navLogUtil.instance().log.call(self, self.updateOrder.name, "No pending orders for "+userId+" for toy : "+toyId, "info");
@@ -50,48 +102,53 @@ module.exports = class navOrders {
                 }
             })
             .then((result) => {
-                    if(result && result.toyDetail && updateFields.orderStatus == navRentalsDAO.getStatus().CANCELLED) {
-                        toyDetail = result.toyDetail;
-                        navLogUtil.instance().log.call(self, self.updateOrder.name, "Updating balance of user "+userId+" for cancellation of order "+orderId, "info");
-                        return new navUserDAO(rDAO.providedClient).updateBalance(userId,  parseInt(toyDetail.price));
-                    } else {
-                        navLogUtil.instance().log.call(self, self.updateOrder.name, "No toy exists for "+toyId, "info");
-                        return Q.resolve();
-                    }
+                toyDetail = result ? result.toyDetail : {};
+                if(rollbackFlag) {
+                    navLogUtil.instance().log.call(self, self.updateOrder.name, "Updating balance of user "+userId+" for cancellation of order "+orderId, "info");
+                    return new navUserDAO(rDAO.providedClient).updateBalance(userId,  parseInt(toyDetail.price));
+                } else {
+                    navLogUtil.instance().log.call(self, self.updateOrder.name, "No toy exists for "+toyId, "info");
+                    return Q.resolve();
+                }
 
             })
             .then(() => {
-                if(toyDetail) {
+                if(rollbackFlag || returnFlag) {
                     return new navToysHandler(rDAO.providedClient).returnFromRent(toyDetail._id);
                 } else {
                     return Q.resolve();
                 }
             })
             .then(() => {
-                if(updateFields.orderStatus == navRentalsDAO.getStatus().RETURNED) {
-
+                if(returnFlag) {
                     navLogUtil.instance().log.call(self, self.updateOrder.name, `Marking order ${orderId} as returned`, "info");
                     updateFields.returnDate = navCommonUtil.getCurrentTime_S();
                 } else {
                     updateFields.returnDate = navCommonUtil.getTimeinMillis( updateFields.returnDate);
                 }
-                //if(updateFields.deliveryDate) {
-                return rDAO.updateRentalDetails(orderId, navCommonUtil.getTimeinMillis(updateFields.deliveryDate),updateFields.returnDate, navCommonUtil.getTimeinMillis(updateFields.leaseStartDate), navCommonUtil.getTimeinMillis(updateFields.leaseEndDate), updateFields.shippingAddress, updateFields.orderStatus);
-                /*} else {
-                   return rDAO.updateStatus(orderId, updateFields.orderStatus); 
-                }*/
+                if(deliveryFlag) {
+                    updateFields.leaseEndDate = moment(updateFields.deliveryDate).add(toyDetail.rent_duration, "days").valueOf()
+                } else {
+                     updateFields.leaseEndDate = null;
+                }
+                //Change this implementation
+                return rDAO.updateRentalDetails(orderId, navCommonUtil.getTimeinMillis(updateFields.deliveryDate),updateFields.returnDate, navCommonUtil.getTimeinMillis(updateFields.leaseStartDate), updateFields.leaseEndDate, updateFields.shippingAddress, updateFields.orderStatus, updateFields.releaseDate);
             })
             .then(() => {
                 return rDAO.commitTx();
             })
             .catch((error) => {
-                return rDAO.rollBackTx()
-                    .then(() => {
-                        return Q.reject(error);
-                    })
-                    .catch((err) => {
-                        return Q.reject(err);
-                    })
+                if(rDAO.providedClient) {
+                    return rDAO.rollBackTx()
+                        .then(() => {
+                            return Q.reject(error);
+                        })
+                        .catch((err) => {
+                            return Q.reject(err);
+                        })
+                } else {
+                    return Q.reject(error);
+                }
             })
             .finally(() => {
                 if(rDAO.providedClient) {
@@ -170,7 +227,7 @@ module.exports = class navOrders {
                         return Q.reject(results[i].reason)
                     }
                 }
-                return new navRentalsDAO(self.client).saveAnOrder(userDetail._id, toyDetail._id, userDetail.shippingAddress, new Date().getTime(), moment().add(toyDetail.rent_duration,'days').valueOf(), navRentalsDAO.getStatus().PENDING_GATEWAY, moment().add(navConfigParser.instance().getConfig("ReleaseInterval",30),'minutes').valueOf());
+                return new navRentalsDAO(self.client).saveAnOrder(userDetail._id, toyDetail._id, userDetail.shippingAddress, new Date().getTime(), navRentalsDAO.getStatus().PENDING_GATEWAY, moment().add(navConfigParser.instance().getConfig("ReleaseInterval",30),'minutes').valueOf());
 
             })
             .catch((error) => {
@@ -180,8 +237,9 @@ module.exports = class navOrders {
 
     }
     completeOrder(orderId, status) {
+        const self = this;
         if(status === "success") {
-            return this.markSuccess(orderId); 
+            return self.markSuccess(orderId); 
         } else if(status === "failure") {
             return new navRentalsDAO(this.client).updateStatus(orderId, navRentalsDAO.getStatus().FAILED, null);
         }
@@ -189,17 +247,81 @@ module.exports = class navOrders {
 
     markSuccess(orderId) {
         const self = this;
-        return new navRentalsDAO(this.client).getOrderDetails(orderId)
+
+        var order, walletDetail, toyDetail;
+
+        return new navRentalsDAO(self.client).getOrderDetails(orderId)
             .then((orders) => {
                 if(orders.length !== 0){
-                    var order = orders[0];
+                    order = orders[0];
                     if(order.release_date > navCommonUtil.getCurrentTime_S() ) {
-                        return new navRentalsDAO(self.client).updateStatus(orderId, navRentalsDAO.getStatus().PLACED, null);
+                        return new navRentalsDAO(self.client).updateStatus(orderId, navRentalsDAO.getStatus().PLACED, navCommonUtil.getCurrentTime_S());
                     } else {
-                        return new navRentalsDAO(self.client).updateStatus(orderId, navRentalsDAO.getStatus().FAILED, null);
+                        return new navRentalsDAO(self.client).updateStatus(orderId, navRentalsDAO.getStatus().FAILED, navCommonUtil.getCurrentTime_S());
                     }
 
                 }
             })
+            .then(() => {
+                return new navToysHandler(self.client).getToyDetail(order.toys_id);
+            })
+            .then((result) => {
+                toyDetail = result.toyDetail;
+                /*if(toyDetails.price > userDetails.balance) {
+                    return Q.reject(new navNoBalanceException());
+                }*/
+                /*if(toyDetail.stock === 0) {
+                    return Q.reject(new navNoStockException());
+                }*/
+                return new navToysHandler(self.client).getOnRent(order.toys_id);
+            })
+            .then(() => {
+                return new navAccount(self.client).getWalletDetails(order.user_id);
+            })
+            .then((walletDetails) => {
+                if(walletDetails.length === 0) {
+                    return Q.reject(new Error("Wallet details not found"));
+                }
+                walletDetail = walletDetails[0];
+                return new navAccount(self.client).rentToy(order.user_id, walletDetail, toyDetail);
+            })
+            .catch((error) => {
+                navLogUtil.instance().log.call(self, self.markSuccess.name, "Error " + error.stack, "error");
+                return Q.reject(error);
+            })
     }
+
+
 } 
+
+/*function checkValidityOfUpdate(newStatus, oldStatus) {
+    if(newStatus === oldStatus) {
+        //no need to do anything
+    }
+    if(newStatus === navRentalsDAO.getStatus().CANCELLED) {
+        if(oldStatus === navRentalsDAO.getStatus().PLACED) {
+            //rollback the toys stock and balance 
+        }
+            
+        else if(oldStatus === navRentalsDAO.getStatus().PENDING_GATEWAY) {
+            //no rollback only status update
+        }
+
+        else {
+            //error validation
+        }
+    }
+
+    if(newStatus === navRentalsDAO.getStatus().RETURNED) {
+        //update return date and update toy stock
+    }
+
+}*/
+
+/* Order Status State Diagram : 
+ *        -----> F        -----------------  
+ *      |                |                 |
+ *      PG ----> P ----> D ----> DR -----> R
+ *      |        |
+ *        -----> C
+ */

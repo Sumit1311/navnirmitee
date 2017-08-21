@@ -19,13 +19,14 @@ module.exports = class navConfigParser {
                     this.config = JSON.parse(configString);
                     setMandatoryConfig.call(this);
                 } catch(e){
+                    console.log(e);
                     this.config = getDefaultConfig();
                 }
             }
     }
    
     getConfig(key, defaultValue) {
-        if(this.config[key] === undefined) {
+        if(this.config[key] === undefined || this.config[key] === '') {
             return defaultValue;
         }
         return this.config[key];
@@ -47,7 +48,7 @@ function getDefaultConfig() {
         DatabaseUser: process.env.DB_USER || "admin",
         DatabasePassword: process.env.DB_PASS || "admin",
         DatabaseName: process.env.DB_NAME || "navnirmitee",
-        DatabasePort: process.env.DB_PORT || "5433",
+        DatabasePort: process.env.DB_PORT || "5432",
         RedisServerURL: process.env.REDISCLOUD_URL,
         ListeningPort : process.env.PORT,
         HostName : process.env.HOST_NAME || "localhost",

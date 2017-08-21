@@ -13,9 +13,9 @@ module.exports = class navChildDAO extends BaseDAO{
     }
     insertChildDetails(userId, ageGroup, hobbies, gender) {
         var self = this;
-        if(!ageGroup && !hobbies && !gender) {
+        /*if(!ageGroup && !hobbies && !gender) {
             return Q.resolve(0);
-        }
+        }*/
         
         var queryString1 = "INSERT INTO "+ tableName + " (_id, user_id ";
         var query2 = " VALUES($1, $2 ";

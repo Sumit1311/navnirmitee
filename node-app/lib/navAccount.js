@@ -1,7 +1,6 @@
 var navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navChildDAO = require(process.cwd() + '/lib/dao/child/navChildDAO.js'),
-    moment = require('moment'),
     navLogicalException = require("node-exceptions").LogicalException,
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
@@ -112,14 +111,14 @@ module.exports = class navAccount {
 
         var plans =  navMembershipParser.instance().getConfig("membership",[]);
         var p = plans[0];
-        var bal = 0;
+        var bal = 0, userBalance = userDetail.balance === null ? 0 : userDetail.balance, userDeposit = userDetail.deposit === null ? 0 : userDetail.deposit;
 
-        if(userDetail.deposit === null || userDetail.deposit < toyDetail.deposit) {
-            if(userDetail.balance !== null && userDetail.balance > toyDetail.deposit) {
-                userDetail.balance -= (toyDetail.deposit - userDetail.deposit);
+        if(userDeposit < toyDetail.deposit) {
+            if(userBalance > toyDetail.deposit) {
+                userBalance -= (toyDetail.deposit - userDeposit);
                 transfers.push({
                     reason : navPaymentsDAO.getReason().BALANCE_TRANSFER,
-                    amount : (toyDetail.deposit - userDetail.deposit),
+                    amount : (toyDetail.deposit - userDeposit),
                     label : "Transfer Balance",
                     from : "balance",
                     to : "deposit"
@@ -127,12 +126,12 @@ module.exports = class navAccount {
             } else {
                 transactions.push({
                     reason : navPaymentsDAO.getReason().DEPOSIT,
-                    amount : userDetail.deposit === null ? toyDetail.deposit : toyDetail.deposit - userDetail.deposit,
+                    amount : userDeposit === 0 ? toyDetail.deposit : toyDetail.deposit - userDeposit,
                     label : "Deposit"
                 });
             }
         } else {
-            bal = userDetail.deposit - toyDetail.deposit;
+            bal = userDeposit - toyDetail.deposit;
             if(bal !== 0) {
                 transfers.push({
                     reason : navPaymentsDAO.getReason().DEPOSIT_TRANSFER,
@@ -151,14 +150,16 @@ module.exports = class navAccount {
                 label : "Registration Fees"
             });
         }
-        if(userDetail.balance === null || (bal + userDetail.balance) < toyDetail.price) {
+        if((bal + userBalance) < toyDetail.price) {
             transactions.push({
                 reason : navPaymentsDAO.getReason().TOY_RENTAL,
-                amount : toyDetail.price - bal - userDetail.balance,
+                amount : toyDetail.price - bal - userBalance,
                 label : "Rental Amount"
             });
             
         }
+        userDetail.balance = userBalance;
+        userDetail.deposit = userDeposit;
         return Q.resolve({
             transactions : transactions,
             transfers : transfers
@@ -231,7 +232,8 @@ module.exports = class navAccount {
         })
         .then(function () {
             var time = new navCommonUtil().getCurrentTime();
-            return userDAO.updateUserDetails(user._id, additionalDetails.firstName, additionalDetails.lastName, additionalDetails.address, moment().add(30, "days").valueOf(), time, additionalDetails.pinCode);
+            //enable whenever want to enable membership
+            return userDAO.updateUserDetails(user._id, additionalDetails.firstName, additionalDetails.lastName, additionalDetails.address, null/*moment().add(30, "days").valueOf()*/, time, additionalDetails.pinCode);
         })
         .then(function () {
             return new navChildDAO().insertChildDetails(user._id, additionalDetails.ageGroup, additionalDetails.hobbies, additionalDetails.gender);
@@ -288,8 +290,8 @@ module.exports = class navAccount {
         if(userDetails.membership_expiry !== null) {
             membershipExpiry = new navCommonUtil().getCurrentTime();
         }
-        navLogUtil.instance().log.call(self, self.rentToy.name, "Updating balance of user "+ userDetails.email_address +" to : " + ((userDetails.balance) - (toyDetails.price)) , "info");
-        return new navUserDAO(this.client).updatePoints(userId, (userDetails.balance) - (toyDetails.price), membershipExpiry);
+        navLogUtil.instance().log.call(self, self.rentToy.name, "Updating balance of user "+ userId +" to : " + ((userDetails.balance) - (toyDetails.price)) , "info");
+        return new navUserDAO(this.client).updatePoints(userId, toyDetails.price, true, membershipExpiry);
     }
 
     resetUserPassword(userDetail) {

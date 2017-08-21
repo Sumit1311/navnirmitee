@@ -8,7 +8,6 @@ var navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.j
     moment = require('moment'),
     navPGCommunicator = require(process.cwd() + "/lib/navPGCommunicator.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
-    navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js");
 
 module.exports = class navPayments{
@@ -26,7 +25,7 @@ module.exports = class navPayments{
         }
         return promise
             .then(() => {
-                navLogUtil.instance().log.call(self, self.updatePayment.name, "Marking membership as expired as transaction is cancelled" , "debug");
+                //navLogUtil.instance().log.call(self, self.updatePayment.name, "Marking membership as expired as transaction is cancelled" , "debug");
                 return new navPaymentsDAO().updatePaymentById(paymentId, fields.paymentStatus, navCommonUtil.getTimeinMillis(fields.retryDate),navCommonUtil.getTimeinMillis(fields.expirationDate));
             })
         .catch((error) => {
@@ -36,7 +35,7 @@ module.exports = class navPayments{
     }
 
     success(transactionId, code, status, message, isCash) {
-        var p = new navPaymentsDAO(), self = this, promise, isOrder, toyId;
+        var p = new navPaymentsDAO(), self = this, promise, isOrder, userId;
         if(this.client) {
             promise = Q.resolve(this.client);
         } else {
@@ -66,7 +65,7 @@ module.exports = class navPayments{
                 promises.push(new navAccount(p.providedClient).transactionSuccess(transactions[i]));
             }
             isOrder = transactions[0].is_order;
-            toyId = transactions[0].toys_id;
+            userId = transactions[0].user_id;
             return Q.allSettled(promises);
 
         })
@@ -87,49 +86,47 @@ module.exports = class navPayments{
         })
         .then((result) => {
             if(result && isOrder) {
-                return new navOrders(self.client).completeOrder(transactionId, "success")
-                    .then(() => {
-                        return new navToysHandler(self.client).getOnRent(toyId);
-                    })
+                return new navOrders(p.providedClient).completeOrder(transactionId, "success")
             } else {
                 return Q.resolve();
             }
         })
         .then(() => {
-                
-                if(self.client) {
-                    return Q.resolve();
-                } else {
-                    return p.commitTx();
-                }
+            if(self.client) {
+                return Q.resolve();
+            } else {
+                return p.commitTx();
+            }
         })
         .catch(function (error) {
             //logg error
+            var promise;
             if(self.client) {
-                return Q.reject(error);
+                promise = Q.resolve();
+            } else {
+                promise = p.rollBackTx();
             }
-            return p.rollBackTx()
-            .then(function() {
-                return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().TRANSACTION_FAILED, null, null, null); 
-            })
-            .then(function () {
-                navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + error, "error");
-                return Q.reject(error);
-                //res.status(500).send("Internal Server Error");
-            })
-            .catch(function (err) {
-                navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + err, "error");
-                //log error
-                return Q.reject(err)
-            });
+            return promise 
+                .then(() => {
+                    return self.failure(transactionId, error.code, error.message, error.status);
+                })
+                .then(function () {
+                    navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + error, "error");
+                    return Q.reject(error);
+                    //res.status(500).send("Internal Server Error");
+                })
+                .catch(function (err) {
+                    navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + err, "error");
+                    //log error
+                    return Q.reject(err)
+                });
         })
         .finally(function () {
-            if(self.client) {
-                return ;
-            }
-            if (p.providedClient) {
-                p.providedClient.release();
-                p.providedClient = undefined;
+            if(!self.client) {
+                if (p.providedClient) {
+                    p.providedClient.release();
+                    p.providedClient = undefined;
+                }
             }
         })
 
@@ -152,52 +149,49 @@ module.exports = class navPayments{
                     return p.startTx();
                 }
             })
-        .then(() => {
-            return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().FAILED, new Date().getTime());
-        })
-        .then(() => {
+            .then(() => {
+                return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().FAILED, new Date().getTime());
+            })
+            .then(() => {
                 return new navOrders(self.client).completeOrder(transactionId, "failure")
-        })
-        .then(() => {
-                
+            })
+            .then(() => {
+
                 if(self.client) {
                     return Q.resolve();
                 } else {
                     return p.commitTx();
                 }
-        })
+            })
             .then(() => {
                 return Q.reject(new navPaymentFailureException());
             })
-        .catch(function (error) {
-            //logg error
-            if(self.client) {
-                return Q.reject(error);
-            }
-            return p.rollBackTx()
-            .then(function() {
-                return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().TRANSACTION_FAILED, null, null, null); 
+            .catch(function (error) {
+                //logg error
+                if(self.client) {
+                    return Q.reject(error);
+                }
+                return p.rollBackTx()
+                    .then(function () {
+                        navLogUtil.instance().log.call(self, self.failure.name,'Error while doing payment' + error, "error");
+                        return Q.reject(error);
+                        //res.status(500).send("Internal Server Error");
+                    })
+                    .catch(function (err) {
+                        navLogUtil.instance().log.call(self, self.failure.name,'Error while doing payment' + err, "error");
+                        //log error
+                        return Q.reject(err);
+                    });
             })
-            .then(function () {
-                navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + error, "error");
-                return Q.reject(error);
-                //res.status(500).send("Internal Server Error");
+            .finally(function () {
+                if(self.client) {
+                    return ;
+                }
+                if (p.providedClient) {
+                    p.providedClient.release();
+                    p.providedClient = undefined;
+                }
             })
-            .catch(function (err) {
-                navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + err, "error");
-                //log error
-                return Q.reject(err)
-            });
-        })
-        .finally(function () {
-            if(self.client) {
-                return ;
-            }
-            if (p.providedClient) {
-                p.providedClient.release();
-                p.providedClient = undefined;
-            }
-        })
     }
     partialSuccess(transactionId, code, status, message) {
         const self = this;

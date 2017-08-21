@@ -47,7 +47,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                         enrollmentDate : new navCommonUtil().getDateString(parseInt(userDetails.enrollment_date)),
                         membershipExpiryDate : userDetails.membership_expiry !== null ? new navCommonUtil().getDateString(parseInt(userDetails.membership_expiry)) : false,
                         deposit : userDetails.deposit,
-                        balance : userDetails.balance,
+                        balance : userDetails.balance === null ? 0 : userDetails.balance,
                         membershipStatus :   (userDetails.membership_expiry === null ? true : ( parseInt(userDetails.membership_expiry) > new navCommonUtil().getCurrentTime()) ? true : false),
                     },
                     transactions : transactions,
@@ -149,6 +149,13 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                                     break;
                             }
                             return lableClass;
+                        },
+                        disableCancel : function(status, options) {
+                            if(status === "PLACED" || status === "PENDING_GATEWAY") {
+                                return options.inverse(this);
+                            }
+                            return options.fn(this);
+
                         }
                     }
 
