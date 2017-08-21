@@ -20,20 +20,24 @@ var STATUS = {
     PENDING : "PENDING",
     PENDING_COD : "CASH",
     COMPLETED : "COMPLETED",
-    COMPLETED_CASH : "COMPLETED",
+    COMPLETED_CASH : "COMPLETED_CASH",
     CANCELLED : "CANCELLED",
     FAILED : "FAILED",
     TRANSACTION_FAILED : "TXN_FAILED"
 }
-var REASON = {
+var REASON = { 
+    DEPOSIT_TRANSFER : "DEPOSIT_TRANSFER",
+    BALANCE_TRANSFER : "BALANCE_TRANSFER",
     DEPOSIT : "DEPOSIT",
     REGISTRATION :"REGISTRATION_FEES",
+    TOY_RENTAL :"TOY_RENTAL",
     PLANS : []
 };
 
 var TRANSACTION_TYPE = {
     PAYTM : "Paytm",
-    CASH :"Cash on Deliver"
+    CASH :"Cash on Deliver",
+    TRANSFER :"Transfer"
 }
 
 var plans = navMembershipParser.instance().getConfig('plans');
@@ -70,12 +74,12 @@ module.exports = class navPaymentsDAO extends BaseDAO{
     static getReason(){
         return REASON;
     }
-    insertPaymentDetails(userId, amount, reason, paymentStatus, orderId, transactionStatus) {
+    insertPaymentDetails(userId, amount, reason, paymentStatus, orderId, transactionStatus, isOrder) {
         var self = this;
-        var queryString1 = "INSERT INTO "+ tableName + " (_id, user_id,amount_payable, reason, credit_date, status, transaction_id, transaction_type"; 
-        var query2 = " VALUES($1, $2, $3, $4, $5, $6, $7, $8";
-        var params = [new navCommonUtil().generateUuid(), userId, amount, reason, new Date().getTime(), paymentStatus, orderId, transactionStatus];
-        var count = 8;
+        var queryString1 = "INSERT INTO "+ tableName + " (_id, user_id,amount_payable, reason, credit_date, status, transaction_id, transaction_type, is_order"; 
+        var query2 = " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9";
+        var params = [new navCommonUtil().generateUuid(), userId, amount, reason, new Date().getTime(), paymentStatus, orderId, transactionStatus, isOrder ? 1 : 0];
+        var count = 9;
         if(paymentStatus == STATUS.PENDING) {
             queryString1 += ", next_retry_date, expiration_date"
                 query2 += ", $" + (++count);
@@ -100,8 +104,8 @@ module.exports = class navPaymentsDAO extends BaseDAO{
 
     getAllPaymentTransactions(userId) {
         var self = this;
-        navLogUtil.instance().log.call(this, "getAllPaymentTransactions", " Fetching all Payment details for user : "+ userId + " except for reasons "+ this.REASON.DEPOSIT + this.REASON.REGISTRATION, "debug");
-        return this.dbQuery("SELECT reason, paid_date, amount_payable, status from " + tableName + " WHERE user_id = $1 AND reason != $2 AND reason != $3", [userId, this.REASON.DEPOSIT, this.REASON.REGISTRATION])
+        navLogUtil.instance().log.call(this, "getAllPaymentTransactions", " Fetching all Payment details for user : "+ userId + " except for reasons ", "debug");
+        return this.dbQuery("SELECT reason, paid_date, amount_payable, status from " + tableName + " WHERE user_id = $1", [userId])
             .then(function (result) {
                 navLogUtil.instance().log.call(self, "getAllPaymentTransactions", "No of transactions fetched : "+result.rowCount,"debug");
 
@@ -146,7 +150,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
     getPaymentsByTransactionId(orderId) {        
         var self = this;
         navLogUtil.instance().log.call(this, "getPaymentsByTransactionId", " Fetching payments for orderId "+ orderId , "debug");
-        return this.dbQuery("SELECT reason, amount_payable, user_id from " + tableName + " WHERE transaction_id = $1 AND (status != $2 OR status != $3)", [orderId, this.STATUS.PENDING, this.STATUS.COMPLETED])
+        return this.dbQuery("SELECT reason, amount_payable, user_id,is_order from " + tableName + " WHERE transaction_id = $1 AND (status != $2 OR status != $3)", [orderId, this.STATUS.PENDING, this.STATUS.COMPLETED])
             .then(function (result) {
                 navLogUtil.instance().log.call(self, "getPaymentsByTransactionId", " No of payments for orderId "+ orderId + " are " + result.rowCount, "debug");
                 return result.rows;

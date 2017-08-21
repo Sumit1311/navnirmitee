@@ -62,6 +62,23 @@ module.exports = class navBaseRouter {
             });
         }
     }
+    ensurePassword(req, res, next) {
+        var self = this;
+        if (req.user === undefined || (req.user && req.user.reset_password === null)  ) {
+            return next();
+        }
+        navLogUtil.instance().log.call(self, self.ensurePassword.name, "User has not reset password", "debug");
+
+        // Redirect if not authenticated
+        if(req.xhr) {
+            new navResponseUtil.redirect(req, res, "/"); 
+        } else {
+            res.render('completeResetPassword',{
+                isLoggedIn : true,
+                layout : 'nav_bar_layout'
+            });
+        }
+    }
     isSessionAvailable(req, res, next) {
         var userDetails = req.user, self = this;
         if (userDetails && userDetails._id) {

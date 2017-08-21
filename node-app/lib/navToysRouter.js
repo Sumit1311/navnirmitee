@@ -2,13 +2,11 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navAccount = require(process.cwd() + "/lib/navAccount.js"),
     navOrders = require(process.cwd() + "/lib/navOrders.js"),
+    navPayments = require(process.cwd() + "/lib/navPayments.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     navValidationException = require(process.cwd() + "/lib/exceptions/navValidationException.js"),
-    navMembershipExpirationException =  require(process.cwd() + "/lib/exceptions/navMembershipExpirationException.js"),
     navLogicalException = require("node-exceptions").LogicalException,
-    navNoSubScriptionException = require(process.cwd() + "/lib/exceptions/navNoSubscriptionException.js"),
-    navNoBalanceException = require(process.cwd() + "/lib/exceptions/navNoBalanceException.js"),
     navNoStockException = require(process.cwd() + "/lib/exceptions/navNoStockException.js"),
     navPendingReturnException = require(process.cwd() + "/lib/exceptions/navPendingReturnException.js"),
     repeatHelper = require('handlebars-helper-repeat'),
@@ -17,8 +15,7 @@ var navBaseRouter = require(process.cwd() + '/lib/navBaseRouter.js'),
     navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js"),
     navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
     Q = require('q'),
-    querystring = require("querystring"),
-    moment = require('moment');
+    querystring = require("querystring");
 
 module.exports = class navToysRouter extends navBaseRouter {
     constructor() {
@@ -34,6 +31,10 @@ module.exports = class navToysRouter extends navBaseRouter {
         this.router.get('/orderPlaced', function(req,res,next){self.getOrderPlaced(req,res,next)});
         this.router.post('/placeOrder',(req, res, next) => {self.placeOrder(req,res,next)});
         this.router.post('/cancelOrder',(req, res, next) => {self.cancelOrder(req,res,next)});
+        this.router.post('/confirmTransaction', this.ensureVerified.bind(this), 
+                        this.ensureAuthenticated.bind(this), 
+                        this.isSessionAvailable.bind(this), 
+                        this.processTransactions.bind(this));
         return this;
     }
     getToysDetails(req, res) {
@@ -58,7 +59,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                     imageCount : result.imageCount,
                     helpers : {
                         repeat : repeatHelper,
-                    helper : helpers
+                        helper : helpers
                     }
                 });
             },(error) => {
@@ -136,9 +137,29 @@ module.exports = class navToysRouter extends navBaseRouter {
         var id = req.query.id;
         var deferred = Q.defer();
         var respUtil =  new navResponseUtil();
+        var transactions, transfers, orderId;
+        
         deferred.promise
             .done(() => {
-                respUtil.redirect(req, res, '/toys/orderPlaced');
+                if(transfers.length == 0 && transactions.length == 0) {
+                    res.render('orderPlaced',{
+                        user : req.user,
+                        isLoggedIn : req.user ? true : false,
+                        layout : 'nav_bar_layout'
+                    });
+
+                } else {
+                    res.render('orderConfirmation', {
+                        orderId : orderId,
+                        transfers : transfers,
+                        transactions : transactions,
+                        helpers : {
+                            repeat : repeatHelper,
+                            helper : helpers
+                        }
+                    });
+                }
+                //respUtil.redirect(req, res, '/toys/orderPlaced');
             },(error) => {
                 var response = respUtil.generateErrorResponse(error);
                 respUtil.renderErrorPage(req, res, {
@@ -162,8 +183,7 @@ module.exports = class navToysRouter extends navBaseRouter {
             return deferred.reject(new navValidationException(validationErrors));
         }
         var rDAO = new navRentalsDAO();
-        var userDetails, toyDetails;
-        //debugger;
+        var userDetails, toyDetails;         //debugger;
         rDAO.getClient()
             .then(function(client){
                 rDAO.providedClient = client;
@@ -175,14 +195,14 @@ module.exports = class navToysRouter extends navBaseRouter {
         })
         .then((_userDetails) => {
             userDetails = _userDetails[0];
-            if(userDetails.deposit === null) {
+            /*if(userDetails.deposit === null) {
                 return Q.reject(new navNoSubScriptionException());
             }
             if(userDetails.membership_expiry !== null && userDetails.membership_expiry < new navCommonUtil().getCurrentTime()) {
                 return Q.reject(new navMembershipExpirationException());
-            }
-            return rDAO.getOrdersByUserId(user._id);
+            }*/
             //TODO : check what to do with the order where lease date is ended but toy is not delivered
+            return new navOrders(rDAO.providedClient).getActiveOrders(user._id);
         })
         .then((_orders) => {
             if(_orders.length !== 0 && _orders[0].lease_end_date >= navCommonUtil.getCurrentTime_S()) {
@@ -193,36 +213,48 @@ module.exports = class navToysRouter extends navBaseRouter {
         .then((result) => {
             if(result) {
                 toyDetails = result.toyDetail;
-                if(toyDetails.price > userDetails.balance) {
+                /*if(toyDetails.price > userDetails.balance) {
                     return Q.reject(new navNoBalanceException());
-                }
+                }*/
                 if(toyDetails.stock === 0) {
                     return Q.reject(new navNoStockException());
-                
                 }
-                //var splittedPlan = userDetails.subscribed_plan.split('::');
-                //console.log(userDetails.subscribed_plan);
-                //var plan = navMembershipParser.instance().getConfig("plans",[])[splittedPlan[0]][splittedPlan[1]];
-                return rDAO.saveAnOrder(req.user._id, id, req.body.shippingAddress, new Date().getTime(), moment().add(toyDetails.rent_duration,'days').valueOf(), rDAO.STATUS.PLACED);
+                return new navAccount().getTransactions(userDetails, toyDetails);
             } else {
                 navLogUtil.instance().log.call(self, self.placeOrder.name, "No toys found for " + id , "warn");
                 return Q.resolve();
             }
         })
-        .then(function(){
-            if(toyDetails) {
-                return new navAccount(rDAO.providedClient).rentToy(user._id, userDetails, toyDetails)
+        .then((result) => {
+            if(result) {
+                transactions = result.transactions;
+                transfers = result.transfers;
+                user.shippingAddress = req.body.shippingAddress;
+                return new navOrders(rDAO.providedClient).placeAnOrder(user, toyDetails, transfers);
             } else {
                 return Q.resolve();
             }
+        
+        })
+        .then(function(result){
+            if(result.rowCount > 0) {
+                orderId = result.orderId;
+            }
+            /*if(toyDetails && transactions.length === 0) {
+                return new navAccount(rDAO.providedClient).rentToy(user._id, userDetails, toyDetails)
+            } else {
+                return Q.resolve(result);
+            }*/
+            return Q.resolve();
         })
         .then(function() {
-            if(toyDetails) {
+            /*if(toyDetails) {
                 navLogUtil.instance().log.call(self, self.placeOrder.name, "Updating stock of toy : "+id , "info");
                 return new navToysHandler(rDAO.providedClient).getOnRent(toyDetails._id);
             } else {
                 return Q.resolve();
-            }
+            }*/
+            return Q.resolve();
         })
         .then(function(){
             return rDAO.commitTx();
@@ -246,18 +278,13 @@ module.exports = class navToysRouter extends navBaseRouter {
                 rDAO.providedClient = undefined;
             }
         })
-        .done(() => {
-            deferred.resolve();
-        },(error) => {
+        .done(function(){
+            deferred.resolve(); 
+        }, (error) => {
             deferred.reject(error);
-        });
+        })
     }
-    getOrderPlaced(req,res) {
-        res.render('orderPlaced',{
-            user : req.user,
-            isLoggedIn : req.user ? true : false,
-            layout : 'nav_bar_layout'
-        });
+    getOrderPlaced() {
     }    
     getSearchPage(req, res) {
         var self = this;
@@ -427,5 +454,114 @@ module.exports = class navToysRouter extends navBaseRouter {
                 navLogUtil.instance().log.call(self, self.cancelOrder.name, "Error occured Details : " + error.stack, "error");
                 deferred.reject(error);
              })
+    }
+    processTransactions(req, res) {
+        var self = this;
+        var orderId = req.query.ref, paymentMethod = req.body.paymentMethod;
+        var deferred = Q.defer();
+        var respUtil =  new navResponseUtil();
+        deferred.promise
+            .done((result) => {
+                if(result) {
+                    res.render(result.pageToRender, {data : result.context, redirectURL : result.redirectURL});
+                } else {
+                    respUtil.redirect(req, res, '/user/orderDetails');
+                }
+            },(error) => {
+                var response = respUtil.generateErrorResponse(error);
+                respUtil.renderErrorPage(req, res, {
+                    errorResponse : response,
+                    user : req.user,
+                    isLoggedIn : false,
+                    layout : 'nav_bar_layout',
+
+                });
+                /*response = new navResponseUtil().generateErrorResponse(error);
+                  res.status(response.status).render("errorDocument",{
+                  errorResponse : response,
+                  user : req.user,
+                  isLoggedIn : false,
+                  layout : 'nav_bar_layout',
+                  });*/
+
+            })
+        req.assert("ref"," Bad Request").notEmpty();
+        req.assert("ref","Bad Request").isUUID();
+        //req.assert("paymentMethod"," Bad Request").notEmpty();
+        
+        var client, user = req.user, orderDetail, toyDetail, transactions, transfers, r;
+        var uDAO = new navUserDAO()
+        uDAO.getClient()
+            .then((_client) => {
+                client = _client;
+                uDAO.providedClient = client;
+                return uDAO.startTx();
+            })
+            .then(() => {
+                return new navOrders(client).getActiveOrders(user._id);
+            })
+            .then((orderDetails) => {
+                if(orderDetails.length == 0) {
+                    return Q.reject(new Error("No active order exists"))
+                }
+                orderDetail = orderDetails[0];
+                return new navToysHandler(client).getToyDetail(orderDetail.toys_id);
+            })
+            .then((result) => {
+                toyDetail = result.toyDetail;
+                return new navAccount(client).getTransactions(user, toyDetail);
+            })
+            .then((result) => {
+                transactions = result.transactions;
+                transfers = result.transfers;
+                if(transfers.length === 0 && transactions.length === 0) {
+                    return new navOrders(client).completeOrder(orderId, "success");
+                }
+                if(transfers.length !== 0 ) {
+                    return new navPayments(client).doPayments(orderId, user._id, transfers, "transfer", null, true, transactions.length > 0);
+                } else {
+                    return Q.resolve();
+                }
+            })
+            .then(() => {
+                if(transactions.length !== 0) {
+                    return new navPayments(client).doPayments(orderId, user._id, transactions, paymentMethod, navCommonUtil.getBaseURL_S(req), true)
+                } else {
+                    return Q.resolve();
+                }
+
+            })
+            .then((_result) => {
+                r = _result;
+                return uDAO.commitTx();
+            }) 
+            .then(() => {
+                return Q.resolve(r);
+            })
+            .catch((error) => {
+                
+                return uDAO.rollBackTx()
+                    .then(function () {
+                        navLogUtil.instance().log.call(self, self.processTransactions.name, "Error occured Details : " + error.stack, "error");
+                        return Q.reject(error);
+                    })
+                    .catch(function (err) {
+                        navLogUtil.instance().log.call(self, self.processTransactions.name, "Error occured while rollbacking : " + err.stack, "error");
+                        //log error
+                        return Q.reject(err);
+                    })
+            })
+            .finally(function () {
+                if (uDAO.providedClient) {
+                    uDAO.providedClient.release();
+                    uDAO.providedClient = undefined;
+                }
+            })
+            .done((r) => {
+                deferred.resolve(r);
+            },(error) => {
+                deferred.reject(error);
+            })
+
     }
 }

@@ -45,7 +45,7 @@ UserDAO.prototype.getLoginDetails = function (loginName) {
     var self = this;
     navLogUtil.instance().log.call(this, "getLoginDetails", "Getting information for "+loginName, "info");
 
-    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type, deposit, address" +
+    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type, deposit, address, balance" +
     " FROM " + tableName + " WHERE email_address=$1", [loginName])
         .then(function (result) {
             navLogUtil.instance().log.call(self, "getLoginDetails", "Login Details for "+ loginName + "with id ", "debug");
@@ -152,18 +152,38 @@ UserDAO.prototype.insertRegistrationData = function (email, phone, password, ver
  * @param userType
  * @returns {*}
  */
-UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address, membershipExpiry, enrollmentDate, pinCode) {
+UserDAO.prototype.updateUserDetails = function (pkey, firstName, lastName, address, membershipExpiry, enrollmentDate, pinCode, password) {
     var self = this;
     navLogUtil.instance().log.call(this, "updateUserDetails", "Update user details for : "+ pkey , "debug");
-    return this.dbQuery("UPDATE " + tableName +
-    " SET " +
-    " first_name=$1," +
-    " last_name=$2," +
-    " address = $3," +
-    " membership_expiry = $4," +
-    " enrollment_date = $5," +
-    " pin_code = $7" +
-    " WHERE _id=$6", [ firstName, lastName, address, membershipExpiry, enrollmentDate, pkey, pinCode])
+    var queryString = "UPDATE " + tableName +
+            " SET " +
+            " first_name=$1," +
+            " last_name=$2," +
+            " address = $3," +
+            " pin_code = $4 ";
+    var params = [firstName, lastName, address,  pinCode]
+    var count = 5;
+    if(membershipExpiry) {
+        queryString += " ,membership_expiry = $" + count+" ";
+        count++;
+        params.push(membershipExpiry);
+    }
+
+    if(password) {
+        queryString += " ,password = $" + count+" ";
+        count++;
+        params.push(password); 
+    }
+    if(enrollmentDate) {
+        queryString += ", enrollment_date = $" +count + " ";
+        count++
+        params.push(enrollmentDate);
+    }
+
+    queryString += " WHERE _id=$"+count;
+    params.push(pkey);
+
+    return this.dbQuery(queryString, params)
         .catch(function (error) {
             navLogUtil.instance().log.call(self, "updateUserDetails", error.message, "error");
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
@@ -198,12 +218,12 @@ UserDAO.prototype.clearVerificationCode = function (_id) {
  * @param verifCode
  * @returns {*}
  */
-UserDAO.prototype.getUserDetailsByCode = function (verifCode) {
+UserDAO.prototype.getUserDetailsByCode = function (verifCode, isResetPassword) {
     var self = this;
     navLogUtil.instance().log.call(this, "getUserDetailsByCode", "Get details for verification code : "+ verifCode , "debug");
-    return this.dbQuery("SELECT _id,password,email_verification,email_address,mobile_no,first_name,last_name,user_type" +
+    return this.dbQuery("SELECT _id,password," + (isResetPassword ? "reset_password, " :  " email_verification," )+"email_address,mobile_no,first_name,last_name,user_type" +
     " FROM " + tableName +
-    " WHERE email_verification=$1", [verifCode])
+    " WHERE "+ (isResetPassword ? "reset_password" : "email_verification") +"=$1", [verifCode])
         .then(function (result) {
             navLogUtil.instance().log.call(self, "getUserDetailsByCode", "Details for verification code : "+ verifCode, "debug");
             return result.rows;
@@ -247,10 +267,10 @@ UserDAO.prototype.getUserDetails = function(userId) {
         })
 
 }
-UserDAO.prototype.updatePoints = function (userId, points, membershipExpiry){
+UserDAO.prototype.updatePoints = function (userId, points, decrement, membershipExpiry){
     var i = 1;
     var query = "UPDATE " + tableName +
-        " SET balance = $" + i;
+        " SET balance = balance "+ (decrement ? " - " : " + ") +"$" + i;
     i++;
     var params = [points];
     if(membershipExpiry) {
@@ -335,4 +355,67 @@ UserDAO.prototype.getAllUsers = function() {
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
         })
 
+}
+
+UserDAO.prototype.updateResetPassword = function(email, code) {
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET reset_password = $1 WHERE email_address = $2;",
+    [code, email])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "updateResetPassword", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+}
+
+UserDAO.prototype.resetPassword = function(userId, password) {
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET reset_password = $1, password=$2 WHERE _id = $3;",
+    [null, password, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "resetPassword", error.message, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+}
+UserDAO.prototype.transferFromDepositToBalance = function(userId , amount) {
+    var self = this;
+    return this.dbQuery("UPDATE " + tableName + 
+    " SET deposit = deposit - $1, balance = balance + $1 WHERE _id = $2;",
+    [amount, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "transferFromDepositToBalance", error.stack, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
+    
+
+
+}
+
+UserDAO.prototype.doTransfer = function(userId, from, to, amount) {
+    var query = "UPDATE "+tableName + " SET "+from + " =  " + from + " - $1, "+ to + " = "+to+" + $1 WHERE _id = $2";
+
+    var self = this;
+    return this.dbQuery(query,
+    [amount, userId])
+        .then(function (result) {
+            return result.rowCount;
+        })
+        .catch(function (error) {
+            new navLogUtil().log.call(self, "doTransfer", error.stack, "error");
+            return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBUSER", navDatabaseException));
+
+        });
 }

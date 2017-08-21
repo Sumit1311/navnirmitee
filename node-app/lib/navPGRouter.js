@@ -92,22 +92,27 @@ module.exports = class navPGRouter extends navBaseRouter {
                 if(result.isSuccess && !result.isPartial) {
                     return new navPayments().success(result.orderId, result.gatewayCode, result.gatewayStatus, result.gatewayMessage)
                        .then(() =>{
-                            deferred.resolve(false);
+                            return Q.resolve(false);
                        })
                 } else if(result.isSuccess && result.isPartial) {
                     return new navPayments().partialSuccess(result.orderId, result.gatewayCode, result.gatewayStatus, result.gatewayMessage)
                        .then(() =>{
-                            deferred.resolve(true);
+                            return Q.resolve(true);
                        })
                 } else {
                     return new navPayments().failure(result.orderId, result.gatewayCode, result.gatewayStatus, result.gatewayMessage)
                        .then(() =>{
-                            deferred.reject(result);
+                            return Q.reject(result);
                        })
                 }
             
             })
             .catch((error) => {
+                return Q.reject(error);
+            })
+            .done((r) => {
+                deferred.resolve(r);
+            }, (error) => {
                 deferred.reject(error);
             })
             /*navLogUtil.instance().log.call(self, self.callback.name, "Initial Payment successful for transaction Id :"+intResponse.orderId, "info");

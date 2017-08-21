@@ -6,11 +6,13 @@ var navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     util = require("util");
 
 var STATUS = {
+        PENDING_GATEWAY : "PENDING_GATEWAY",
         DELIVERED : "DELIVERED",
         RETURNED : "RETURNED",
         PLACED : "PLACED",
         CANCELLED : "CANCELLED",
-        DUE_RETURN : "DUE_RETURN"
+        DUE_RETURN : "DUE_RETURN",
+        FAILED : "FAILED"
     };
 
 
@@ -29,14 +31,20 @@ module.exports = navRentalsDAO;
 //private variables
 var tableName = "nav_rentals";
 
-navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, startDate, endDate, status) {
+navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, startDate, status,releaseDate) {
     var self = this;
+    var orderId = new navCommonUtils().generateUuid();
     navLogUtil.instance().log.call(self, self.saveAnOrder.name, "Save order for user "+ userId+" for toy "+toyId, "debug")            
-   return this.dbQuery("INSERT INTO "+tableName+" (_id, user_id,toys_id,shipping_address,lease_start_date, lease_end_date, status, transaction_date) VALUES($1,$2,$3,$4,$5,$6, $7, $8)",
-           [new navCommonUtils().generateUuid(), userId, toyId, shippingAddress, startDate, endDate, status, startDate])
+   return this.dbQuery("INSERT INTO "+tableName+" (_id, user_id,toys_id,shipping_address,lease_start_date, status, transaction_date, release_date) VALUES($1,$2,$3,$4,$5,$6, $7, $8)",
+           [orderId, userId, toyId, shippingAddress, startDate, status, startDate, releaseDate])
       .then(function(result){
           navLogUtil.instance().log.call(self, self.saveAnOrder.name, "Save order for user "+userId+" Count :" +result.rowCount, "debug");
-         return result.rowCount;
+         return {
+             rowCount : result.rowCount,
+
+             orderId : orderId 
+         };
+
       })
       .catch(function(error){
             navLogUtil.instance().log.call(self, "saveAnOrder",  error.message, "error" );
@@ -47,7 +55,7 @@ navRentalsDAO.prototype.saveAnOrder=function(userId, toyId, shippingAddress, sta
 navRentalsDAO.prototype.getOrdersByUserId = function (userId) {
     var self = this;
     navLogUtil.instance().log.call(self, self.getOrdersByUserId.name, "Fetch only active orders for user "+ userId, "debug")            
-    return this.dbQuery("SELECT _id, lease_end_date FROM "+ tableName + " WHERE user_id = $1 AND (status != $2 AND status != $3 AND status != $4)",[userId, this.STATUS.CANCELLED, this.STATUS.RETURNED, this.STATUS.DUE_RETURN])
+    return this.dbQuery("SELECT _id, lease_end_date,toys_id FROM "+ tableName + " WHERE user_id = $1 AND (status NOT IN ($2, $3, $4, $5))",[userId, this.STATUS.CANCELLED, this.STATUS.RETURNED, this.STATUS.DUE_RETURN, this.STATUS.FAILED])
       .then(function(result){
           navLogUtil.instance().log.call(self, self.getOrdersByUserId.name, "Fetched " + result.rowCount+" orders for user "+ userId, "debug");
          return result.rows;
@@ -106,13 +114,19 @@ navRentalsDAO.prototype.getOrdersCount = function() {
       });
 
 }
-navRentalsDAO.prototype.updateRentalDetails = function(orderId, deliveryDate, returnDate, leaseStartDate, leaseEndDate, shippingAddress, orderStatus) {
+navRentalsDAO.prototype.updateRentalDetails = function(orderId, deliveryDate, returnDate, leaseStartDate, leaseEndDate, shippingAddress, orderStatus, releaseDate) {
     var self = this;
     var query = "UPDATE "+tableName+" SET delivery_date = $1, returned_date = $2, lease_start_date = $3, lease_end_date = $4, shipping_address = $5 ", params = [deliveryDate, returnDate, leaseStartDate, leaseEndDate, shippingAddress], count = 5;
     if(orderStatus) {
-    count++
+        count++
         query+=", status = $"+count;
         params.push(orderStatus);
+    }
+    if(releaseDate) {
+        count++
+        query+=", release_date = $"+count;
+        params.push(releaseDate);
+    
     }
     count++;
     query += " WHERE _id = $"+count;
@@ -130,10 +144,15 @@ navRentalsDAO.prototype.updateRentalDetails = function(orderId, deliveryDate, re
 
 }
 
-navRentalsDAO.prototype.updateStatus = function (orderId, status) {
+navRentalsDAO.prototype.updateStatus = function (orderId, status, releaseDate) {
     var self = this;
     var query = "UPDATE "+tableName+" SET status = $1 ", params = [status], count = 1;
     count++;
+    if(releaseDate){
+        query += ",release_date = $"+count;
+        params.push(releaseDate);
+        count++;
+    }
     query += " WHERE _id = $"+count;
     params.push(orderId);
     return this.dbQuery(query, params)
@@ -151,7 +170,7 @@ navRentalsDAO.prototype.updateStatus = function (orderId, status) {
 navRentalsDAO.prototype.getOrderDetails = function(orderId) {
     var self = this;
     navLogUtil.instance().log.call(self, self.getOrderDetails.name, "Fetching details for "+orderId , "debug");
-    return this.dbQuery("select user_id, toys_id, status FROM "+tableName+" WHERE _id=$1",[orderId])
+    return this.dbQuery("select user_id, toys_id, status, release_date FROM "+tableName+" WHERE _id=$1",[orderId])
       .then(function(result){
          return result.rows;
       })
@@ -177,4 +196,16 @@ navRentalsDAO.prototype.markOrdersForReturn =function() {
             navLogUtil.instance().log.call(self, self.markOrdersForReturn,  error.message, "error" );
             return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
       });
+}
+
+navRentalsDAO.prototype.getCountOfPendingOrders = function(toyId) {
+   var self = this;
+    return self.dbQuery("select count(_id) FROM "+tableName + " WHERE toys_id=$1 AND release_date > $2",[toyId, navCommonUtils.getCurrentTime_S()])
+        .then(function(result) {
+            return result.rows[0].count;
+        })
+        .catch((error) => {
+            navLogUtil.instance().log.call(self, self.getPendingOrders.name, "Error occured " + error.stack, "error");
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBRENTAL", navDatabaseException));
+        })
 }

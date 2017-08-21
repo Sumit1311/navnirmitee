@@ -3,13 +3,18 @@
 EXECUTABLE='node'
 SCRIPT='app.js'
 USER=`whoami`
-APP_DIR='/home/geek/workspace/navnirmitee/node-app'
 
 PIDFILE=$APP_DIR/navnirmitee.pid
 LOGFILE=$APP_DIR/navnirmitee.log
+DEBUG=0
 
 touch $PIDFILE
 touch $LOGFILE
+if [ $APP_DIR ]; then
+    APP_DIR='/home/geek/workspace/navnirmitee/node-app'
+fi
+
+
 
 start() {
     echo $(cat "$PIDFILE");
@@ -19,14 +24,20 @@ start() {
     fi
     echo 'Starting service…' >&2
     #local CMD="$EXECUTABLE $SCRIPT > \"$LOGFILE\" 2>&1 & echo \$!"
-    local CMD="$EXECUTABLE $SCRIPT > \"$LOGFILE\" 2>&1"
-    echo $CMD
-    #su -c "$CMD" $USER > "$PIDFILE"
-    $CMD &
-    echo $! > "$PIDFILE"
-    echo "disown"
-    disown
-    echo 'Service started' >&2
+    if [ $DEBUG -eq 1 ]; then 
+        local CMD="$EXECUTABLE debug $SCRIPT > \"$LOGFILE\" 2>&1";
+        $CMD 
+        echo $! > "$PIDFILE"
+    else
+        local CMD="$EXECUTABLE $SCRIPT > \"$LOGFILE\" 2>&1"
+        echo $CMD
+        #su -c "$CMD" $USER > "$PIDFILE"
+        $CMD &
+        echo $! > "$PIDFILE"
+        echo "disown"
+        disown
+        echo 'Service started' >&2
+    fi
 }
 
 stop() {
@@ -39,17 +50,38 @@ stop() {
     echo 'Service stopped' >&2
 }
 
-case "$1" in
-    start)
-        start
-        ;;
-    stop)
-        stop
-        ;;
-    restart)
-        stop
-        start
-        ;;
-    *)
-        echo "Usage: $0 {start|stop|restart|uninstall}"
-esac
+
+
+if [ "$1" = "--debug" ]; then 
+    DEBUG=1
+    case "$2" in
+        start)
+            start
+            ;;
+        stop)
+            stop
+            ;;
+        restart)
+            stop
+            start
+            ;;
+        *)
+            echo "Usage: $0 {start|stop|restart|uninstall}"
+    esac
+else
+
+    case "$1" in
+        start)
+            start
+            ;;
+        stop)
+            stop
+            ;;
+        restart)
+            stop
+            start
+            ;;
+        *)
+            echo "Usage: $0 {start|stop|restart|uninstall}"
+    esac
+fi

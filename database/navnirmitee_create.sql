@@ -22,10 +22,11 @@ CREATE TABLE  nav_user(
 	mobile_no varchar(15),
 	password text,
 	email_verification VARCHAR(36),
+	reset_password VARCHAR(36),
     subscribed_plan VARCHAR(10),
     points integer,
-    balance integer,
-    deposit integer,
+    balance integer DEFAULT 0,
+    deposit integer DEFAULT 0,
 	address text,
 	city varchar(50),
 	state varchar(30),
@@ -58,6 +59,7 @@ CREATE TABLE  nav_toys(
     brand integer,
     category smallint,
 	parent_toys_id varchar(36),
+    deposit integer,
 	CONSTRAINT _id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
@@ -82,6 +84,7 @@ CREATE TABLE  nav_rentals(
     status VARCHAR(30),
     delivery_date bigint,
     returned_date bigint,
+    release_date bigint,
 	CONSTRAINT nav_rentals_id_pk PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);
@@ -94,13 +97,14 @@ CREATE TABLE  nav_payments(
     reason VARCHAR(10),
     credit_date bigint,
     paid_date bigint,
-    status VARCHAR(10),
+    status VARCHAR(30),
 	transaction_id varchar(36),
 	transaction_summary TEXT,
     transaction_date bigint,
     next_retry_date bigint,
     expiration_date bigint,
-    transaction_type VARCHAR(20)
+    is_order smallint,
+    transaction_type VARCHAR(20),
 	CONSTRAINT nav_payments_id PRIMARY KEY (_id)
 )
 WITH (OIDS=FALSE);

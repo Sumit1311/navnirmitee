@@ -1,5 +1,6 @@
 var navPaymentsDAO = require(process.cwd() + "/lib/dao/payments/navPaymentsDAO.js"),
     navAccount = require(process.cwd() + "/lib/navAccount.js"),
+    navOrders = require(process.cwd() + "/lib/navOrders.js"),
     navTransactions = require(process.cwd() + "/lib/navTransactions.js"),
     Q = require('q'),
     navPaymentFailureException = require(process.cwd() + "/lib/exceptions/navPaymentFailureException.js"),
@@ -24,7 +25,7 @@ module.exports = class navPayments{
         }
         return promise
             .then(() => {
-                navLogUtil.instance().log.call(self, self.updatePayment.name, "Marking membership as expired as transaction is cancelled" , "debug");
+                //navLogUtil.instance().log.call(self, self.updatePayment.name, "Marking membership as expired as transaction is cancelled" , "debug");
                 return new navPaymentsDAO().updatePaymentById(paymentId, fields.paymentStatus, navCommonUtil.getTimeinMillis(fields.retryDate),navCommonUtil.getTimeinMillis(fields.expirationDate));
             })
         .catch((error) => {
@@ -34,7 +35,7 @@ module.exports = class navPayments{
     }
 
     success(transactionId, code, status, message, isCash) {
-        var p = new navPaymentsDAO(), self = this, promise;
+        var p = new navPaymentsDAO(), self = this, promise, isOrder, userId;
         if(this.client) {
             promise = Q.resolve(this.client);
         } else {
@@ -63,6 +64,8 @@ module.exports = class navPayments{
             for(var i = 0; i < transactions.length; i++) {
                 promises.push(new navAccount(p.providedClient).transactionSuccess(transactions[i]));
             }
+            isOrder = transactions[0].is_order;
+            userId = transactions[0].user_id;
             return Q.allSettled(promises);
 
         })
@@ -81,54 +84,113 @@ module.exports = class navPayments{
             }
             return Q.resolve();
         })
+        .then((result) => {
+            if(result && isOrder) {
+                return new navOrders(p.providedClient).completeOrder(transactionId, "success")
+            } else {
+                return Q.resolve();
+            }
+        })
         .then(() => {
-                if(self.client) {
-                    return Q.resolve();
-                } else {
-                    return p.commitTx();
-                }
+            if(self.client) {
+                return Q.resolve();
+            } else {
+                return p.commitTx();
+            }
         })
         .catch(function (error) {
             //logg error
+            var promise;
             if(self.client) {
-                return Q.reject(error);
+                promise = Q.resolve();
+            } else {
+                promise = p.rollBackTx();
             }
-            return p.rollBackTx()
-            .then(function() {
-                return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().TRANSACTION_FAILED, null, null, null); 
-            })
-            .then(function () {
-                navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + error, "error");
-                return Q.reject(error);
-                //res.status(500).send("Internal Server Error");
-            })
-            .catch(function (err) {
-                navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + err, "error");
-                //log error
-                return Q.reject(err)
-            });
+            return promise 
+                .then(() => {
+                    return self.failure(transactionId, error.code, error.message, error.status);
+                })
+                .then(function () {
+                    navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + error, "error");
+                    return Q.reject(error);
+                    //res.status(500).send("Internal Server Error");
+                })
+                .catch(function (err) {
+                    navLogUtil.instance().log.call(self, self.success.name,'Error while doing payment' + err, "error");
+                    //log error
+                    return Q.reject(err)
+                });
         })
         .finally(function () {
-            if(self.client) {
-                return ;
-            }
-            if (p.providedClient) {
-                p.providedClient.release();
-                p.providedClient = undefined;
+            if(!self.client) {
+                if (p.providedClient) {
+                    p.providedClient.release();
+                    p.providedClient = undefined;
+                }
             }
         })
 
     }
 
     failure(transactionId, code, status, message) {
-        const self = this;
-        return new navPaymentsDAO().updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().FAILED, new Date().getTime())
+        var p = new navPaymentsDAO(), self = this, promise;
+        if(this.client) {
+            promise = Q.resolve(this.client);
+        } else {
+            promise = p.getClient();
+
+        }
+        return promise
+            .then((_client) => {
+                p.providedClient = _client;
+                if(self.client) {
+                    return Q.resolve();
+                } else {
+                    return p.startTx();
+                }
+            })
+            .then(() => {
+                return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().FAILED, new Date().getTime());
+            })
+            .then(() => {
+                return new navOrders(self.client).completeOrder(transactionId, "failure")
+            })
+            .then(() => {
+
+                if(self.client) {
+                    return Q.resolve();
+                } else {
+                    return p.commitTx();
+                }
+            })
             .then(() => {
                 return Q.reject(new navPaymentFailureException());
             })
-            .catch((error) => {
-                navLogUtil.instance().log.call(self, self.failure.name,'Error while doing payment' + error, "error");
-                return Q.reject(error);
+            .catch(function (error) {
+                //logg error
+                if(self.client) {
+                    return Q.reject(error);
+                }
+                return p.rollBackTx()
+                    .then(function () {
+                        navLogUtil.instance().log.call(self, self.failure.name,'Error while doing payment' + error, "error");
+                        return Q.reject(error);
+                        //res.status(500).send("Internal Server Error");
+                    })
+                    .catch(function (err) {
+                        navLogUtil.instance().log.call(self, self.failure.name,'Error while doing payment' + err, "error");
+                        //log error
+                        return Q.reject(err);
+                    });
+            })
+            .finally(function () {
+                if(self.client) {
+                    return ;
+                }
+                if (p.providedClient) {
+                    p.providedClient.release();
+                    p.providedClient = undefined;
+                }
             })
     }
     partialSuccess(transactionId, code, status, message) {
@@ -143,11 +205,11 @@ module.exports = class navPayments{
             })
     }
 
-    doPayments(transactionId, userId, transactions, paymentMethod, baseUrl) {
+    doPayments(transactionId, userId, transactions, paymentMethod, baseUrl, isOrder, needTransaction) {
        //for each recharge insert entry
        //calculate amount
        //act according to payment method and return path if it is paytm 
-       if(paymentMethod !== "cash" && paymentMethod !== "paytm") {
+       if(paymentMethod !== "cash" && paymentMethod !== "paytm" && paymentMethod !== "transfer") {
            return Q.reject(new Error("Undefined payment method"));
        }
        var pDAO = new navPaymentsDAO(this.client);
@@ -156,9 +218,12 @@ module.exports = class navPayments{
         for(var i = 0; i < transactions.length; i++) {
             amount += transactions[i].amount;
             if(paymentMethod === "cash") {
-                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING_COD, transactionId, pDAO.TRANSACTION_TYPE.CASH));       
+                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING_COD, transactionId, pDAO.TRANSACTION_TYPE.CASH, isOrder));       
             } else if(paymentMethod === "paytm") {
-                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING, transactionId, pDAO.TRANSACTION_TYPE.PAYTM));       
+                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING, transactionId, pDAO.TRANSACTION_TYPE.PAYTM, isOrder));       
+            } else if(paymentMethod === "transfer") {
+                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING, transactionId, pDAO.TRANSACTION_TYPE.TRANSFER, isOrder));       
+                
             }
         }
 
@@ -173,6 +238,8 @@ module.exports = class navPayments{
                     return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true);
                 } else if(paymentMethod === "paytm") {
                     return navPGCommunicator.initiate(userId, amount + "", transactionId, baseUrl);
+                } else if((paymentMethod === "transfer" && !needTransaction)){
+                    return self.success(transactionId, "TXN_SUCCESS", "0", "Transferred", false);
                 } else {
                     return Q.resolve();
                 }
@@ -233,5 +300,6 @@ module.exports = class navPayments{
                 return Q.reject(error);
             })
     }
+
 
 }
