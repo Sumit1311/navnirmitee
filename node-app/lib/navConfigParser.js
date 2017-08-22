@@ -14,7 +14,7 @@ module.exports = class navConfigParser {
                 }
             } else {
                 try {
-                    var configString = fs.readFileSync(process.cwd() + "/config/navnirmitee.json");
+                    var configString = fs.readFileSync(process.cwd() + "/config/ajab-gajab.json");
                     configString = mustache.render(configString.toString(), process.env);
                     this.config = JSON.parse(configString);
                     setMandatoryConfig.call(this);
@@ -47,7 +47,7 @@ function getDefaultConfig() {
         DatabaseHost: process.env.DB_HOST || "localhost",
         DatabaseUser: process.env.DB_USER || "admin",
         DatabasePassword: process.env.DB_PASS || "admin",
-        DatabaseName: process.env.DB_NAME || "navnirmitee",
+        DatabaseName: process.env.DB_NAME || "ajab_gajab",
         DatabasePort: process.env.DB_PORT || "5432",
         RedisServerURL: process.env.REDISCLOUD_URL,
         ListeningPort : process.env.PORT,

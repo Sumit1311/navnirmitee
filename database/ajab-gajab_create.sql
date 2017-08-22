@@ -6,8 +6,8 @@
 /* Database creation must be done outside an multicommand file.
    These commands were put in this file only for convenience.
 
--- object: navnirmitee | type: DATABASE -- 
-CREATE DATABASE navnirmitee
+-- object: ajab_gajab | type: DATABASE -- 
+CREATE DATABASE ajab_gajab
 	ENCODING = 'UTF8'
 ;
 

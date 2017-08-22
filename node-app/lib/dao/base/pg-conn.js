@@ -12,7 +12,7 @@ module.exports = class navDbConnectionHandler {
         }
 
         //var logger = new navLogUtil(), configParser = new navConfigParser();
-        var databaseUrl = "pg://" + navConfigParser.instance().getConfig("DatabaseUser", "admin") + ":" + navConfigParser.instance().getConfig("DatabasePassword","admin") + "@" +navConfigParser.instance().getConfig("DatabaseHost", "localhost") + ":" + navConfigParser.instance().getConfig("DatabasePort","5432") + "/" +navConfigParser.instance().getConfig("DatabaseName", "navnirmitee");
+        var databaseUrl = "pg://" + navConfigParser.instance().getConfig("DatabaseUser", "admin") + ":" + navConfigParser.instance().getConfig("DatabasePassword","admin") + "@" +navConfigParser.instance().getConfig("DatabaseHost", "localhost") + ":" + navConfigParser.instance().getConfig("DatabasePort","5432") + "/" +navConfigParser.instance().getConfig("DatabaseName", "ajab_gajab");
     if (!databaseUrl) {
         navLogUtil.instance().log.call(this,"constructor", "Please check db url " + databaseUrl, "error");
         return;
