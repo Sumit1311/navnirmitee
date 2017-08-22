@@ -2,35 +2,35 @@
 
 HOSTNAME=`hostname -I | xargs`
 PRESENT_DIR=`pwd`
-LOGFILE="$PRESENT_DIR/.setup-navnirmitee.log"
+LOGFILE="$PRESENT_DIR/.setup-ajab-gajab.log"
 TOMCAT_PACKAGE="tomcat7"
 
 
 touch $LOGFILE
 echo "" > $LOGFILE
-echo "Starting Tomcat installation"
-
-AVAILABLE=` apt-cache search ^$TOMCAT_PACKAGE$`
-
-if [ -z "$AVAILABLE" ]
-then
-    echo "Error Tomcat 7 not found int repos. Please add it to repo"
-    exit
-fi
-
- apt-get install $TOMCAT_PACKAGE >> $LOGFILE 2>&1
- service $TOMCAT_PACKAGE start>> $LOGFILE
-RC=$?
-if [ $RC == 3 ]
-then
-    echo "Error : Installing Tomcat Please Check... Logs : $LOGFILE"
-    exit
-fi
-
-echo "Please visit : http://$HOSTNAME:8080"
-echo "Press any key to continue..."
-
-read
+#echo "Starting Tomcat installation"
+#
+#AVAILABLE=` apt-cache search ^$TOMCAT_PACKAGE$`
+#
+#if [ -z "$AVAILABLE" ]
+#then
+#    echo "Error Tomcat 7 not found int repos. Please add it to repo"
+#    exit
+#fi
+#
+# apt-get install $TOMCAT_PACKAGE >> $LOGFILE 2>&1
+# service $TOMCAT_PACKAGE start>> $LOGFILE
+#RC=$?
+#if [ $RC == 3 ]
+#then
+#    echo "Error : Installing Tomcat Please Check... Logs : $LOGFILE"
+#    exit
+#fi
+#
+#echo "Please visit : http://$HOSTNAME:8080"
+#echo "Press any key to continue..."
+#
+#read
 
 echo 'Proceeding with Node js installation'
 NODE_PACKAGE='nodejs'
@@ -88,9 +88,9 @@ read
 
 echo "Proceeding with proxy setup.."
 
- mv /etc/nginx/conf.d/navnirmitee.conf /etc/nginx/conf.d/navnirmitee.conf.backup >> $LOGFILE 2>&1
+ mv /etc/nginx/conf.d/ajab-gajab.conf /etc/nginx/conf.d/ajab-gajab.conf.backup >> $LOGFILE 2>&1
 
-PROXY_CONF_FILE="navnirmitee.conf"
+PROXY_CONF_FILE="ajab-gajab.conf"
 cat << END > "$PROXY_CONF_FILE"
 server {
   listen 80;
@@ -111,7 +111,7 @@ server {
   }
 }
 END
- mv navnirmitee.conf /etc/nginx/conf.d >> $LOGFILE 2>&1
+ mv ajab-gajab.conf /etc/nginx/conf.d >> $LOGFILE 2>&1
 
  nginx -t >> $LOGFILE 2>&1
 

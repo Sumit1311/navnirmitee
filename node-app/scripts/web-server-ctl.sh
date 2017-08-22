@@ -7,12 +7,12 @@ USER=`whoami`
 if [ $APP_DIR ]; then
     echo "Using app root $APP_DIR"
 else
-    APP_DIR='/home/geek/workspace/navnirmitee/node-app'
+    APP_DIR='/home/geek/workspace/kids-library/node-app'
 fi
 
 
-PIDFILE=$APP_DIR/navnirmitee.pid
-LOGFILE=$APP_DIR/navnirmitee.log
+PIDFILE=$APP_DIR/ajab-gajab.pid
+LOGFILE=$APP_DIR/ajab-gajab.log
 
 touch $PIDFILE
 touch $LOGFILE
@@ -26,6 +26,8 @@ start() {
         return 1
     fi
     echo 'Starting service…' >&2
+    #export DB_PORT=5433
+    echo $DB_PORT
     #local CMD="$EXECUTABLE $SCRIPT > \"$LOGFILE\" 2>&1 & echo \$!"
     if [ $DEBUG -eq 1 ]; then 
         local CMD="$EXECUTABLE debug $SCRIPT > \"$LOGFILE\" 2>&1";
