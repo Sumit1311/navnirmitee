@@ -24,9 +24,9 @@ module.exports = class navToysRouter extends navBaseRouter {
 
     setup() {
         var self = this;
-        this.router.use(this.ensureAuthenticated.bind(this), this.ensureVerified.bind(this), this.isSessionAvailable.bind(this));
         this.router.get('/detail', function(req,res,next){self.getToysDetails(req,res,next);});
         this.router.get('/search', function(req,res,next){self.getSearchPage(req,res,next)});
+        this.router.use(this.ensureAuthenticated.bind(this), this.ensureVerified.bind(this), this.isSessionAvailable.bind(this));
         this.router.get('/order', function(req,res,next){self.getOrder(req,res,next)});
         this.router.get('/orderPlaced', function(req,res,next){self.getOrderPlaced(req,res,next)});
         this.router.post('/placeOrder',(req, res, next) => {self.placeOrder(req,res,next)});
@@ -142,11 +142,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         deferred.promise
             .done(() => {
                 if(transfers.length == 0 && transactions.length == 0) {
-                    res.render('orderPlaced',{
-                        user : req.user,
-                        isLoggedIn : req.user ? true : false,
-                        layout : 'nav_bar_layout'
-                    });
+                    res.render('orderPlaced');
 
                 } else {
                     res.render('orderConfirmation', {
@@ -205,7 +201,7 @@ module.exports = class navToysRouter extends navBaseRouter {
             return new navOrders(rDAO.providedClient).getActiveOrders(user._id);
         })
         .then((_orders) => {
-            if(_orders.length !== 0 && _orders[0].lease_end_date >= navCommonUtil.getCurrentTime_S()) {
+            if(_orders.length !== 0 /*&& _orders[0].lease_end_date >= navCommonUtil.getCurrentTime_S()*/) {
                 return Q.reject(new navPendingReturnException());
             }
             return new navToysHandler(rDAO.providedClient).getToyDetail(id);
@@ -216,7 +212,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                 /*if(toyDetails.price > userDetails.balance) {
                     return Q.reject(new navNoBalanceException());
                 }*/
-                if(toyDetails.stock === 0) {
+                if(toyDetails.stock === 0 || toyDetails.stock === null) {
                     return Q.reject(new navNoStockException());
                 }
                 return new navAccount().getTransactions(userDetails, toyDetails);
@@ -303,18 +299,30 @@ module.exports = class navToysRouter extends navBaseRouter {
                     }
                 }
                 if(req.query.hasOwnProperty(key) && (key == "ageGroup")) {
+                    if(Array.isArray(req.query)) {
                     for(index = 0; index < req.query[key].length; index++) {
                         activeAgeGroups.push(parseInt(req.query[key][index]));
                     }
+                    } else {
+                        activeAgeGroups.push(parseInt(req.query[key]));
+                    }
                 }
                 if(req.query.hasOwnProperty(key) && (key === "skill")) {
+                    if(Array.isArray(req.query)) {
                     for(index = 0; index < req.query[key].length; index++) {
                         activeSkills.push(parseInt(req.query[key][index]));
                     }
+                    } else {
+                        activeSkills.push(parseInt(req.query[key]));
+                    }
                 }
                 if(req.query.hasOwnProperty(key) && (key === "brand")) {
-                    for(index = 0; index < req.query[key].length; index++) {
-                        activeBrands.push(parseInt(req.query[key][index]));
+                    if(Array.isArray(req.query)) {
+                        for(index = 0; index < req.query[key].length; index++) {
+                            activeBrands.push(parseInt(req.query[key][index]));
+                        }
+                    } else {
+                        activeBrands.push(parseInt(req.query[key]));
                     }
                 }
             }
@@ -322,7 +330,7 @@ module.exports = class navToysRouter extends navBaseRouter {
         req.assert("q"," Bad Request").isByteLength({min :0, max :128});
         //req.assert("shippingAddress","Bad Request").notEmpty();
         var deferred = Q.defer();
-        var respUtil =  new navResponseUtil(), categories, ageGroups, skills, brands, perPageToys = 4;
+        var respUtil =  new navResponseUtil(), categories, ageGroups, skills, brands, perPageToys = 12;
         var sortColumns = ["name", "price", "age_group"];
         var sortLabels = ["Name", "Price", "Age Group"];
         var sortTypes = ["ASC", "DESC"];
@@ -462,7 +470,14 @@ module.exports = class navToysRouter extends navBaseRouter {
         var respUtil =  new navResponseUtil();
         deferred.promise
             .done((result) => {
-                if(result) {
+                if(paymentMethod == "paytm_qr" || paymentMethod == "bhim_qr") {
+                    res.render("scanCode", {
+                        user: req.user,
+                        isLoggedIn : req.user ? true : false,
+                        layout : 'nav_bar_layout',
+                        paymentMethod : paymentMethod
+                    });
+                } else if(result) {
                     res.render(result.pageToRender, {data : result.context, redirectURL : result.redirectURL});
                 } else {
                     respUtil.redirect(req, res, '/user/orderDetails');

@@ -85,7 +85,7 @@ module.exports = class navBaseRouter {
             next();
         } else {
         navLogUtil.instance().log.call(self, self.isSessionAvailable.name, "Session not available", "warn");
-            new navResponseUtil().redirect("/login");
+            new navResponseUtil().redirect(req,res,"/login");
         }
     }
 }

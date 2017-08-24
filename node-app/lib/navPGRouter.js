@@ -90,7 +90,7 @@ module.exports = class navPGRouter extends navBaseRouter {
             helper.handlePaymentResponse(intResponse)
             .then((result) => {
                 if(result.isSuccess && !result.isPartial) {
-                    return new navPayments().success(result.orderId, result.gatewayCode, result.gatewayStatus, result.gatewayMessage)
+                    return new navPayments().success(result.orderId, result.gatewayCode, result.gatewayStatus, result.gatewayMessage, false)
                        .then(() =>{
                             return Q.resolve(false);
                        })

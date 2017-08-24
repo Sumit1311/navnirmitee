@@ -1,57 +1,67 @@
 {
     "brands" :[
-            {
-                "id" : 0,
-                "name" : "Fisher Price"
-            },
-            {
-                "id" : 1,
-                "name" : "Chicco"
-            },
-            {
-                "id" : 2,
-                "name" : "Thomas"
-            },
-            {
-                "id" : 3,
-                "name" : "Little Tikes"
-            },
-            {
-                "id" : 4,
-                "name" : "B kids"
-            },
-            {
-                "id" : 5,
-                "name" : "Infantio"
-            },
-            {
-                "id" : 6,
-                "name" : "Leap Frog"
-            },
-            {
-                "id" : 7,
-                "name" : "Playskool"
-            },
-            {
-                "id" : 8,
-                "name" : "Tommy"
-            },
-            {
-                "id" : 9,
-                "name" : "VTech"
-            },
-            {
-                "id" : 10,
-                "name" : "Mee Mee"
-            },
-            {
-                "id" : 11,
-                "name" : "Melissa and Doug"
-            }
+        {
+            "id" : 0,
+            "name" : "Fisher Price"
+        },
+        {
+            "id" : 1,
+            "name" : "Chicco"
+        },
+        {
+            "id" : 2,
+            "name" : "Thomas"
+        },
+        {
+            "id" : 3,
+            "name" : "Little Tikes"
+        },
+        {
+            "id" : 4,
+            "name" : "B kids"
+        },
+        {
+            "id" : 5,
+            "name" : "Infantio"
+        },
+        {
+            "id" : 6,
+            "name" : "Leap Frog"
+        },
+        {
+            "id" : 7,
+            "name" : "Playskool"
+        },
+        {
+            "id" : 8,
+            "name" : "Tommy"
+        },
+        {
+            "id" : 9,
+            "name" : "VTech"
+        },
+        {
+            "id" : 10,
+            "name" : "Mee Mee"
+        },
+        {
+            "id" : 11,
+            "name" : "Melissa and Doug"
+        },
+        {
+            "id" : 12,
+            "name" : "STEM Robo"
+        },
+        {
+            "id" : 13,
+            "name" : "Butterfly Fields"
+        }
 
 
-        ],
-    "skills" : [
+
+
+    ],
+        "skills" : [
             {
                 "id" : 0,
                 "name" : "Hand-Eye Coordination"
@@ -120,41 +130,31 @@
                 "name" : "Sports"
             },{
                 "id" : 22,
-                "name" : "Science"
+                "name" : "STEM"
+            },{
+                "id" : 23,
+                "name" : "Robotics"
             }
         ],  
-    "ageGroups" : [
-        {
-            "id" : 0,
-            "name" : "0 - 5 Years"
-        }, {
-            "id" : 1,
-            "name" : "6 - 7 Years"
-        }, {
-            "id" : 2,
-            "name" : "8 - 10 Years"
-        }, {
-            "id" : 3,
-            "name" : "11 - 13 Years"
-        }, {
-            "id" : 4,
-            "name" : "13 - 15 Years"
-        }
-    ],  
-    "categories" : [
-        {
-            "id" : 0,
-            "name" : "Educational"
-        },{
-            "id" : 1,
-            "name" : "Scientific"
-        },{
-            "id" : 2,
-            "name" : "Fun"
-        },{
-            "id" : 2,
-            "name" : "Motor Skills"
-        }
-    ]
+        "ageGroups" : [
+            {
+                "id" : 0,
+                "name" : "0 - 5 Years"
+            }, {
+                "id" : 1,
+                "name" : "5 - 7 Years"
+            }, {
+                "id" : 2,
+                "name" : "7 - 10 Years"
+            }, {
+                "id" : 3,
+                "name" : "10 - 13 Years"
+            }, {
+                "id" : 4,
+                "name" : "13 - 15 Years"
+            }
+        ],  
+        "categories" : [
+        ]
 
 }

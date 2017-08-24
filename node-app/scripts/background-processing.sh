@@ -4,10 +4,10 @@ EXECUTABLE='node'
 DEBUG='debug'
 SCRIPT='background.js'
 USER=`whoami`
-APP_DIR='/home/geek/workspace/navnirmitee/node-app'
+APP_DIR='/home/geek/workspace/kids-library/node-app'
 
-PIDFILE=$APP_DIR/navnirmitee-background.pid
-LOGFILE=$APP_DIR/navnirmitee-background.log
+PIDFILE=$APP_DIR/ajab-gajab-background.pid
+LOGFILE=$APP_DIR/ajab-gajab-background.log
 
 start() {
     echo $(cat "$PIDFILE");

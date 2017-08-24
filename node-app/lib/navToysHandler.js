@@ -94,7 +94,7 @@ module.exports = class navToysHandler {
                 return new navRentalsDAO().getCountOfPendingOrders(toyId); 
             })
             .then(function(count){
-                toy[0].stock = toy[0].stock - parseInt(count);
+                toy[0].stock = toy[0].stock == null ? null : toy[0].stock - parseInt(count);
                 return Q.resolve({
                     toyDetail : toy[0],
                     imageCount : imageCount

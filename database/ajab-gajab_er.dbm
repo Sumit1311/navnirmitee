@@ -4,7 +4,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
 <dbmodel>
-<database name="navnirmitee" encoding="UTF8">
+<database name="ajab_gajab" encoding="UTF8">
 </database>
 
 <table name="nav_user" oids="false">

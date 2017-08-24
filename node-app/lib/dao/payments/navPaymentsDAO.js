@@ -19,6 +19,7 @@ var tableName = "nav_payments";
 var STATUS = {
     PENDING : "PENDING",
     PENDING_COD : "CASH",
+    PENDING_QR : "QR_CODE",
     COMPLETED : "COMPLETED",
     COMPLETED_CASH : "COMPLETED_CASH",
     CANCELLED : "CANCELLED",
@@ -37,6 +38,8 @@ var REASON = {
 var TRANSACTION_TYPE = {
     PAYTM : "Paytm",
     CASH :"Cash on Deliver",
+    QR_PAYTM :"QR Code Paytm",
+    QR_BHIM :"QR Code BHIM",
     TRANSFER :"Transfer"
 }
 

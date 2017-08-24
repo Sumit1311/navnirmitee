@@ -19,7 +19,7 @@ module.exports = class navPayments{
 
     updatePayment(paymentId, fields) {
         var p = new navPaymentsDAO(), promise = Q.resolve(), self = this;
-        if(fields.type == p.TRANSACTION_TYPE.CASH && fields.paymentStatus === p.STATUS.CANCELLED) {
+        if(fields.type == p.TRANSACTION_TYPE.CASH && fields.type == p.TRANSACTION_TYPE.QR_BHIM && fields.type == p.TRANSACTION_TYPE.QR_PAYTM  && fields.paymentStatus === p.STATUS.CANCELLED) {
             navLogUtil.instance().log.call(self, self.updatePayment.name, "Rollbacking cash transaction " , "info");
             promise = new navAccount().rollbackTransaction(fields);
         }
@@ -34,7 +34,7 @@ module.exports = class navPayments{
         })
     }
 
-    success(transactionId, code, status, message, isCash) {
+    success(transactionId, code, status, message, isCash, isQR) {
         var p = new navPaymentsDAO(), self = this, promise, isOrder, userId;
         if(this.client) {
             promise = Q.resolve(this.client);
@@ -78,8 +78,10 @@ module.exports = class navPayments{
             if(results.length !== 0) {
                 if(isCash) {
                 return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().PENDING_COD, new Date().getTime(), null, null);
+                } else if(isQR) {
+                    return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().PENDING_QR, new Date().getTime(), null, null);
                 } else {
-                return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().COMPLETED, new Date().getTime(), null, null);
+                    return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().COMPLETED, new Date().getTime(), null, null);
                 }
             }
             return Q.resolve();
@@ -209,7 +211,7 @@ module.exports = class navPayments{
        //for each recharge insert entry
        //calculate amount
        //act according to payment method and return path if it is paytm 
-       if(paymentMethod !== "cash" && paymentMethod !== "paytm" && paymentMethod !== "transfer") {
+       if(paymentMethod !== "cash" && paymentMethod !== "paytm" && paymentMethod !== "transfer" && paymentMethod !== "paytm_qr" && paymentMethod !== "bhim_qr") {
            return Q.reject(new Error("Undefined payment method"));
        }
        var pDAO = new navPaymentsDAO(this.client);
@@ -218,12 +220,15 @@ module.exports = class navPayments{
         for(var i = 0; i < transactions.length; i++) {
             amount += transactions[i].amount;
             if(paymentMethod === "cash") {
-                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING_COD, transactionId, pDAO.TRANSACTION_TYPE.CASH, isOrder));       
+                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING_COD, transactionId, pDAO.TRANSACTION_TYPE.CASH, isOrder));      
+            } else if(paymentMethod === "paytm_qr") {
+                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING_QR, transactionId, pDAO.TRANSACTION_TYPE.QR_PAYTM, isOrder));       
+            } else if(paymentMethod === "bhim_qr") {
+                promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING_QR, transactionId, pDAO.TRANSACTION_TYPE.QR_BHIM, isOrder));       
             } else if(paymentMethod === "paytm") {
                 promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING, transactionId, pDAO.TRANSACTION_TYPE.PAYTM, isOrder));       
             } else if(paymentMethod === "transfer") {
                 promises.push(pDAO.insertPaymentDetails(userId, transactions[i].amount , transactions[i].reason, pDAO.STATUS.PENDING, transactionId, pDAO.TRANSACTION_TYPE.TRANSFER, isOrder));       
-                
             }
         }
 
@@ -235,11 +240,13 @@ module.exports = class navPayments{
                     }
                 }
                 if(paymentMethod === "cash") {
-                    return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true);
+                    return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true, false);
+                } else if(paymentMethod === "paytm_qr" || paymentMethod === "bhim_qr") {
+                    return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true, true);
                 } else if(paymentMethod === "paytm") {
                     return navPGCommunicator.initiate(userId, amount + "", transactionId, baseUrl);
                 } else if((paymentMethod === "transfer" && !needTransaction)){
-                    return self.success(transactionId, "TXN_SUCCESS", "0", "Transferred", false);
+                    return self.success(transactionId, "TXN_SUCCESS", "0", "Transferred", false, false);
                 } else {
                     return Q.resolve();
                 }

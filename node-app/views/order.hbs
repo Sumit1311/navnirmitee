@@ -1,10 +1,10 @@
 
 <!-- begin:heading -->
-<div class="heads" style="background: url(/img/img02.jpg) center center;">
+<div class="heads" style="">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2><span>//</span>Place Your Order</h2>
+                <h2>Place Your Order</h2>
             </div>
         </div>
     </div>
@@ -26,8 +26,17 @@
         <div class="row confirm">
             <div class="col-md-12" id="_nav_order_div">
                 <form class="form-horizontal" role="form" action="/toys/placeOrder?id={{toyDetail._id}}" method="post">
-                    <h3 class="text-center">Order</h3>
                     <hr>
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/toys/search">Toy List</a></li>
+                    <li><a href="/toys/detail?id={{toyDetail._id}}">{{toyDetail.name}}</a></li>
+                    <li class="active">Place Order</li>
+                </ol>
+            </div>
+        </div>
                     <div class="row">
 
                         <div class="col-md-offset-1 col-md-4" id="_nav_ordered_toy">
