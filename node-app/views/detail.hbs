@@ -1,9 +1,9 @@
 <!-- begin:heading -->
-<div class="heads" style="background: url(/img/toys/{{toyDetail._id}}_1.jpg) center center;">
+<div class="heads" style="">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2><span>//</span> {{toyDetail.name}}</h2>
+                <h2>{{toyDetail.name}}</h2>
             </div>
         </div>
     </div>
@@ -16,7 +16,8 @@
         <div class="row">
             <div class="col-md-12">
                 <ol class="breadcrumb">
-                    <li><a href="#">Home</a></li>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/toys/search">Toy List</a></li>
                     <li class="active">{{toyDetail.name}}</li>
                 </ol>
             </div>
@@ -76,13 +77,20 @@
   <dt>Deposit :</dt>
   <dd>{{toyDetail.deposit}}</dd>
 </dl>
+{{#compare toyDetail.stock "!==" null}} 
 <dl>
   <dt>In Stock:</dt>
   <dd>{{#compare toyDetail.stock "!=" 0}}<span class="label label-success">Yes<span>{{else}}<span class="label label-danger">No<span>{{/compare}}
-</dd>
+                      </dd>
+                  {{/compare}}
 </dl>
-     <h3 class="">Price : &#x20b9; {{toyDetail.price}}</h3>
-                        <p><a href="/toys/order?id={{toyDetail._id}}" class="btn btn-green btn-large"{{#compare toyDetail.stock "==" 0}}disabled{{/compare}}><i class="icon-shopping-cart"></i> Place An Order</a></p>
+<h3 class="">Price : &#x20b9; {{toyDetail.price}}</h3>
+{{#compare toyDetail.stock "==" null}} 
+
+    <p><a href="#" class="btn btn-green btn-large" disabled><i class="icon-shopping-cart"></i>Coming Soon</a></p>
+{{else}}
+    <p><a href="/toys/order?id={{toyDetail._id}}" class="btn btn-green btn-large"{{#compare toyDetail.stock "==" 0}}disabled{{/compare}}><i class="icon-shopping-cart"></i> Place An Order</a></p>
+        {{/compare}}
                         
                     </div>
                 </div>
@@ -92,15 +100,23 @@
                     <div class="col-md-12 product-tabs">
                         <ul id="myTab" class="nav nav-tabs">
                             <li class="active"><a href="#info" data-toggle="tab">More Info</a></li>
-                            <li class=""><a href="#review" data-toggle="tab">Review</a></li>
+                            <li class=""><a href="#skills" data-toggle="tab">Skills</a></li>
                             <!--<li class=""><a href="#related" data-toggle="tab">Related Items</a></li> -->
                         </ul>
                         <div id="myTabContent" class="tab-content">
                             <div class="tab-pane fade active in" id="info">
-                                <p>{{toyDetail.long_description}}</p>
+                                <p>{{{toyDetail.long_description}}}</p>
                             </div>
-                            <div class="tab-pane fade" id="review">
-                                <p>No Reviews For This</p>
+                            <div class="tab-pane fade" id="skills">
+                                    <h3>
+                                        Skills Developed :<br>
+                                    </h3>
+                                    <p>
+                                        {{#each toyDetail.skills}}
+                                            {{skill}}<br>
+                                        {{/each}}
+
+                                    </p>
                                 <!--<p>Howdy, I'm in Section 2. Etiam luctus, tellus sed varius facilisis, turpis nisl mollis metus, adipiscing scelerisque felis dui ac lacus.
                                 Etiam luctus, tellus sed varius facilisis, turpis nisl mollis metus, adipiscing scelerisque felis dui ac lacus.</p>-->
                             </div>  

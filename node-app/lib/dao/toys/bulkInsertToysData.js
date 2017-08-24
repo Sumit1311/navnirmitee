@@ -5,7 +5,7 @@ const exec = require('child_process').execSync;
 
 function ConvertToArray() {
     var data = fs.readFileSync(process.cwd() + '/nav_toys.csv');
-    var rows = data.toString().trim().split(/\n/);
+    var rows = data.toString().trim().split(/#/);
     var queries = {
         "nav_toys" : [],
         "nav_toys_skills" : []
