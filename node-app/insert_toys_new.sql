@@ -155,7 +155,7 @@ How does it help?<br>
 It helps the kid to identify the useful connection for the daily like house hold wiring and function lighting.<br>
 It helps the kid to understand that variable resistnace control an electric appliance.<br>',4,13);
 INSERT INTO nav_toys_skills (_id,toys_id, skill) VALUES('ae9dc1e9-4155-47e3-87ae-0f87a5197721','a791e7f2-b8a9-46c2-b79c-d23c77822bc7',22);
-INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand) VALUES('ae4320f9-9a63-43bc-91f8-89cc7d351460','Gravitation',null,100,7,'Make a spring balance, Make a miniature boat, Make a setup to verify Archimedes principle of buoyancy','Learning Objectives:<br>
+INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand) VALUES('ae4320f9-9a63-43bc-91f8-89cc7d351460','Gravitation',null,100,7,'Make a spring balance, Make a miniature boat, Make a setup for Archimedes principle','Learning Objectives:<br>
 1. Difference between mass and weight.<br>
 2. Calibration and its importance<br>
 3. How do heavy ships float? – Difference between the volume of the shape and volume of the material<br>
