@@ -138,14 +138,13 @@ module.exports = class navToysRouter extends navBaseRouter {
         var deferred = Q.defer();
         var respUtil =  new navResponseUtil();
         var transactions, transfers, orderId;
+        var userDetails, toyDetails;         //debugger;
         
         deferred.promise
             .done(() => {
-                if(transfers.length == 0 && transactions.length == 0) {
-                    res.render('orderPlaced');
-
-                } else {
                     res.render('orderConfirmation', {
+                        userDetails :userDetails,
+                        toyDetails : toyDetails,
                         orderId : orderId,
                         transfers : transfers,
                         transactions : transactions,
@@ -154,7 +153,6 @@ module.exports = class navToysRouter extends navBaseRouter {
                             helper : helpers
                         }
                     });
-                }
                 //respUtil.redirect(req, res, '/toys/orderPlaced');
             },(error) => {
                 var response = respUtil.generateErrorResponse(error);
@@ -179,7 +177,6 @@ module.exports = class navToysRouter extends navBaseRouter {
             return deferred.reject(new navValidationException(validationErrors));
         }
         var rDAO = new navRentalsDAO();
-        var userDetails, toyDetails;         //debugger;
         rDAO.getClient()
             .then(function(client){
                 rDAO.providedClient = client;
@@ -453,15 +450,49 @@ module.exports = class navToysRouter extends navBaseRouter {
             return deferred.reject(new navValidationException(validationErrors));
         }
         navLogUtil.instance().log.call(self, self.getSearchPage.name, "Canceling order :  " + orderId, "info");
-         new navOrders().updateOrder(orderId, null, null, {
-            orderStatus : navRentalsDAO.getStatus().CANCELLED
-         })
-             .done(() => {
+        var uDAO = new navUserDAO(), client;
+        uDAO.getClient()
+            .then((_client) => {
+                client = _client;
+                uDAO.providedClient = client;
+                return uDAO.startTx();
+            })
+            .then(() => {
+                return new navOrders(client).updateOrder(orderId, null, null, {
+                    orderStatus : navRentalsDAO.getStatus().CANCELLED
+                })
+            })
+            .then(() => {
+                return new navPayments(client).cancel(orderId);
+            })
+            .then(() => {
+                return uDAO.commitTx();
+            })
+            .catch(function(error){
+
+                return uDAO.rollBackTx()
+                    .then(function () {
+                        navLogUtil.instance().log.call(self, self.cancelOrder.name, "Error occured Details : " + error, "error");
+                        return Q.reject(error);
+                    })
+                    .catch(function (err) {
+                        navLogUtil.instance().log.call(self, self.cancelOrder.name, "Error occured while rollbacking : " + err, "error");
+                        //log error
+                        return Q.reject(err);
+                    })
+            })
+            .finally(function () {
+                if (uDAO.providedClient) {
+                    uDAO.providedClient.release();
+                    uDAO.providedClient = undefined;
+                }
+            })
+            .done(() => {
                 deferred.resolve();
-             },(error) => {
+            },(error) => {
                 navLogUtil.instance().log.call(self, self.cancelOrder.name, "Error occured Details : " + error.stack, "error");
                 deferred.reject(error);
-             })
+            })
     }
     processTransactions(req, res) {
         var self = this;
