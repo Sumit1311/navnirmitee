@@ -19,14 +19,15 @@ module.exports = class navPayments{
 
     updatePayment(paymentId, fields) {
         var p = new navPaymentsDAO(), promise = Q.resolve(), self = this;
-        if(fields.type == p.TRANSACTION_TYPE.CASH && fields.type == p.TRANSACTION_TYPE.QR_BHIM && fields.type == p.TRANSACTION_TYPE.QR_PAYTM  && fields.paymentStatus === p.STATUS.CANCELLED) {
+        //TODO : Handle the case of gateway transaction rollback or refund
+        if((fields.type == p.TRANSACTION_TYPE.CASH || fields.type == p.TRANSACTION_TYPE.QR_BHIM || fields.type == p.TRANSACTION_TYPE.QR_PAYTM || fields.type == p.TRANSACTION_TYPE.TRANSFER )  && fields.paymentStatus === p.STATUS.CANCELLED) {
             navLogUtil.instance().log.call(self, self.updatePayment.name, "Rollbacking cash transaction " , "info");
-            promise = new navAccount().rollbackTransaction(fields);
+            promise = new navAccount(self.client).rollbackTransaction(fields);
         }
         return promise
             .then(() => {
                 //navLogUtil.instance().log.call(self, self.updatePayment.name, "Marking membership as expired as transaction is cancelled" , "debug");
-                return new navPaymentsDAO().updatePaymentById(paymentId, fields.paymentStatus, navCommonUtil.getTimeinMillis(fields.retryDate),navCommonUtil.getTimeinMillis(fields.expirationDate));
+                return new navPaymentsDAO(self.client).updatePaymentById(paymentId, fields.paymentStatus, navCommonUtil.getTimeinMillis(fields.retryDate),navCommonUtil.getTimeinMillis(fields.expirationDate));
             })
         .catch((error) => {
             navLogUtil.instance().log.call(self, self.updatePayment.name, `Error occured , Error : ${error}` , "error");
@@ -308,5 +309,38 @@ module.exports = class navPayments{
             })
     }
 
+    cancel(transactionId) {
+       var self = this;
+       return new navPaymentsDAO(self.client).getPaymentsByTransactionId(transactionId)
+       .then((payments) => {
+            var promises = [];
+            for(var i = 0; i < payments.length; i++) {
+                payments[i].paymentStatus = navPaymentsDAO.getStatus().CANCELLED;
+                payments[i].type = payments[i].transaction_type;
+                promises.push(self.updatePayment(payments[i]._id, payments[i]));
+            }
+           return Q.allSettled(promises);
+       })
+        .then((results) => {
+            for(var i = 0;  i < results.length; i++) {
+                if(results[i].state === "rejected") {
+                    return Q.reject(results[i].reason);
+                }
+            }
+            return Q.resolve();
+        })
+        .catch((error) => {
+            return Q.reject(error);
+        })
+    }
+
 
 }
+
+/**
+ *  
+ *
+ *
+ *
+ *
+ */

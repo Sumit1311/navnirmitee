@@ -23,6 +23,8 @@ module.exports = class navAccount {
         var userDAO = new navUserDAO(this.client);
         navLogUtil.instance().log.call(self, self.transactionSuccess.name, `Updating success status for ${transaction.user_id} for ${transaction.reason}` , "debug")
         switch(transaction.reason) {
+            case navPaymentsDAO.getReason().DEPOSIT_RETURN :
+                return userDAO.updateDeposit(transaction.user_id,transaction.amount_payable, true);
             case navPaymentsDAO.getReason().DEPOSIT :
                 return userDAO.updateDeposit(transaction.user_id,transaction.amount_payable);
             case navPaymentsDAO.getReason().REGISTRATION:
@@ -158,8 +160,8 @@ module.exports = class navAccount {
             });
             
         }
-        userDetail.balance = userBalance;
-        userDetail.deposit = userDeposit;
+        /*userDetail.balance = userBalance;
+        userDetail.deposit = userDeposit;*/
         return Q.resolve({
             transactions : transactions,
             transfers : transfers

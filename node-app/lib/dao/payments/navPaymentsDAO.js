@@ -27,6 +27,7 @@ var STATUS = {
     TRANSACTION_FAILED : "TXN_FAILED"
 }
 var REASON = { 
+    DEPOSIT_RETURN : "DEPOSIT_RETURN",
     DEPOSIT_TRANSFER : "DEPOSIT_TRANSFER",
     BALANCE_TRANSFER : "BALANCE_TRANSFER",
     DEPOSIT : "DEPOSIT",
@@ -76,6 +77,9 @@ module.exports = class navPaymentsDAO extends BaseDAO{
 
     static getReason(){
         return REASON;
+    }
+    static getTransactionType(){
+        return TRANSACTION_TYPE;
     }
     insertPaymentDetails(userId, amount, reason, paymentStatus, orderId, transactionStatus, isOrder) {
         var self = this;
@@ -153,7 +157,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
     getPaymentsByTransactionId(orderId) {        
         var self = this;
         navLogUtil.instance().log.call(this, "getPaymentsByTransactionId", " Fetching payments for orderId "+ orderId , "debug");
-        return this.dbQuery("SELECT reason, amount_payable, user_id,is_order from " + tableName + " WHERE transaction_id = $1 AND (status != $2 OR status != $3)", [orderId, this.STATUS.PENDING, this.STATUS.COMPLETED])
+        return this.dbQuery("SELECT reason, amount_payable, user_id,is_order, _id, transaction_type from " + tableName + " WHERE transaction_id = $1 AND (status != $2 OR status != $3)", [orderId, this.STATUS.PENDING, this.STATUS.COMPLETED])
             .then(function (result) {
                 navLogUtil.instance().log.call(self, "getPaymentsByTransactionId", " No of payments for orderId "+ orderId + " are " + result.rowCount, "debug");
                 return result.rows;
@@ -251,7 +255,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
             return Q.reject(new navCommonUtil().getErrorObject(error, 500, "DBPAYMENT", navDatabaseException));
 
         });
-    }             
+    }            
 }
 
 

@@ -1016,6 +1016,9 @@ blockquote {
 	color: #0d2231;
 	text-align: center;
 	text-transform: capitalize;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .caption-details .price{
@@ -2801,4 +2804,5 @@ padding-left:0px;
 .popover {
     background : #f5f5f5;
 }
+
 

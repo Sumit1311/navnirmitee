@@ -17,7 +17,7 @@ module.exports = class navOrders {
 
     updateOrder(orderId, toyId, userId, updateFields) {
         var self = this;
-        var rDAO = new navRentalsDAO(), toyDetail,  orderDetail;
+        var rDAO = new navRentalsDAO(), toyDetail,  orderDetail, promise;
         var updateStatusFlag = true, rollbackFlag = false, returnFlag = false, validationFlag = true, deliveryFlag = false; 
         /*if(!toyId || !userId) {
             promise = rDAO.getOrderDetails(orderId)
@@ -35,10 +35,21 @@ module.exports = class navOrders {
                     }
                 })
         }*/
-        return rDAO.getClient()
+        if(this.client) {
+            promise = Q.resolve(this.client);
+        } else {
+            promise = rDAO.getClient();
+            
+
+        }
+        return  promise
             .then((_client) => {
                 rDAO.providedClient = _client;
-                return rDAO.startTx();
+                if(self.client) {
+                    return Q.resolve();
+                } else {
+                    return rDAO.startTx();
+                }
             })
             .then(() => {
                 return rDAO.getOrderDetails(orderId)
@@ -135,25 +146,34 @@ module.exports = class navOrders {
                 return rDAO.updateRentalDetails(orderId, navCommonUtil.getTimeinMillis(updateFields.deliveryDate),updateFields.returnDate, navCommonUtil.getTimeinMillis(updateFields.leaseStartDate), updateFields.leaseEndDate, updateFields.shippingAddress, updateFields.orderStatus, updateFields.releaseDate);
             })
             .then(() => {
-                return rDAO.commitTx();
-            })
-            .catch((error) => {
-                if(rDAO.providedClient) {
-                    return rDAO.rollBackTx()
-                        .then(() => {
-                            return Q.reject(error);
-                        })
-                        .catch((err) => {
-                            return Q.reject(err);
-                        })
+                if(self.client) {
+                    return Q.resolve();
                 } else {
-                    return Q.reject(error);
+                    return rDAO.commitTx();
                 }
             })
+            .catch((error) => {
+                var promise;
+                if(self.client) {
+                    promise = Q.resolve();
+                } else {
+                    promise = rDAO.rollBackTx()
+
+                }
+                return  promise
+                    .then(() => {
+                        return Q.reject(error);
+                    })
+                    .catch((err) => {
+                        return Q.reject(err);
+                    })
+            })
             .finally(() => {
-                if(rDAO.providedClient) {
-                    rDAO.providedClient.release();
-                    rDAO.providedClient = undefined;
+                if(!self.client) {
+                    if(rDAO.providedClient) {
+                        rDAO.providedClient.release();
+                        rDAO.providedClient = undefined;
+                    }
                 }
             })
 
