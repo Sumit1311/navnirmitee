@@ -20,7 +20,7 @@ module.exports = class navPayments{
     updatePayment(paymentId, fields) {
         var p = new navPaymentsDAO(), promise = Q.resolve(), self = this;
         //TODO : Handle the case of gateway transaction rollback or refund
-        if((fields.type == p.TRANSACTION_TYPE.CASH || fields.type == p.TRANSACTION_TYPE.QR_BHIM || fields.type == p.TRANSACTION_TYPE.QR_PAYTM)  && fields.paymentStatus === p.STATUS.CANCELLED) {
+        if((fields.type == p.TRANSACTION_TYPE.CASH || fields.type == p.TRANSACTION_TYPE.QR_BHIM || fields.type == p.TRANSACTION_TYPE.QR_PAYTM || fields.type == p.TRANSACTION_TYPE.TRANSFER )  && fields.paymentStatus === p.STATUS.CANCELLED) {
             navLogUtil.instance().log.call(self, self.updatePayment.name, "Rollbacking cash transaction " , "info");
             promise = new navAccount(self.client).rollbackTransaction(fields);
         }

@@ -160,8 +160,8 @@ module.exports = class navAccount {
             });
             
         }
-        userDetail.balance = userBalance;
-        userDetail.deposit = userDeposit;
+        /*userDetail.balance = userBalance;
+        userDetail.deposit = userDeposit;*/
         return Q.resolve({
             transactions : transactions,
             transfers : transfers

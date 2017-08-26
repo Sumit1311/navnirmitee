@@ -142,9 +142,14 @@ module.exports = class navToysRouter extends navBaseRouter {
         
         deferred.promise
             .done(() => {
+                var amount = 0;           
+                for(var i = 0; i < transactions.length; i++) {
+                    amount += transactions[i].amount;
+                }
                     res.render('orderConfirmation', {
-                        userDetails :userDetails,
+                        userDetails : userDetails,
                         toyDetails : toyDetails,
+                        totalAmount : amount,
                         orderId : orderId,
                         transfers : transfers,
                         transactions : transactions,
@@ -212,7 +217,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                 if(toyDetails.stock === 0 || toyDetails.stock === null) {
                     return Q.reject(new navNoStockException());
                 }
-                return new navAccount().getTransactions(userDetails, toyDetails);
+                return new navAccount(rDAO.providedClient).getTransactions(userDetails, toyDetails);
             } else {
                 navLogUtil.instance().log.call(self, self.placeOrder.name, "No toys found for " + id , "warn");
                 return Q.resolve();
