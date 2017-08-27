@@ -87,7 +87,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
         var query2 = " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9";
         var params = [new navCommonUtil().generateUuid(), userId, amount, reason, new Date().getTime(), paymentStatus, orderId, transactionStatus, isOrder ? 1 : 0];
         var count = 9;
-        if(paymentStatus == STATUS.PENDING) {
+        if(paymentStatus == STATUS.PENDING && transactionStatus === TRANSACTION_TYPE.PAYTM) {
             queryString1 += ", next_retry_date, expiration_date"
                 query2 += ", $" + (++count);
             query2 += ", $" + (++count);
@@ -112,7 +112,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
     getAllPaymentTransactions(userId) {
         var self = this;
         navLogUtil.instance().log.call(this, "getAllPaymentTransactions", " Fetching all Payment details for user : "+ userId + " except for reasons ", "debug");
-        return this.dbQuery("SELECT reason, paid_date, amount_payable, status from " + tableName + " WHERE user_id = $1", [userId])
+        return this.dbQuery("SELECT reason, paid_date, amount_payable, status from " + tableName + " WHERE user_id = $1 AND (status = $2 OR status = $3 OR status = $4 OR status = $5)", [userId, STATUS.COMPLETED, STATUS.COMPLETED_CASH, STATUS.FAILED, STATUS.TRANSACTION_FAILED])
             .then(function (result) {
                 navLogUtil.instance().log.call(self, "getAllPaymentTransactions", "No of transactions fetched : "+result.rowCount,"debug");
 
@@ -157,7 +157,7 @@ module.exports = class navPaymentsDAO extends BaseDAO{
     getPaymentsByTransactionId(orderId) {        
         var self = this;
         navLogUtil.instance().log.call(this, "getPaymentsByTransactionId", " Fetching payments for orderId "+ orderId , "debug");
-        return this.dbQuery("SELECT reason, amount_payable, user_id,is_order, _id, transaction_type from " + tableName + " WHERE transaction_id = $1 AND (status != $2 OR status != $3)", [orderId, this.STATUS.PENDING, this.STATUS.COMPLETED])
+        return this.dbQuery("SELECT reason, amount_payable, user_id,is_order, _id, transaction_type from " + tableName + " WHERE transaction_id = $1 AND (status != $2 OR status != $3)", [orderId, this.STATUS.COMPLETED_CASH, this.STATUS.COMPLETED])
             .then(function (result) {
                 navLogUtil.instance().log.call(self, "getPaymentsByTransactionId", " No of payments for orderId "+ orderId + " are " + result.rowCount, "debug");
                 return result.rows;

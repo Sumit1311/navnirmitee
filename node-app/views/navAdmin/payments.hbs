@@ -32,6 +32,8 @@
                 <tr>
                     <!-- TODO : check whether this works in firefox -->
                     <form id="{{this._id}}"> 
+                        <input type="hidden" name="transactionId" value="{{this.transaction_id}}">
+                        <input type="hidden" name="userId" value="{{this.user_id}}">
                         <td><select name="userId"  class="form-control"  disabled>
                                 <option value="{{user_id}}" selected>{{email_address}}</option>
                             </select>

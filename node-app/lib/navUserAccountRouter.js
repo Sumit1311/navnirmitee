@@ -67,6 +67,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                                 case navRentalsDAO.getStatus().PLACED:
                                 case navRentalsDAO.getStatus().RETURNED:
                                 case navPaymentsDAO.getStatus().COMPLETED :
+                                case navPaymentsDAO.getStatus().COMPLETED_CASH :
                                     lableClass = "success";
                                     break;
                                 case navRentalsDAO.getStatus().CANCELLED:
@@ -102,7 +103,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
             } )
             .then((_transactions) => {
                 creditTransactions = _transactions;
-                return new navOrders().getOrders(user._id);
+                return new navOrders().getDebitTransactions(user._id);
             })
             .done((_transactions) => {
                 debitTransactions = _transactions;
@@ -110,7 +111,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
                 membershipPlans =  navMembershipParser.instance().getConfig("membership",[]); 
                 deferred.resolve();
             },(error) => {
-                navLogUtil.instance().log.call(self, self.getRechargeDetails.name, "Error occured Details : " + error, "error");
+                navLogUtil.instance().log.call(self, self.getRechargeDetails.name, "Error occured Details : " + error.stack, "error");
                 deferred.reject(error);
             });
     
@@ -170,7 +171,7 @@ module.exports = class navUserAccountRouter extends navBaseRouter {
 
                 });
             });
-        return new navOrders().getOrders(user._id)
+        return new navOrders().getAllUserOrders(user._id)
             .done((_orders) => {
                 deferred.resolve(_orders);
             },(error) => {

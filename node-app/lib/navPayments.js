@@ -18,11 +18,52 @@ module.exports = class navPayments{
     }
 
     updatePayment(paymentId, fields) {
-        var p = new navPaymentsDAO(), promise = Q.resolve(), self = this;
-        //TODO : Handle the case of gateway transaction rollback or refund
-        if((fields.type == p.TRANSACTION_TYPE.CASH || fields.type == p.TRANSACTION_TYPE.QR_BHIM || fields.type == p.TRANSACTION_TYPE.QR_PAYTM || fields.type == p.TRANSACTION_TYPE.TRANSFER )  && fields.paymentStatus === p.STATUS.CANCELLED) {
+        var p = new navPaymentsDAO(), promise = Q.resolve(), self = this, toyDetail, walletDetail, isRental = false;
+        //TODO : Even if cash transaction we do not need to do rollback
+        /*if((fields.type == p.TRANSACTION_TYPE.CASH || fields.type == p.TRANSACTION_TYPE.QR_BHIM || fields.type == p.TRANSACTION_TYPE.QR_PAYTM || fields.type == p.TRANSACTION_TYPE.TRANSFER )  && fields.paymentStatus === p.STATUS.CANCELLED) {
             navLogUtil.instance().log.call(self, self.updatePayment.name, "Rollbacking cash transaction " , "info");
             promise = new navAccount(self.client).rollbackTransaction(fields);
+        }*/
+        if((fields.type == p.TRANSACTION_TYPE.CASH || fields.type == p.TRANSACTION_TYPE.QR_BHIM || fields.type == p.TRANSACTION_TYPE.QR_PAYTM || fields.type == p.TRANSACTION_TYPE.TRANSFER )  && fields.paymentStatus === p.STATUS.COMPLETED_CASH) {
+            navLogUtil.instance().log.call(self, self.updatePayment.name, "Marking cash transaction as success " , "info");
+            promise = new navAccount(self.client).transactionSuccess({
+                user_id : fields.userId,
+                amount_payable : fields.amount,
+                reason : fields.reason
+            })
+                .then(() => {
+                    switch(fields.reason) {
+                        case navPaymentsDAO.getReason().DEPOSIT_RETURN :
+                        case navPaymentsDAO.getReason().DEPOSIT :
+                        case navPaymentsDAO.getReason().REGISTRATION:
+                        case navPaymentsDAO.getReason().DEPOSIT_TRANSFER:
+                        case navPaymentsDAO.getReason().BALANCE_TRANSFER:
+                            return Q.resolve();
+                        default :   
+                            isRental = true;
+                    }
+                    return new navOrders(self.client).getToyDetail(fields.transactionId);
+                })
+                .then((_toyDetail) => {
+                    if(isRental) {
+                        toyDetail = _toyDetail;
+                        return new navAccount(self.client).getWalletDetails(fields.userId);
+                    } else {
+                        return Q.resolve()
+                    }
+                })
+                .then((walletDetails) => {
+                    if(isRental) {
+                        if(walletDetails.length === 0) {
+                            return Q.reject(new Error("Wallet details not found"));
+                        }
+                        walletDetail = walletDetails[0];
+                        return new navAccount(self.client).rentToy(fields.userId, walletDetail, toyDetail);
+                    } else {
+                        return Q.resolve();
+                    }
+
+                })
         }
         return promise
             .then(() => {
@@ -36,7 +77,7 @@ module.exports = class navPayments{
     }
 
     success(transactionId, code, status, message, isCash, isQR) {
-        var p = new navPaymentsDAO(), self = this, promise, isOrder, userId;
+        var p = new navPaymentsDAO(), self = this, promise, isOrder, userId, walletDetail;
         if(this.client) {
             promise = Q.resolve(this.client);
         } else {
@@ -78,7 +119,7 @@ module.exports = class navPayments{
             }
             if(results.length !== 0) {
                 if(isCash) {
-                return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().PENDING_COD, new Date().getTime(), null, null);
+                    return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().PENDING_COD, new Date().getTime(), null, null);
                 } else if(isQR) {
                     return p.updatePaymentDetails(transactionId,code + "::" +status +"::"+message, navPaymentsDAO.getStatus().PENDING_QR, new Date().getTime(), null, null);
                 } else {
@@ -88,8 +129,21 @@ module.exports = class navPayments{
             return Q.resolve();
         })
         .then((result) => {
+            var toyDetail;
             if(result && isOrder) {
-                return new navOrders(p.providedClient).completeOrder(transactionId, "success")
+                return new navOrders(self.client).getToyDetail(transactionId)
+                .then((_toyDetail) => {
+                    toyDetail = _toyDetail;
+                    return new navAccount(self.client).getWalletDetails(userId)
+                })
+                .then((walletDetails) => {
+                    if(walletDetails.length === 0) {
+                        return Q.reject(new Error("Wallet details not found"));
+                    }
+                    walletDetail = walletDetails[0];
+                    return new navAccount(self.client).rentToy(userId, walletDetail, toyDetail);
+                })
+                //return new navOrders(p.providedClient).completeOrder(transactionId, "success")
             } else {
                 return Q.resolve();
             }
@@ -216,7 +270,7 @@ module.exports = class navPayments{
            return Q.reject(new Error("Undefined payment method"));
        }
        var pDAO = new navPaymentsDAO(this.client);
-       var self = this;
+       //var self = this;
        var promises = [], amount = 0;
         for(var i = 0; i < transactions.length; i++) {
             amount += transactions[i].amount;
@@ -241,13 +295,13 @@ module.exports = class navPayments{
                     }
                 }
                 if(paymentMethod === "cash") {
-                    return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true, false);
+                    //return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true, false);
                 } else if(paymentMethod === "paytm_qr" || paymentMethod === "bhim_qr") {
-                    return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true, true);
+                    //return self.success(transactionId, "TXN_SUCCESS", "0", "Cash on Delivery", true, true);
                 } else if(paymentMethod === "paytm") {
                     return navPGCommunicator.initiate(userId, amount + "", transactionId, baseUrl);
                 } else if((paymentMethod === "transfer" && !needTransaction)){
-                    return self.success(transactionId, "TXN_SUCCESS", "0", "Transferred", false, false);
+                    //return self.success(transactionId, "TXN_SUCCESS", "0", "Transferred", false, false);
                 } else {
                     return Q.resolve();
                 }
@@ -300,7 +354,9 @@ module.exports = class navPayments{
             .then((_transactions) => {
                 var transactions =[];
                 for(var i = 0; i < _transactions.length; i++) {
-                    transactions.push(navTransactions.createObject(_transactions[i], navTransactions.getType().PAYMENTS)); 
+                    if(_transactions[i].status === navPaymentsDAO.getStatus().COMPLETED_CASH) {
+                        transactions.push(navTransactions.createObject(_transactions[i], navTransactions.getType().PAYMENTS)); 
+                    }
                 }
                 return Q.resolve(transactions)
             })
@@ -315,9 +371,12 @@ module.exports = class navPayments{
        .then((payments) => {
             var promises = [];
             for(var i = 0; i < payments.length; i++) {
-                payments[i].paymentStatus = navPaymentsDAO.getStatus().CANCELLED;
-                payments[i].type = payments[i].transaction_type;
-                promises.push(self.updatePayment(payments[i]._id, payments[i]));
+                //TODO : check what to do if gateway transaction gets cancelled
+                if(payments[i].status === navPaymentsDAO.getStatus().PENDING_COD) {
+                    payments[i].paymentStatus = navPaymentsDAO.getStatus().CANCELLED;
+                    payments[i].type = payments[i].transaction_type;
+                    promises.push(self.updatePayment(payments[i]._id, payments[i]));
+                }
             }
            return Q.allSettled(promises);
        })

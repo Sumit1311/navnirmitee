@@ -16,7 +16,7 @@ module.exports = class navToysHandler {
       var promise = Q.resolve();
       var self = this;
       var l_offset = offset || 0, l_limit = limit || 10, noOfPages;
-      if(isLoggedIn !== undefined && isLoggedIn !== null) {
+      /*if(isLoggedIn !== undefined && isLoggedIn !== null) {
           noOfPages = 1;
           if(isLoggedIn){
               promise = (new navToysDAO()).getAllToys(l_offset, l_limit);
@@ -24,9 +24,9 @@ module.exports = class navToysHandler {
           else{
               promise = (new navToysDAO()).getAllToys(l_offset, l_limit);
           }
-      } else {
+      } else {*/
           promise = new navToysDAO().getAllToys(null, null, filters.ageGroups, filters.categories, filters.keywords , sorters[0].column, sorters[0].type, filters.skills, filters.brands);
-      }
+      //}
 
       var toyList = [];
       return promise
@@ -128,5 +128,15 @@ module.exports = class navToysHandler {
           .catch((error) => {
               return Q.reject(error);
           })
+  }
+
+  getPopularToys() {
+    return new navToysDAO(this.client).getPopularToys()
+      .then((toys) => {
+        return Q.resolve(toys);
+      })
+      .catch((error) => {
+        return Q.reject(error);
+      })
   }
 }
