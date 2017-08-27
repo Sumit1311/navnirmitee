@@ -109,7 +109,7 @@ SIMPLE ROBOT ASSEMBLY: The STEMBOT Smart’s electronic circuits are kid-friendl
 Robotics kit includes a full set of tools for building real robots, including motors, circuit boards, and Chasis. Batteries are included, manual and helpful tutorial videos are available  that will help you start programming and building immediately!',4,12, 1000, true);
 INSERT INTO nav_toys_skills (_id,toys_id, skill) VALUES('07959108-1420-484d-87e0-c2a7ef41d972','bff55cac-739f-4856-9e40-95f39e9c306a',22);
 INSERT INTO nav_toys_skills (_id,toys_id, skill) VALUES('09432878-c7ab-4848-94aa-54d8ccfffef5','bff55cac-739f-4856-9e40-95f39e9c306a',23);
-INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit, popular) VALUES('15018929-fd0a-43dd-a134-c97110d69ed7','Make hydraulic jack And Shooter',null,150,7,'Make a hydraulic jack and projectile launcher.','Learning Objectives<br>
+INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit, popular) VALUES('15018929-fd0a-43dd-a134-c97110d69ed7','Make hydraulic jack And Shooter',1,150,7,'Make a hydraulic jack and projectile launcher.','Learning Objectives<br>
 Introduction to Force, types of forces and its effect on motion and shape.<br>
 Understanding Pressure and its relation to surface area.<br>
 Pascal’s law<br>
@@ -127,7 +127,7 @@ Understanding how Magicians and Babas sleep on nail beds without hurting themsel
 Understanding how we lift cars using hydraulic jack by building a pressure meter.<br>
 Understanding how a JCB crane works by building a projectile launcher.',4,13, 300, true);
 INSERT INTO nav_toys_skills (_id,toys_id, skill) VALUES('c4f73b52-345e-49a8-bb24-6f24d82e22a9','15018929-fd0a-43dd-a134-c97110d69ed7',22);
-INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit, popular) VALUES('b464345d-6d14-404b-8710-855514208b79','Homemade Vacuum Cleaner',null,150,7,'Build the model of a miniature vacuum cleaner and Make a mini shooter and a balloon balance','Learning Objectives:<br>
+INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit, popular) VALUES('b464345d-6d14-404b-8710-855514208b79','Homemade Vacuum Cleaner',1,150,7,'Build the model of a miniature vacuum cleaner and Make a mini shooter and a balloon balance','Learning Objectives:<br>
 1. Learning about properties and components of air<br>
 2. Understanding the working of a fan and an exhaust fan<br>
 3. Using the property of air suction to design and understand the working of a vacuum cleaner<br>
@@ -141,7 +141,7 @@ Kit components:<br>
 3. Plastic moulded components for easy working of the model<br>
 4. Various materials for mini experiments to understand the properties of air<br>',4,13,300, true);
 INSERT INTO nav_toys_skills (_id,toys_id, skill) VALUES('8c1cd74a-fee8-43ac-b31f-62e0cfc64ba8','b464345d-6d14-404b-8710-855514208b79',22);
-INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit) VALUES('a791e7f2-b8a9-46c2-b79c-d23c77822bc7','Senior Electricity Kit',null,150,7,'Learn to make an electric circuits by connecting the resistors in different ways','Learning Objectives<br>
+INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit) VALUES('a791e7f2-b8a9-46c2-b79c-d23c77822bc7','Senior Electricity Kit',1,150,7,'Learn to make an electric circuits by connecting the resistors in different ways','Learning Objectives<br>
 Learn to make an electric circuits by connecting the resistors in different ways and their advantages and disadvantages.<br>
 Making a rheostat and utilizing it to control to observe the change in the glow of a bulb.<br>
 <br>
@@ -155,7 +155,7 @@ How does it help?<br>
 It helps the kid to identify the useful connection for the daily like house hold wiring and function lighting.<br>
 It helps the kid to understand that variable resistnace control an electric appliance.<br>',4,13, 300);
 INSERT INTO nav_toys_skills (_id,toys_id, skill) VALUES('ae9dc1e9-4155-47e3-87ae-0f87a5197721','a791e7f2-b8a9-46c2-b79c-d23c77822bc7',22);
-INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit, popular) VALUES('ae4320f9-9a63-43bc-91f8-89cc7d351460','Gravitation',null,150,7,'Make a spring balance, Make a miniature boat, Make a setup for Archimedes principle','Learning Objectives:<br>
+INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit, popular) VALUES('ae4320f9-9a63-43bc-91f8-89cc7d351460','Gravitation',1,150,7,'Make a spring balance, Make a miniature boat, Make a setup for Archimedes principle','Learning Objectives:<br>
 1. Difference between mass and weight.<br>
 2. Calibration and its importance<br>
 3. How do heavy ships float? – Difference between the volume of the shape and volume of the material<br>
@@ -164,7 +164,7 @@ INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, 
 How does it help?<br>
 Your Child will make a spring balance that will help him understand the link between the weight of an object and earth’s gravity and also the concept that makes a heavy iron boat float on water ( Archimedes principle).<br>',4,13, 300, true);
 INSERT INTO nav_toys_skills (_id,toys_id, skill) VALUES('f3b70bcf-bd04-4a47-8f97-2890ab295988','ae4320f9-9a63-43bc-91f8-89cc7d351460',22);
-INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit) VALUES('0e6bdbaf-4635-4c6d-916a-5f6a52586657','Sound',null,150,7,'Build a model of Human ear & Make a Wave Generator','Sound – Vibrations<br>
+INSERT INTO nav_toys (_id,name, stock, price, rent_duration, short_description, long_description, age_group, brand, deposit) VALUES('0e6bdbaf-4635-4c6d-916a-5f6a52586657','Sound',1,150,7,'Build a model of Human ear & Make a Wave Generator','Sound – Vibrations<br>
 Make a sound instrument – musical balloon – and a vibration detector to understand:<br>
 Difference between frequency and amplitude<br>
 How to change frequency and amplitude of sound in an instrument.<br>
