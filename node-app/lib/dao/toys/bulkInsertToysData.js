@@ -4,14 +4,14 @@ const exec = require('child_process').execSync;
 
 
 function ConvertToArray() {
-    var data = fs.readFileSync(process.cwd() + '/nav_toys.csv');
+    var data = fs.readFileSync(process.cwd() + '/nav_toys.remaining.csv');
     var rows = data.toString().trim().split(/#/);
     var queries = {
         "nav_toys" : [],
         "nav_toys_skills" : []
     }
     var queryPrefixToys = "INSERT INTO nav_toys (_id,", queryPrefixSkills="INSERT INTO nav_toys_skills (_id,toys_id,";
-    console.log(rows[0]);
+    //console.log(rows[0]);
     var columns = rows[0].trim().split(';');
     for(var j = 0; j < columns.length - 1; j++) {
         queryPrefixToys += columns[j];
@@ -21,11 +21,11 @@ function ConvertToArray() {
             queryPrefixToys += ","
         }
     }
-    console.log(queryPrefixToys);
+    //console.log(queryPrefixToys);
     var skillsColumn = columns[columns.length - 1];
     queryPrefixSkills += skillsColumn + ") VALUES(";
     var queryToys, querySkills;
-    console.log(queryPrefixSkills);
+    //console.log(queryPrefixSkills);
     for(var i = 1; i< rows.length; i++) {
         columns = rows[i].trim().split(';');
         var cells;
@@ -85,9 +85,9 @@ function ConvertToArray() {
     }
 }*/
 
-var query = ConvertToArray();
+ConvertToArray();
 //console.log(query.nav_toys[0]);
-console.log(query.nav_toys_skills.length);
+//console.log(query.nav_toys_skills.length);
 //CreateImages(query.nav_toys);
 
 

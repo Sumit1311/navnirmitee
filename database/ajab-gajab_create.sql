@@ -58,6 +58,7 @@ CREATE TABLE  nav_toys(
 	age_group smallint,
     brand integer,
     category smallint,
+    popular boolean,
 	parent_toys_id varchar(36),
     deposit integer,
 	CONSTRAINT _id PRIMARY KEY (_id)

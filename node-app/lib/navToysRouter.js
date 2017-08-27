@@ -301,7 +301,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                     }
                 }
                 if(req.query.hasOwnProperty(key) && (key == "ageGroup")) {
-                    if(Array.isArray(req.query)) {
+                    if(Array.isArray(req.query[key])) {
                     for(index = 0; index < req.query[key].length; index++) {
                         activeAgeGroups.push(parseInt(req.query[key][index]));
                     }
@@ -310,7 +310,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                     }
                 }
                 if(req.query.hasOwnProperty(key) && (key === "skill")) {
-                    if(Array.isArray(req.query)) {
+                    if(Array.isArray(req.query[key])) {
                     for(index = 0; index < req.query[key].length; index++) {
                         activeSkills.push(parseInt(req.query[key][index]));
                     }
@@ -319,7 +319,7 @@ module.exports = class navToysRouter extends navBaseRouter {
                     }
                 }
                 if(req.query.hasOwnProperty(key) && (key === "brand")) {
-                    if(Array.isArray(req.query)) {
+                    if(Array.isArray(req.query[key])) {
                         for(index = 0; index < req.query[key].length; index++) {
                             activeBrands.push(parseInt(req.query[key][index]));
                         }
@@ -558,16 +558,21 @@ module.exports = class navToysRouter extends navBaseRouter {
                 orderDetail = orderDetails[0];
                 return new navToysHandler(client).getToyDetail(orderDetail.toys_id);
             })
+            
             .then((result) => {
                 toyDetail = result.toyDetail;
+                //if payment method is Paytm or gateway we should not place an order here instead it should be placed in success of navPayments
+                return new navOrders(client).completeOrder(orderId, "success");
+            })
+            .then(() => {
                 return new navAccount(client).getTransactions(user, toyDetail);
             })
             .then((result) => {
                 transactions = result.transactions;
                 transfers = result.transfers;
-                if(transfers.length === 0 && transactions.length === 0) {
+                /*if(transfers.length === 0 && transactions.length === 0) {
                     return new navOrders(client).completeOrder(orderId, "success");
-                }
+                }*/
                 if(transfers.length !== 0 ) {
                     return new navPayments(client).doPayments(orderId, user._id, transfers, "transfer", null, true, transactions.length > 0);
                 } else {

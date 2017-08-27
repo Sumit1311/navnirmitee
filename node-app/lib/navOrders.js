@@ -4,11 +4,9 @@ var navRentalsDAO = require(process.cwd() + "/lib/dao/rentals/navRentalsDAO.js")
     navLogUtil = require(process.cwd() + "/lib/navLogUtil.js"),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     navToysHandler = require(process.cwd() + "/lib/navToysHandler.js"),
-    navAccount = require(process.cwd() + "/lib/navAccount.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
     Q = require('q'), 
-    moment = require('moment'), 
-    navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js");
+    moment = require('moment');
 
 module.exports = class navOrders {
     constructor(client) {
@@ -116,7 +114,9 @@ module.exports = class navOrders {
                 toyDetail = result ? result.toyDetail : {};
                 if(rollbackFlag) {
                     navLogUtil.instance().log.call(self, self.updateOrder.name, "Updating balance of user "+userId+" for cancellation of order "+orderId, "info");
-                    return new navUserDAO(rDAO.providedClient).updateBalance(userId,  parseInt(toyDetail.price));
+                    return Q.resolve();
+                    //when gatewayy gets added we might need this but not for cash
+                    //return new navUserDAO(rDAO.providedClient).updateBalance(userId,  parseInt(toyDetail.price));
                 } else {
                     navLogUtil.instance().log.call(self, self.updateOrder.name, "No toy exists for "+toyId, "info");
                     return Q.resolve();
@@ -215,7 +215,22 @@ module.exports = class navOrders {
             })
     }
 
-    getOrders(userId) {
+    getDebitTransactions(userId) {
+        var transactions = [];
+        return new navRentalsDAO().getDebitTransactions(userId)
+        .then((_transactions) => {
+            for(var i = 0; i < _transactions.length; i++) {
+                transactions.push(navTransactions.createObject(_transactions[i], navTransactions.getType().RENT)); 
+            }
+            return Q.resolve(transactions);
+        })
+        .catch((error) => {
+            return Q.reject(error);
+        })
+
+    }
+
+    getAllUserOrders(userId) {
         var transactions = [];
         return new navRentalsDAO().getAllOrders(userId)
         .then((_transactions) => {
@@ -227,7 +242,6 @@ module.exports = class navOrders {
         .catch((error) => {
             return Q.reject(error);
         })
-
     }
 
     getActiveOrders(userId) {
@@ -268,7 +282,7 @@ module.exports = class navOrders {
     markSuccess(orderId) {
         const self = this;
 
-        var order, walletDetail, toyDetail;
+        var order, toyDetail;
 
         return new navRentalsDAO(self.client).getOrderDetails(orderId)
             .then((orders) => {
@@ -282,9 +296,9 @@ module.exports = class navOrders {
 
                 }
             })
-            .then(() => {
+            /*.then(() => {
                 return new navToysHandler(self.client).getToyDetail(order.toys_id);
-            })
+            })*/
             .then((result) => {
                 toyDetail = result.toyDetail;
                 /*if(toyDetails.price > userDetails.balance) {
@@ -295,7 +309,7 @@ module.exports = class navOrders {
                 }*/
                 return new navToysHandler(self.client).getOnRent(order.toys_id);
             })
-            .then(() => {
+            /*.then(() => {
                 return new navAccount(self.client).getWalletDetails(order.user_id);
             })
             .then((walletDetails) => {
@@ -304,13 +318,30 @@ module.exports = class navOrders {
                 }
                 walletDetail = walletDetails[0];
                 return new navAccount(self.client).rentToy(order.user_id, walletDetail, toyDetail);
-            })
+            })*/
             .catch((error) => {
                 navLogUtil.instance().log.call(self, self.markSuccess.name, "Error " + error.stack, "error");
                 return Q.reject(error);
             })
     }
 
+    getToyDetail(orderId) {
+        var self = this, toyDetail;
+        return new navRentalsDAO(self.client).getOrderDetails(orderId)
+            .then((order) => {
+
+                return new navToysHandler(self.client).getToyDetail(order[0].toys_id);
+            })
+            .then((result) => {
+                toyDetail = result.toyDetail;
+                return Q.resolve(toyDetail);
+            })
+            .catch((error) => {
+                navLogUtil.instance().log.call(self, self.getToyDetail.name, "Error " + error.stack, "error");
+                return Q.reject(error);
+            })
+        
+    }
 
 } 
 

@@ -71,11 +71,11 @@
 </dl>
 <dl>
   <dt>Renting Duration:</dt>
-  <dd>{{toyDetail.rent_duration}}</dd>
+  <dd>{{toyDetail.rent_duration}} Days</dd>
 </dl>
 <dl>
   <dt>Deposit :</dt>
-  <dd>{{toyDetail.deposit}}</dd>
+  <dd>&#x20b9; {{toyDetail.deposit}}</dd>
 </dl>
 {{#compare toyDetail.stock "!==" null}} 
 <dl>
@@ -84,7 +84,7 @@
                       </dd>
                   {{/compare}}
 </dl>
-<h3 class="">Price : &#x20b9; {{toyDetail.price}}</h3>
+<h3 class="">Rent : &#x20b9; {{toyDetail.price}}</h3>
 {{#compare toyDetail.stock "==" null}} 
 
     <p><a href="#" class="btn btn-green btn-large" disabled><i class="icon-shopping-cart"></i>Coming Soon</a></p>

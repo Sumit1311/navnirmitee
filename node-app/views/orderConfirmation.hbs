@@ -11,78 +11,110 @@
 <div class="page-content">
     <div class="container"> -->
 
-<form class="form-horizontal col-lg-offset-4 col-lg-4" role="form" action="/toys/confirmTransaction?ref={{orderId}}" method="post">
-    <div class="row confirm">
+<!-- <div class="heads" style="background: url(img/img02.jpg) center center;">
+    <div class="container">
         <div class="row">
-            <div class="col-md-12 col-sm-12">
-                <h3 class="text-center">Wallet Summary</h3>
-                <hr>
-                    <dl class="text-center">
-                        <dt class="">Wallet Balance : </dt>
+            <div class="col-md-12">
+                <h2><span>//</span> Order Confirmation</h2>
+            </div>
+        </div>
+    </div>
+</div> 
+
+<div class="page-content">
+    <div class="container"> -->
+
+<form id="orderConfirmForm" class="form-horizontal " role="form" action="/toys/confirmTransaction?ref={{orderId}}" method="post">
+    <div class="row confirm" style="margin-right: px;
+        margin-left: 0px;">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <h3 class="">Wallet Summary</h3>
+
+                <hr><div class="col-md-6 col-sm-12 col-xs-6">
+                    <dl class="dl-horizontal">
+                        <dt class="col-xs-6">Wallet Balance : </dt>
                         <dd class="">&#x20b9; {{userDetails.balance}}</dd>
                     </dl>      
-                    <dl class="text-center">
-                        <dt class="">Wallet Deposit : </dt>
+                </div>
+                <div class="col-md-6 col-sm-12 col-xs-6">
+                    <dl class="dl-horizontal">
+                        <dt class="col-xs-6">Wallet Deposit : </dt>
                         <dd class="">&#x20b9; {{userDetails.deposit}}</dd>
+                    </dl>   
+                </div>
+
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <h3 class="">Order Summary</h3>
+                <hr>
+                <div class="col-md-6 col-sm-12 col-xs-6">
+                    <dl class="dl-horizontal">
+                        <dt class="col-xs-6">Toy Rental : </dt>
+                        <dd class="">&#x20b9; {{toyDetails.price}}</dd>
                     </dl>      
-                <hr style="margin-top: 0px;">
+                </div>
+                <div class="col-md-6 col-sm-12 col-xs-6">
+                    <dl class="dl-horizontal">
+                        <dt class="col-xs-6">Toy Deposit : </dt>
+                        <dd class="">&#x20b9; {{toyDetails.deposit}}</dd>
+                    </dl>    
+                </div>
             </div>
 
         </div>
         <div class="row">
-            <div class="col-md-12 col-sm-12">
-                <h3 class="text-center">Order Summary</h3>
-                <hr>
-                    <dl class="text-center">
-                        <dt class="">Toy Rental : </dt>
-                        <dd class="">&#x20b9; {{toyDetails.price}}</dd>
-                    </dl>      
-                    <dl class="text-center">
-                        <dt class="">Toy Deposit : </dt>
-                        <dd class="">&#x20b9; {{toyDetails.deposit}}</dd>
-                    </dl>      
+
+
+            <hr></div>
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">            <h3 class="">Transfer Summary</h3>
+
                 <hr style="margin-top: 0px;">
+                {{#each transfers}}
+                    <div class="col-md-6 col-sm-12 col-xs-6">
+                    <dl class="dl-horizontal">
+                        <dt class="col-xs-6">Trasnferring from {{from}} to {{to}} : </dt>
+                        <dd class="">&#x20b9; {{amount}}</dd>
+                    </dl>      
+                </div>
+                {{/each}}
             </div>
 
-        </div>
-        <div class="col-md-12 col-sm-12">
-            <h3 class="text-center">Transfer Summary</h3>
-            <hr>
-            {{#each transfers}}
-                <dl class="text-center">
-                    <dt class="">Trasnferring from {{from}} to {{to}} : </dt>
-                    <dd class="">&#x20b9; {{amount}}</dd>
-                </dl>      
-            {{/each}}
-            <hr style="margin-top: 0px;">
-        </div>
-        <div class="row confirm">
-            <div class="col-md-12 col-sm-12">
-                {{#compare (length transactions) "!==" 0}}
-                    <h3 class="text-center">Transaction Summary</h3>
-                    <hr>
+
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <h3 class="">Transaction Summary</h3>
+                <hr>
                     {{#each transactions}}
-                        <dl class="dl-horizontal text-center">
-                            <dt class="">{{label}} : </dt>
+                    <div class="col-md-6 col-sm-12 col-xs-6">
+                        <dl class="dl-horizontal">
+                            <dt class="col-xs-6">{{label}} : </dt>
                             <dd class="">&#x20b9; {{amount}}</dd>
                         </dl>      
+                    </div>
                     {{/each}}
-                    <hr style="margin-top: 0px;">
-                        <dl class="dl-horizontal text-center">
-                            <dt class="">Total Amount : </dt>
-                            <dd class="">&#x20b9; {{totalAmount}}</dd>
-                        </dl>      
-                    <hr style="margin-top: 0px;">
-                    <div class="form-group">
-                        <div class="text-center">
-                            <div class="radio col-md-6 col-lg-6 col-sm-6 col-xs-12">
-                                <label class="pull-right">
-                                    <input type="radio" name="paymentMethod" value="cash"  checked>
 
-                                    &nbsp; Cash On Delivery 
-                                </label>
-                            </div>
-                            <!-- <div class="radio col-md-6 col-lg-6 col-sm-6 col-xs-12">
+
+
+            </div>
+        </div>
+        <hr style="margin-top: 0px;"><div class="row form-group">
+            <div style="vertical-align: middle;" class="col-md-4 col-md-offset-2 col-sm-offset-0 col-sm-6 col-xs-offset-0 col-xs-6">
+                <dl style="margin-top: 11px;" class="dl-horizontal">
+                    <dt class="col-xs-6">Total Amount Payable : </dt>
+                    <dd class="">&#x20b9; {{totalAmount}}</dd>
+                </dl>
+            </div>
+
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="radio col-md-4 col-lg-4 col-sm-6 col-xs-6">
+                    <label class="">
+                        <input name="paymentMethod" value="cash" checked="" type="radio">
+
+                        &nbsp; Cash On Delivery 
+                    </label>
+
+                    <!-- <div class="radio col-md-6 col-lg-6 col-sm-6 col-xs-12">
                                 <label class="pull-left">
                                     <input type="radio" name="paymentMethod"  value="paytm" disabled>
                                     &nbsp; Pay By Paytm
@@ -101,16 +133,19 @@
                                     &nbsp; QR Code With BHIM
                                 </label>
                             </div> -->
-                        </div>
-                        </div>
-                    {{/compare}}
                 </div>
+                <button class="btn btn-green" style="" type="submit">Confirm</button>
             </div>
-            <div class="row text-center form-group">
-                <button style="" type="submit" class="btn btn-green">Confirm</button>
-            </div>
-
         </div>
+
+    </div>
 </form>
+<!--    </div>
+</div> -->
+
+
+
+
+
 <!--    </div>
 </div> -->

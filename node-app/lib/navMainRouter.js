@@ -1,5 +1,6 @@
 var navBaseRouter = require(process.cwd() + "/lib/navBaseRouter.js"),
     navUserDAO = require(process.cwd() + "/lib/dao/user/userDAO.js"),
+    repeatHelper = require('handlebars-helper-repeat'),
     navMembershipParser = require(process.cwd() + "/lib/navMembershipParser.js"),
     navResponseUtil = require(process.cwd() + "/lib/navResponseUtil.js"),
     navCommonUtil = require(process.cwd() + "/lib/navCommonUtil.js"),
@@ -113,13 +114,49 @@ module.exports = class navMainRouter extends navBaseRouter {
     }
 
     getHome(req, res){
-        new navToysHandler().getToysList(req.user ? true : false, 0, 10, {}, [])
+        var categories, ageGroups, skills, brands, popularToys;
+        var sortLabels = ["Name", "Price", "Age Group"];
+        var sortTypes = ["ASC", "DESC"];
+        ageGroups = navCommonUtil.getAgeGroups();
+        categories = navCommonUtil.getCategories();
+        skills = navCommonUtil.getSkills();
+        brands = navCommonUtil.getBrands();
+        new navToysHandler().getPopularToys()
+            .then((toys) => {
+                popularToys = toys;
+                return new navToysHandler().getToysList(req.user ? true : false, 0, 12, {}, [{}])
+            })
             .done((result) => {
                 res.render('index', {
                     user : req.user,
                     isLoggedIn : req.user ? true : false,
                     layout : 'nav_bar_layout',
-                    toysList : result.toys
+                    toysData : {
+                        toysList : result.toys,
+                        popularToys : popularToys,
+                        filters : {
+                            categories : categories,
+                            ageGroups : ageGroups,
+                            skills : skills,
+                            brands : brands,
+                            activeCategories : [],
+                            activeAge : [], 
+                            activeSkills : [],
+                            activeBrands : []
+                        },
+                        sorters : {
+                            sortLabels : sortLabels,
+                            sortTypes : sortTypes,
+                            sortBy : 0 ,
+                            sortType : 0 
+                        },
+                        noOfPages : result.noOfPages,
+                        perPageLimit : result.perPageToys,
+                        currentPage : 1
+                    },
+                    helpers : {
+                        repeat : repeatHelper
+                    }
                 });
             
             },function(error){

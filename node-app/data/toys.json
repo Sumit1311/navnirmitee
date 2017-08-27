@@ -59,7 +59,17 @@
         {
             "id" : 14,
             "name" : "Smartivity"
+        },
+        {
+            "id" : 15,
+            "name" : "Ekta"
+        },
+        {
+            "id" : 16,
+            "name" : "Basetronix"
         }
+
+
 
 
 
@@ -135,7 +145,7 @@
                 "name" : "Sports"
             },{
                 "id" : 22,
-                "name" : "STEM"
+                "name" : "STEM(Science, Technology, Engineering, Mathematics)"
             },{
                 "id" : 23,
                 "name" : "Robotics"

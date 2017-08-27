@@ -34,6 +34,9 @@ $(document).ready(function() {
 		interval: 5000
 	});
 	
+	$("#home-slider1").carousel({
+		interval: 5000
+	});
 	$("#testi").carousel({
 		interval: 4000
 	});
@@ -42,6 +45,20 @@ $(document).ready(function() {
 		interval: false
 	});
 
+    $('.carousel-showmanymoveone .item').each(function(){
+        var itemToClone = $(this);
+        for (var i=1;i<4;i++) {
+            itemToClone = itemToClone.next();
+
+            if (!itemToClone.length) {
+                itemToClone = $(this).siblings(':first');
+            }
+
+            itemToClone.children(':first-child').clone()
+            .addClass("cloneditem-"+(i))
+            .appendTo($(this));
+        }
+    });
 });
 
 $(function(){

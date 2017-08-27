@@ -174,6 +174,22 @@ navToysDAO.prototype.getAllToys = function (offset, limit, ageGroups, categories
 
 };
 
+navToysDAO.prototype.getPopularToys = function() {
+    var self = this;
+
+    return this.dbQuery("SELECT _id, name, stock , price, points , age_group , category , parent_toys_id, short_description, long_description" +
+            " FROM " + tableName + " WHERE popular = $1",[true])
+        .then(function (result) {
+            return result.rows;
+        })
+    .catch(function (error) {
+            navLogUtil.instance().log.call(self, "getToyDetailsById",  error.message, "error" );
+            return Q.reject(new navCommonUtils().getErrorObject(error,500,"DBTOYS", navDatabaseException));
+    });
+    
+}
+
+
 navToysDAO.prototype.getToyDetailById = function (toyId) {
     var self = this;
     navLogUtil.instance().log.call(self, self.getToyDetailById.name, "Fetch toys details by id " + toyId, "debug");
