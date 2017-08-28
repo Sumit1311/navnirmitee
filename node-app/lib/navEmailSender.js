@@ -56,6 +56,7 @@ module.exports = class navEmailSender {
         var mailOptions = {
             to: to, // list of receivers
             subject: subject, // Subject line
+            from : "sumit@ajab-gajab.com",
             //text: htmlToText(htmlText), // plaintext body
             //html: htmlText// html body
             template: htmlTemplate.template,
