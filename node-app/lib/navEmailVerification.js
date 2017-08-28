@@ -11,7 +11,7 @@ module.exports = class navEmailVerification extends navEmailSender {
         var self = this;
         navLogUtil.instance().log.call(self,self.sendVerificationEmail.name, 'Sending verfication email to '+ to + 'with verification link '+verificationLink, "debug");
 
-        return this.sendMail(to, "Ajab Gajab Kids Library",{
+        return this.sendMail(to, "Action required: Please verify your email address",{
 
             template: "verificationEmail",
                context: {

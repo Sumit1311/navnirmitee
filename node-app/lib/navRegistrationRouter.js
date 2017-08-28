@@ -81,7 +81,7 @@ module.exports = class navRegistration extends navBaseRouter {
 
              //return userDAO.insertRegistrationData(email, contactNo, password,verificationCode);
              //todo : uncomment when want to send verification email
-             return emailVer.sendVerificationEmail(email, null, verificationLink)
+             return emailVer.sendVerificationEmail(email, email, verificationLink)
         })
         .then(function (response) {
              navLogUtil.instance().log.call(self, self.doRegistration.name," Sent verificiation email" + response, 'info');
