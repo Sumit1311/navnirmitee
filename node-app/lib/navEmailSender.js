@@ -5,7 +5,7 @@ var Q = require('q'),
     exphbs = require('express-handlebars'),
     navConfigParser = require(process.cwd() + "/lib/navConfigParser.js"),
     handleBars = require('nodemailer-express-handlebars');
-
+const htmlToText = require('html-email-to-text');
 
 module.exports = class navEmailSender {
     constructor(smtpServerURL) {
@@ -63,15 +63,21 @@ module.exports = class navEmailSender {
             context: htmlTemplate.context
         };
 
-        // send mail with defined transport object
-        self.transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                navLogUtil.instance().log.call(self,self.sendMail.name,'Error sending mail ' + error, "error");
-                return def.reject(new navSendEmailException(error));
-            }
-            navLogUtil.instance().log.call(self,self.sendMail.name, 'Sent mail to '+ to + ' : ' + info.response, "debug");
-            def.resolve(info);
-        });
+        exphbs.create().render(process.cwd() + "/views/"+htmlTemplate.template+".hbs", htmlTemplate.context)
+            .then((string) => {
+                // send mail with defined transport object
+                mailOptions.text = htmlToText(string);
+                self.transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        navLogUtil.instance().log.call(self,self.sendMail.name,'Error sending mail ' + error, "error");
+                        return def.reject(new navSendEmailException(error));
+                    }
+                    navLogUtil.instance().log.call(self,self.sendMail.name, 'Sent mail to '+ to + ' : ' + info.response, "debug");
+                    def.resolve(info);
+                });
+            
+            })
+
         return def.promise;
     }
 }
