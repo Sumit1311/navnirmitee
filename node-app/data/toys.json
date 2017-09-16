@@ -67,9 +67,63 @@
         {
             "id" : 16,
             "name" : "Basetronix"
+        },
+        {
+            "id" : 17,
+            "name" : "Blix"
+        },
+        {
+            "id" : 18,
+            "name" : "Mechanix"
+        },
+        {
+            "id" : 19,
+            "name" : "Creatives"
+        },
+        {
+            "id" : 20,
+            "name" : "Skillmatics"
+        },
+        {
+            "id" : 21,
+            "name" : "Hape"
+        },
+        {
+            "id" : 22,
+            "name" : "Saffire"
+        },
+        {
+            "id" : 23,
+            "name" : "Lego"
+        },
+        {
+            "id" : 24,
+            "name" : "IkenJoy"
+        },
+        {
+            "id" : 25,
+            "name" : "Smart Labz"
+        },
+        {
+            "id" : 26,
+            "name" : "4m"
+        },
+        {
+            "id" : 27,
+            "name" : "Let's Create"
+        },
+        {
+            "id" : 28,
+            "name" : "NASA Tech"
+        },
+        {
+            "id" : 29,
+            "name" : "SS Net"
+        },
+        {
+            "id" : 30,
+            "name" : "Kutuhal"
         }
-
-
 
 
 
@@ -149,7 +203,11 @@
             },{
                 "id" : 23,
                 "name" : "Robotics"
+            },{
+                "id" : 24,
+                "name" : "IQ"
             }
+
         ],  
         "ageGroups" : [
             {

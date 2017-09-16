@@ -4,7 +4,7 @@ const exec = require('child_process').execSync;
 
 
 function ConvertToArray() {
-    var data = fs.readFileSync(process.cwd() + '/nav_toys.remaining.csv');
+    var data = fs.readFileSync(process.cwd() + '/data/nav_toys.remaining.csv');
     var rows = data.toString().trim().split(/#/);
     var queries = {
         "nav_toys" : [],
@@ -35,8 +35,9 @@ function ConvertToArray() {
 
         for(j = 0; j < columns.length - 1; j++) {
             cells = columns[j].trim();
+            
             if(j === 0) {
-                for(var x = 1; x <= 5;x++) {
+                for(var x = 1; x <= 7;x++) {
                    try {
                        fs.statSync("../public/img/toys/"+ columns[j] +"_"+ x +".jpg");
                    } catch(error) {
@@ -48,9 +49,15 @@ function ConvertToArray() {
                 //cells = cells.replace("'", "\\\'");
             }
             //console.log(cells);
+            if(j == 4 && cells.length === 100) {
+                console.log("Length of short description exceeds. i is "+i);
+                break;
+            }
             if(j === 0 || j === 4 || j === 5) {
                 cells = cells.replace(new RegExp("'", 'g'), "''");
                 queryToys += "'" + cells + "'";
+            }else if(j == 1 && cells === "null"){
+                queryToys += "null";
             } else {
                 queryToys += cells;
 
