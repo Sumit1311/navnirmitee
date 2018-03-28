@@ -37,10 +37,10 @@ start() {
         local CMD="$EXECUTABLE $SCRIPT > \"$LOGFILE\" 2>&1"
         echo $CMD
         #su -c "$CMD" $USER > "$PIDFILE"
-        $CMD &
+        $CMD
         echo $! > "$PIDFILE"
-        echo "disown"
-        disown
+        #echo "disown"
+        #disown
         echo 'Service started' >&2
     fi
 }
