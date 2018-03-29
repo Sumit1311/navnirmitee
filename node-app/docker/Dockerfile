@@ -4,12 +4,12 @@ ENV SIGN_KEY="nginx_signing.key"
 
 #Set proxy if required
 
-ENV http_proxy="http://sumit_toshniwal:Time%401234@10.43.3.110:8080"
-ENV https_proxy="https://sumit_toshniwal:Time%401234@10.43.3.110:8080"
-RUN npm config set proxy "$http_proxy"
-RUN npm config set https-proxy "$http_proxy"
-RUN git config --global http.proxy "$http_proxy"
-#RUN git config --global core.gitproxy 
+#ENV http_proxy="http://sumit_toshniwal:Time%401234@10.43.3.110:8080"
+#ENV https_proxy="https://sumit_toshniwal:Time%401234@10.43.3.110:8080"
+#RUN npm config set proxy "$http_proxy"
+#RUN npm config set https-proxy "$http_proxy"
+#RUN git config --global http.proxy "$http_proxy"
+##RUN git config --global core.gitproxy 
 RUN git config --global url.https://github.com/.insteadOf git://github.com/
 
 
@@ -36,8 +36,10 @@ RUN apt-get install -y certbot -t jessie-backports
 
 COPY . /src/app
 RUN cp /src/app/ajabgajab.conf /etc/nginx/conf.d/ajabgajab.conf
-
-
+RUN mkdir /etc/letsencrypt
+RUN cp -r /src/app/letsencrypt/* /etc/letsencrypt
+#RUN chown -R root:root /etc/letsencrypt
+RUN mkdir /var/www/ajab-gajab.com/.well-known/
 
 #RUN /src/app/scripts/db-setup.sh
 #RUN git config --global core.gitproxy /src/app/scripts/gitproxy.sh

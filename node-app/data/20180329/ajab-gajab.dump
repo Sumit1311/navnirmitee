@@ -1,0 +1,709 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.6.3
+-- Dumped by pg_dump version 9.6.3
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: nav_child; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE nav_child (
+    _id character varying(36) NOT NULL,
+    age_group smallint,
+    hobbies text,
+    user_id character varying(36),
+    gender smallint
+);
+
+
+ALTER TABLE nav_child OWNER TO admin;
+
+--
+-- Name: nav_enquiry; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE nav_enquiry (
+    _id character varying(36) NOT NULL,
+    name character varying(50),
+    email character varying(50),
+    contact_no character varying(15),
+    message character varying(500),
+    submission_date bigint
+);
+
+
+ALTER TABLE nav_enquiry OWNER TO admin;
+
+--
+-- Name: nav_payments; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE nav_payments (
+    _id character varying(36) NOT NULL,
+    user_id character varying(36),
+    amount_payable integer,
+    reason character varying(30),
+    credit_date bigint,
+    paid_date bigint,
+    status character varying(30),
+    transaction_id character varying(36),
+    transaction_summary text,
+    next_retry_date bigint,
+    expiration_date bigint,
+    transaction_type character varying(20),
+    is_order smallint
+);
+
+
+ALTER TABLE nav_payments OWNER TO admin;
+
+--
+-- Name: nav_rentals; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE nav_rentals (
+    _id character varying(36) NOT NULL,
+    user_id character varying(36),
+    toys_id character varying(36),
+    transaction_date bigint,
+    lease_start_date bigint,
+    lease_end_date bigint,
+    shipping_address text,
+    status character varying(30),
+    delivery_date bigint,
+    returned_date bigint,
+    release_date bigint
+);
+
+
+ALTER TABLE nav_rentals OWNER TO admin;
+
+--
+-- Name: nav_toys; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE nav_toys (
+    _id character varying(36) NOT NULL,
+    name character varying(50),
+    stock integer,
+    price integer,
+    short_description character varying(100),
+    long_description text,
+    points integer,
+    age_group smallint,
+    parent_toys_id character varying(36),
+    rent_duration integer,
+    brand integer,
+    category smallint,
+    deposit integer,
+    popular boolean DEFAULT false
+);
+
+
+ALTER TABLE nav_toys OWNER TO admin;
+
+--
+-- Name: nav_toys_skills; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE nav_toys_skills (
+    _id character varying(36) NOT NULL,
+    toys_id character varying(36),
+    skill integer
+);
+
+
+ALTER TABLE nav_toys_skills OWNER TO admin;
+
+--
+-- Name: nav_user; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE nav_user (
+    _id character varying(36) NOT NULL,
+    first_name text,
+    last_name text,
+    email_address character varying(100),
+    mobile_no character varying(15),
+    password text,
+    email_verification character varying(36),
+    subscribed_plan character varying(10),
+    points integer,
+    balance integer DEFAULT 0,
+    deposit integer DEFAULT 0,
+    address text,
+    city character varying(50),
+    state character varying(30),
+    membership_expiry bigint,
+    enrollment_date bigint,
+    pin_code character varying(10),
+    user_type smallint,
+    reset_password character varying(36)
+);
+
+
+ALTER TABLE nav_user OWNER TO admin;
+
+--
+-- Data for Name: nav_child; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY nav_child (_id, age_group, hobbies, user_id, gender) FROM stdin;
+4232514a-0b08-4fac-a424-6808ee708734	\N	\N	18d57428-9f99-4f7f-a11a-141a0e14041e	\N
+690d5c13-9e2a-459c-91ea-c637c31f226f	0	\N	da1bb34e-1b90-45a8-b02f-9fd068b31260	\N
+ef7afd55-17d4-41d1-87db-36620e993598	\N	\N	8efde24a-733d-4970-b8e3-449f0d421cc6	\N
+6ed4b631-2a94-40d4-b57b-928e8abc47e3	1	\N	13b53c8e-1f9c-40a4-8dd4-780f2d9b4af7	\N
+d9a17713-0c12-4836-9ff2-a3de095e6de4	\N	\N	5c3f3f04-43ba-4c65-b9bc-ee7ffd79c263	\N
+\.
+
+
+--
+-- Data for Name: nav_enquiry; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY nav_enquiry (_id, name, email, contact_no, message, submission_date) FROM stdin;
+f52476b6-f7c4-4881-b379-17019f8cb703	Amit Toshniwal	toshniwalami0@gmail.com	9619503031	Test contact us	1503847468426
+8bfd67d2-29b7-4954-bfa0-7aff0bef8c6c	vaishali	abhi.kmgr@gmail.com	9545675511	Pls contact me I want to know plans to rent out toys 	1510071078176
+\.
+
+
+--
+-- Data for Name: nav_payments; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY nav_payments (_id, user_id, amount_payable, reason, credit_date, paid_date, status, transaction_id, transaction_summary, next_retry_date, expiration_date, transaction_type, is_order) FROM stdin;
+03d5bd77-3ee5-4551-9830-db40f18a2236	18d57428-9f99-4f7f-a11a-141a0e14041e	300	DEPOSIT	1503841899693	\N	COMPLETED_CASH	cf8fba1a-38ca-4618-b5fb-4ccf3c29f5f3	\N	\N	\N	Cash on Deliver	1
+791fb113-3d79-4f3b-aa12-36c7b5dddf5f	18d57428-9f99-4f7f-a11a-141a0e14041e	150	TOY_RENTAL	1503841899693	\N	COMPLETED_CASH	cf8fba1a-38ca-4618-b5fb-4ccf3c29f5f3	\N	\N	\N	Cash on Deliver	1
+a88cac7b-e2f4-439f-85c0-0e923b3b8a3e	18d57428-9f99-4f7f-a11a-141a0e14041e	150	TOY_RENTAL	1503842059549	\N	CASH	0b2a4ce1-9674-46fd-bdf2-f4430dbfbba8	\N	\N	\N	Cash on Deliver	1
+011ecc23-3884-4c36-982b-3dee3a71243b	18d57428-9f99-4f7f-a11a-141a0e14041e	1200	DEPOSIT	1503847202567	\N	CASH	5fddb68b-3214-4c84-9937-81726e89a6d7	\N	\N	\N	Cash on Deliver	1
+c1d1214a-4dd7-4920-bb11-1dee135eb4e2	18d57428-9f99-4f7f-a11a-141a0e14041e	350	TOY_RENTAL	1503847202567	\N	CASH	5fddb68b-3214-4c84-9937-81726e89a6d7	\N	\N	\N	Cash on Deliver	1
+\.
+
+
+--
+-- Data for Name: nav_rentals; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY nav_rentals (_id, user_id, toys_id, transaction_date, lease_start_date, lease_end_date, shipping_address, status, delivery_date, returned_date, release_date) FROM stdin;
+cf8fba1a-38ca-4618-b5fb-4ccf3c29f5f3	18d57428-9f99-4f7f-a11a-141a0e14041e	15018929-fd0a-43dd-a134-c97110d69ed7	1503841891905	1503841891000	1504792319000	Dhayari, Pune	RETURNED	1504187519000	1503842015928	1503841899684
+0b2a4ce1-9674-46fd-bdf2-f4430dbfbba8	18d57428-9f99-4f7f-a11a-141a0e14041e	15018929-fd0a-43dd-a134-c97110d69ed7	1503842048651	1503842070983	\N	\N	CANCELLED	1503842070983	1503842070983	1503842059545
+17cfe666-4fa3-470f-9ede-e108e0000d10	18d57428-9f99-4f7f-a11a-141a0e14041e	8cdbe165-b10e-486a-9b63-aad47e16f9b5	1503847067717	1503847178025	\N	\N	CANCELLED	1503847178025	1503847178025	1503847178024
+5fddb68b-3214-4c84-9937-81726e89a6d7	18d57428-9f99-4f7f-a11a-141a0e14041e	8cdbe165-b10e-486a-9b63-aad47e16f9b5	1503847200451	1503847243160	\N	\N	CANCELLED	1503847243160	1503847243158	1503847202562
+\.
+
+
+--
+-- Data for Name: nav_toys; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY nav_toys (_id, name, stock, price, short_description, long_description, points, age_group, parent_toys_id, rent_duration, brand, category, deposit, popular) FROM stdin;
+09f00d6b-03bc-491d-bdf9-276772c1db31	Mechanix - 0	\N	100	Assemble accordingly the whole process to make your Mechanix-0 run on the floor.	Knowledge: Teaches about art of designing and construction <br>    Creativity: Helps creating various models with your own imagination<br>    Reasoning: Learns basics techniques of constructing mechanix instrument / tools.	\N	2	\N	15	18	\N	300	f
+15018929-fd0a-43dd-a134-c97110d69ed7	Make hydraulic jack And Shooter	1	150	Make a hydraulic jack and projectile launcher.	Learning Objectives<br>\nIntroduction to Force, types of forces and its effect on motion and shape.<br>\nUnderstanding Pressure and its relation to surface area.<br>\nPascal’s law<br>\nIntroduction to Hydraulics and pneumatics.<br>\n<br>\nKit components<br>\n40 different components to build various models.<br>\nAdhesives and tools for building experimental set up.<br>\nColour workbook with highly detailed instructions to build models, exercises on observations,information about real life applications, concept map for revision and other interesting questions which would trigger application oriented learning.<br>\nUnlimited fun with Hands-on learning.<br>\n<br>\nHow does it help?<br>\nUnderstanding different forces by experiencing them.<br>\nUnderstanding how Magicians and Babas sleep on nail beds without hurting themselves.<br>\nUnderstanding how we lift cars using hydraulic jack by building a pressure meter.<br>\nUnderstanding how a JCB crane works by building a projectile launcher.	\N	4	\N	7	13	\N	300	t
+138383ac-b617-4a54-87a7-262b8e25db1b	Eye Spy Preriscope	1	200	How does a submarine sense objects above water despite being deep under it?	How can you look through walls? Well, its time to introduce your child to the wonders of Optics with Smartivity Eye Spy Periscope S.T.E.M. Educational D.I.Y. Toy kit.<br>A periscope is an instrument for observation over, around or through an object, obstacle or condition that prevents direct line-of-sight observation from an observer's current position. This is achieved by using mirrors aligned in a particular pattern so that images are reflected multiple times and carried to the viewer without exposing the viewer.<br>This kit contains all the elements needed to assemble a fully-functional Periscope. You child will have great fun assembling it and playing with it.	\N	1	\N	15	14	\N	300	f
+6b7d582b-d4e8-4a7e-a676-4ce5209b65c9	Clickety Flix Retroscope	1	300	How about introducing young minds to the art and craft of making movies?!	Long before film cameras and digital filmmaking were invented, movies used to be made using moving slides. Retroscope was among the first moviemaking machines. It uses Persistence of Vision to create an illusion of moving images.<br>This exciting S.T.E.M. learning based educational D.I.Y. toy kit introduces your child to the fundamentals of movie-making by encouraging them to build a movie-making machine from scratch.<br>The Smartivity Clickety Flix Retroscope S.T.E.M. learning educational D.I.Y. kit includes all the elements and components required to assemble a fully functional movie-making retroscope. The components (parts) are made from high quality engineered wood and non-toxic plastic.<br>Using the richly illustrated, easy to understand, step-by-step instructions from the Instruction Manual, your child can build a fully functional retroscope from scratch. The activity box comes with two sets of slides, a coloured set and a black and white set. Children can also design their own slides and bring their imagination to animated life using the Smartivity Clickety Flix Retroscope.	\N	2	\N	15	14	\N	500	f
+9a385ee0-e508-4a98-a956-16f70ec36c8f	Mechanix Maze Challenge!	\N	100	Understands the principles & functionality of physics and mechanics.	Insert AA size batteries & turn the switch on.<br>    Put the ring of the wand around the metal wire via open area of the ring.<br>    Keep your hand steady & carefully move the ring through the metal wire.<br>    If the ring touches the metal wire, the bell starts ringing & you lose the game.<br>    While creating different levels of difficulty, bend the metal wire.<br>    Ensure that the switch is off & batteries are removed when you bend those metal wires.	\N	1	\N	15	18	\N	300	f
+9de1a40a-4ca5-44c6-8faf-aa942e6278c9	Bubble Science	\N	150	Learns about physics of foams.	Make the bubble solution by diluting any soap into the water.<br>Fill the solution into bubble solution container.<br>Then insert AA size batteries to the battery compartment & turn on the switch.<br>As the switches on, the bubble plate will start to spin & the blower will blow out bubbles	\N	2	\N	15	18	\N	300	f
+8c3d1e06-8cdb-4ce5-9ab3-178da7ab9e53	Purple & Green Pottery Clay Wheel for Kids	1	300	Children through the handmade create artwork by themselves.	Saffire presents this pottery clay wheel for your kids. This is a kind of handmade and educational toys. Children through the handmade create artwork by themselves. This can exercise handmade ability and develop their art cultivation, improve their coordinated ability. It is also helpful for children healthy department. Moreover, this pottery wheel is battery operated and suitable for kids of three and above of age and only for girls.	\N	1	\N	15	22	\N	700	f
+ea74eae3-fc2e-42d2-881a-506128edb2d9	Battle Station - 2	1	150	High power motor. You wont believe how this tank can climb over anything.	Step by Step fix the spare parts with help of bolts and nuts.<br>To fit the bolts tightly, make use of spanner holding the nuts , given inside the box.<br>Do accordingly the whole process to make your Battle station ready to shoot and fight through the process.	\N	2	\N	15	18	\N	200	f
+7dddf9b8-7e86-48d2-8145-403298ec95a0	Robotix - 0	1	100	A specialised MECHANIX for the bike fanatics.	With varieties of models shown in the manual, the child can choose from a scooter to a cruiser, and build his dream bike everyday.  A product of international quality - MECHANIX. Its pieces are crafted from high quality steel, superior plastics and selected tools. These are friendly for little hands and aspire to keep up with the breathless pace of their minds! These construction sets take the shape of mind boggling variety of Bikes. No wonder then, the All India Toy Manufacturers Association has awarded MECHANIX with 2 titles: ‘The Best Toy’ and ‘The Best Educational Toy’.	\N	2	\N	15	18	\N	200	f
+8cdbe165-b10e-486a-9b63-aad47e16f9b5	1-2-3 Snail	1	350	Snail which has lights and mirror with it to be enjoyed by kids	Wobble, wiggle, smile and giggle�this cheerful friend is fun in so many ways! For tummy time, baby will enjoy looking in the mirror, listening to music and sounds. For sit-up play, there�s back and forth rocking motion. And when baby�s ready to crawl, the snail will lead the way, wobbling along with lively music and dancing lights! Features: >Smiling face lights up >Music & silly sounds >Large mirror invites self discovery >Baby can sit & bat the snail >Ladybug to slide back & froth >Rocking motion & musical rewards >Wheels lock so it won't roll away. >Unlock the wheels & baby can send the snail rolling along-crawling after!	\N	0	\N	7	0	\N	1500	f
+3da2b06d-587f-4e51-89a8-cd05563ad47c	Fun With Mathematics	1	150	Learn about basic mathematics	Math Puzzles -<br>Children read the number or number sentence printed on the back of their puzzle pieces. If there is a number sentence they look for its answer or if there is a number they look for its matching number sentence on the play board and put that puzzle piece at the corresponding answer space on the board picture side up. When all the numbers and number sentences are matched correctly they will see that their beautiful picture puzzle is correctly matched. The pack includes three 25 pieces puzzles, 3 Play Boards, a special dice.<br>Addition and Subtraction - <br>This game develops the skill of observation, Count and Add/ subtract quantities, Add/ subtract different numbers that match the pictures and develop elementary math skills<br>Multiplication - <br>This game develops the skill of observation, Count and Add/ subtract quantities, Add/ subtract different numbers that match the pictures and develop elementary math skills.	\N	1	\N	15	19	\N	350	f
+b9ec64ea-fcdb-4e69-b71c-b749225ac065	Brain Boosters	1	150	Activities for exercising child's brain	contains a lot of brain boosting activities for preschoolers to stimulate their mind and help in learning language, numeracy and other subjects.	\N	1	\N	15	19	\N	350	f
+baef0769-8586-49ff-90ff-3e347d2dd98b	Airport Starter Kit	1	200	Create an airport model	Help get Lego city's mail on the helicopter. Be part of the crew with a very important job. Help the postal workers empty the mailbox and get the mail to the helicopter. Load the on board storage boxes before helping the pilot into the cockpit. Fill up the fuel tank with the gasoline barrel and lead the helicopter to the runway with the guide lights. Send off another successful mail delivery to Lego city. Includes 4 minifigures a female postal worker, male postal worker, pilot and airport service worker. Features a helicopter with spinning rotors, space for a minifigure and storage boxes that open. Accessory elements include a gasoline barrel, 2 hand trucks, mailbox, wrench, 3 pieces of mail and 2 lights. Open the front of the mailbox to empty the mail onto the hand truck. Open the storage boxes on the side of the helicopter to load the mail for transport. Spin the rotors and get ready to take off, after fuelling up the helicopter with the gasoline barrel.	\N	1	\N	15	23	\N	800	f
+c0072e91-862b-4f5d-a9f5-e56badfab251	Soccer Fever	1	150	Play soccer with this model and improve your soccer playing skills	Soccer Fever is a popular sport played worldwide. In this game the goal keeper has an exceptional role of blocking the opponents from scoring a goal. Amazing Soccer Fever is the scientific game that is challenged against the goal keeper. Soccer Fever helps the development of coordination and control skills with the fundamentals of science. Challenge yourself to see how many scores you can make and understand the simple but ingenious design that transform the rotatory motion to an opposite pair of left and right motion.	\N	2	\N	15	24	\N	300	f
+3b74dd6a-6673-4eb7-8883-a5d026778293	You Build It Robo Xplorer	1	350	Explore Started sKit	It's RoboXplorer! Kids build their very own multiterain robotic vehicle, complete with six S-shaped legs designed to conquer some of the toughest terrains, such as sand, rocks, and grass. Test its limits by towing toy cars, climbing a stack of books, or negotiating a wall—RoboXplorer will stop at almost nothing!<br>Key Features<br><br>    Develops creativity and imagination skills	\N	2	\N	15	25	\N	1000	f
+652ef496-672d-4084-b0f9-77289cb60ff3	Touch magic learning bus	1	350	Little touches. Big learning	Little touches. Big learning.� � Hop on board for fun with the alphabet, early vocabulary, motor skills and learning songs! � Make a movement or touch a sensor to activate the bus and get the learning journey rolling. � Switch between 3 modes: Learning, Letter Exploration and Music, which includes fun sing-along songs about the alphabet, motion and more. � The award-winning Touch Magic Learning Bus is appropriate for children ages 2+ years. � Parents can connect to the online LeapFrog� Learning Path for customized learning insights and ideas to expand the learning.	\N	0	\N	7	6	\N	1500	f
+016fb1ab-2d97-497f-9cec-b739c1efe6f8	Thomas collectible railway playset	1	150	A railway engine with track	No. of Parts: Collectible playset � Train engine and cargo truck connect together with plastic connectors � Set works with any collectible Railway engine	\N	0	\N	7	0	\N	500	f
+43245c04-d6a7-4eac-b2c3-f34078433638	Ekta World Of Science	1	100	To help your kids understand the procedure and functioning of an experiment	Time for Some Educational Fun!<br>\n<br>\n    Indulge your young scientists in long hours of brain churning fun with the Ekta World of Science. Apart from keeping them engaged and entertained, this science experiment set will enable your growing child to garner a deeper understanding of some of the most important scientific concepts and principles. Hands-on experience with innumerable experiments related to nature, physics, water, air, chemistry, colour and light will also help them to figure out the advanced scientific concepts with ease. Discovering how a magnifying glass enlarges, how static electricity attracts, how sundials function, testing displacement etc. will surely spark an area of interest in young minds.<br>\n    A Pictorial Guidebook for Added Convenience<br>\n<br>\n    To help your kids understand the procedure and functioning of an experiment, the science experiment kit comes with a 48 page pictorial guide book. All the apparatus required to perform these experiments is already included in this kit to offer maximum convenience. The science experiment kit for 5 year old kids is designed by professionals keeping in mind the safety of your young one. This kit enhances your child's confidence and inspires him or her to think logically like a scientist. It's a great way to introduce children to the astounding world of science with this science experiment kit with guide.	\N	1	\N	7	15	\N	200	f
+313b6719-5d48-4dbf-8795-12eb735210f7	Angry Bird Battery Operated Blocks	1	150	Arrange the blocks for observing the motions of different components	Arrange the blocks in different 8 structures and observe the motions converted from one direction to other. Along with that understanding how electrical energy can be converted into mechanical energy.	\N	1	\N	7	16	\N	300	f
+82596a16-4ed2-4486-92aa-f9a8c0746e73	Fun With Time	1	200	Understand the wall clock and which position makes which time	Creatives - Fun with Time<br><br>Children understand the abstract concept of time with this exciting matching game . Includes 32 self-correcting match-ups to read and understand the number symbols and correlate times of the day with activities.<br>Fusion - Learn Time Clock<br>The unique fearure of the time learning clock is the special design of the hour and minute hands linking numbers to time-telling. Hour hand hole corresponds to inner numbers, those are hours. Minute hand corresponds to outer numbers printed on the base, those are minutes.	\N	1	\N	15	19	\N	500	f
+fb3882c6-4580-4348-92b9-915b58e8dec9	Brain Games	1	200	Write and Wipe Activity Mats which build core skills through fun learning methodologies	Brain Games<br><br>Skillmatics Boredom Buster is the perfect companion to keep your little one occupied. The highly engaging activities are carefully designed to ensure that your child practices key concepts while having loads of fun! This holistic pack is easy to carry around and will ensure your child is never bored again!<br>Brain Games<br>Skillmatics Brain Games will teach your children to use a 'think and reason approach' when faced with challenges. Our activities are designed to build logic and problem solving skills through fun learning methodologies! Suitable for all ages, Brain Games is filled with innovative content that promises to be equally engaging for both children and parents.	\N	1	\N	15	20	\N	500	f
+1395b89e-a688-407e-8d82-036f74e29281	Hape Cross Out	1	350	Arrange the cards to complete the story about cause and effect.	Learning goals - Visual perception and classifications - Sorting and reasoning Contents - 12 game cards - 4 red "X" cards How to play The child takes a game strip with 4 pictures on it. One of the images does not belong. The "X" is placed on top of or underneath the odd item. Turning the game strip over shows a key to see if  the "X" has been put in the right place. Once this game is mastered, ask the child to find or draw two items that would go with the odd item.	\N	1	\N	15	21	\N	1000	f
+8619a44b-5011-4b12-b602-2f88d82d18ae	Learn The Times Table	1	300	Learn the times table with addition and subtraction	Learn Times Table - Learning and memorizing tables is a challenging exercise for most children. At Skillmatics we solve this problem by making times tables logical, easy-to-solve and most importantly fun! Our product allows children to learn times tables up to 15 at their own pace and our unique Write and Wipe format enables them to practice again and again - and yet again! <br><br>Pizza Set - Create, slice and serve your own “personal pizza” with this sturdy wooden pizza set from Emob. Yet another great toy for your beloved little one. Young pizza chefs will shout with joy with this wooden pizza set. Kids get busy topping, cutting and serving up six custom slices for their happy customers. Comes with a brightly colored tray, pizza cutter, spatula and a box for storage, and the pizza makes "slicing" noises when cut!! Your child can assemble the pizza right on the cheerful pizza tray. Using different types of combination of the three toppings, your little chef can make a pizza that almost looks good enough to eat. Once the pizza is "ready," the child can use the pizza cutter to cut the pizza. It actually has a rolling blade, just like an authentic utensil and since the pizza slices are held together with Velcro, it makes a fun crunching sound when it's cut. Your little pizza chef can then dish out pizza to their customers with the included server. The Pizza Party toy gives children fun, straightforward tools to inspire their imaginations. We also love that this toy is perfect for both independent and interactive playtime, giving parents the opportunity to help kids learn while playing, too. For example, children can learn counting concepts while preparing pizza: ask them to count the number of mushrooms on the pizza, or to put 10 peppers on her pizza. Set includes 54 mix-‘n-match toppings. Six sliceable pieces served in a brightly coloured tray, complete with a pizza cutter, spatula, and toppings that store neatly in a wooden box. High quality materials and non toxic paints and finishes ensure durability and safety for your little chef!!	\N	1	\N	15	20	\N	800	f
+bf4ea4a2-e149-4667-a81e-92029de2817f	Volume Estimation	1	150	Learn to measure the volume of a container using a measuring device	Build cylinders of different sizes (base and height) and learn how volume changes with the base and height.<br> Learn to estimate the volume of a container & compare volume of 2 different containers<br>	\N	2	\N	15	13	\N	300	f
+b209fe89-136e-4d03-9ff0-13cadec7c061	Color Mixing	1	150	Understanding colors and how to create different colors	Mix different colours to get new colours & learn about primary and secondary colours.<br> Make 3D glasses to see an application of colour mixing in real life.<br>	\N	2	\N	15	13	\N	300	f
+73e7b4ba-ed51-4d58-b383-53276294ac2d	Hand Washing	\N	150	Hand  wash - Before and After Activity	How do germs spread?<br>How to clean germs on your hand? <br>Areas often missed during hand wash. Hand washing technique	\N	2	\N	15	13	\N	300	f
+31ce667d-3953-4193-be65-284a3b63f17d	Plants Help Us	\N	150	Learn about uses of plants.	Make hand sanitizer from aloe vera gel to know medicinal uses of plants.<br> Mix ingredients together to make mehendi to know the decorative uses of plants.<br> Do an activity to understand the difference between cereals and pulses - food from plant<br>	\N	2	\N	15	13	\N	300	f
+e74bd000-57c8-4e31-8e08-77dcf3d8dc68	Different Shapes	1	150	Learn to guess the shape of an object from its shadow.	•  Make different shapes using sticks and clay to understand the difference between lines and joining points.<br>•    Solve a jig-saw puzzle using different shapes based on their no. of sides & joining points<br>•    Learn to guess the shape of an object from its shadow.	\N	2	\N	15	13	\N	300	f
+1919a6e3-e24f-4f95-a5b0-ad425e789262	Place Value - 4 Digit Numbers	1	150	Understand the need for place value	Use blocks and tiles to understand the need for place value.<br> Learn expanded form of representing numbers using the place value strips (1-9, 10-90, 100-900, 1000-9000)<br>.  Compare 4 digit numbers using the place value strips.	\N	2	\N	15	13	\N	300	f
+aab20392-06ed-45da-9fc1-57df51667c68	Plants-Parts We Eat	1	150	Match the food items with its correct part of plant to gain points	Make your own buzzing device by connecting wires together and match the food items with its correct part of plant to gain points. <br>Understand how to connect battery, buzzer and wires together.	\N	2	\N	15	13	\N	300	f
+21cc1a01-d9d7-4976-be93-c4db8aa4acfc	Air and it's properties	1	150	Carry out a series of experiments to understand different properties of air	Carry out a series of experiments to understand different properties of air:<br> -air occupies space & has weight - Balloon balance<br> -air can push things - Hydraulic cannon<br> -air (oxygen) is needed for combustion - Water candle experiment<br>	\N	2	\N	15	13	\N	300	f
+92783ef6-5873-4763-ac8f-bcd6cd5d1fc5	Introduction To Basic Operations	1	150	Tool to understand addition and subtraction	Make an innovative tool to practice:<br>•    Addition of three digit numbers with and without carry.<br>•    Subtraction of three digit numbers with and without borrow.<br>Understand multiplication and repetitive addition through the math mat.<br>Understand division by grouping through the math mat.	\N	2	\N	15	13	\N	300	f
+2eec9819-3353-4758-a8d8-3a4125d3a24f	Agricultural Practices	1	150	Learn all about farming	Make miniature forms of different agricultural implements - shovel, gamela, rake, crowbar, plough, Archimedes screw.<br>Play a board game to learn about the steps involved in crop production & the implements used in each step.	\N	2	\N	15	13	\N	300	f
+d35ddeb1-9008-4dd0-96bc-a27bfa194601	Traditional Dresses	1	150	Learn about different dresses wore in different parts of India	Play a creative game on Indian dresses to know the traditional dresses worn in 16 different states of India <br>Learn the process of dyeing of cloth using the tie and dye method.	\N	2	\N	15	13	\N	300	f
+c3b27b74-bb88-4ec5-b919-7cd2ef4243f8	Earth is Oval	1	150	Make a model to understand shape of earth	Make a model of earth, sun and moon to understand difference between rotation and revolution.<br> Make a model of earth and observe the effect of rotation on it that gives earth an ‘egg’ like shape.	\N	2	\N	15	13	\N	300	f
+5142fd47-5302-476d-91de-18161b3d7850	Animal Help Us	1	150	Understand importance of animals in eco system	Play a game to understand how honey bees collect nectar and the dangers they face during the process.<br>Make a model to understand how beekeepers extract honey - Apiculture	\N	2	\N	15	13	\N	300	f
+226f4e91-41f0-4804-b537-71ad409cd21e	Shadow Projections	1	150	Build a model with a light source, object and screen.	Build a model with a light source, object and screen to understand:<br> •    How shadows are formed?<br> •    Know the effect of changing object distance on size of the shadow formed<br> Build a model to see how change in angle of light changes the length of the shadow formed<br> Identify the shape of the object by seeing its shadow	\N	2	\N	15	13	\N	300	f
+7c2e8f3f-611c-4f3f-8776-cbe684c31b02	Water Purification	\N	150	Build a mini water filter	Build a mini water filter to understand purification of water based on particle size<br>Play a game on water filtration and learn about:<br>•    Different sources of water pollutants<br>•    Nature of pollutants (type, relative sizes).<br>•    Know and understand different methods of filtration (Reverse osmosis, Nano - filtration etc).	\N	2	\N	15	13	\N	300	f
+e1e12173-884f-48b5-bef1-58c095146f5f	Different Forms of Energy	1	150	Understand diferent Forms of Energy	Make a battery operated fan to see how electrical energy can move a fan<br> Move a magnet through a maze to see how magnetic energy can move things<br> Build a wind mill to see how wind energy can be used to lift load using a basket	\N	2	\N	15	13	\N	300	f
+75c8345e-d362-4a94-98d5-5819ef211840	Modes of Transport	1	150	Rope way & Elevator	Build a rope way model with pulleys to learn about mode of transportation in hilly areas.<br> Build an elevator model to understand how it helps to reach upper floors of a tall building quickly.<br> Play the modes of transport game to know different modes and try reaching your destination in the least time possible by using different combinations.	\N	2	\N	15	13	\N	300	f
+2026714e-a5db-415e-80be-c27c5f2574f7	Fractions	1	150	Addition and subtraction of fractions	Use circular fraction discs to:<br>•    understand representation of fractions<br>•    understand how the value of a fraction becomes smaller as the denominator increases<br>•    compare like & unlike fractions	\N	2	\N	15	13	\N	300	f
+fa2ff199-944b-43f9-a6ca-8710e67f49d3	Weaving	1	150	Handloom model	Build a miniature hand loom and make your own wrist band by weaving 2 threads together<br>Touch and feel different types of clothes and identify the fibre (silk, cotton, man-made) etc.	\N	2	\N	15	13	\N	300	f
+3f47fd2d-c3fa-4716-a739-f2f0eb28fced	Introduction to Data Handling	1	150	Importance of representation of data	Build a rotating flag wheel model to understand collecting,organizing, representing & interpreting data.<br>Use of tally charts for collection of data.<br>Representation of the collected data using pictograph.	\N	2	\N	15	13	\N	300	f
+5b57be39-7a99-4e07-9738-1ccda40abdea	Super Duper Propulsion Car	1	200	How about making a car that runs on air!	Introduce your child to the power of jet propulsion and thrust with Smartivity Super Duper Propulsion Car S.T.E.M. Educational D.I.Y. Toy Kit. A redesign of our most popular activity project in the 6+ age-group, the Super Duper Propulsion car now comes with extendible tracks and additional learnings about friction and gradients.<br>Once assembled, children can lay out the tracks they have build and change the length of the track as they please. The tracks have a flat element and an adjustable gradient/slope element. Using the breakers on the flat tracks, children learn the concept of friction and braking. While by changing the notches of the adjustable gradient children understand the variation in power required to climb an incline.<br>This exploratory and playful learning activity is bound to keep your child engaged for a long time!	\N	1	\N	15	14	\N	300	f
+ec91d087-092c-4d05-ab19-ab1bcbedd2cd	Mix 'N' Match Colour Imaginator	1	200	The fundamentals of Colour Theory explained in a never-before fun way!	Primary colours mix together to form Secondary Colours, while Tertiary Colours are produced when a primary and a secondary or two secondary colours are mixed. <br>The Smartivity Mix N Match Colour Imaginator S.T.E.M. Learning D.I.Y. Educational toy kit is the perfect way to introduce your child to the intricacies of Colour Theory. With this kit, children learn about colours as well as gear-mechanism by building the two part project. The Colour Imaginator consists of coloured sectors and two mechanical units. The Colour Mixing Wheel, when spun with primary coloured sectors fitted on it, results in secondary colours being generated. <br>The second part is the Dark Box game, where a kid has to predict the resulting colour. A kid flags the colour they think will be seen, and a marble released shows the actual result.	\N	2	\N	15	14	\N	300	f
+706511aa-fe9d-4fb7-9acb-f0d00737b5d8	Stop Drop Gravity Transporter	1	300	Learn the fundamentals of Gravity and Pulley Mechanism through play!	The Smartivity Stop Drop Gravity Transporter S.T.E.M. Educational D.I.Y. Toy kit is  designed to introduce 8+ year olds to the fundamentals of simple machines and the chain-pulley mechanism. Through building this awesome game, children also learn about gravity and weight, and how force of gravity affects motion.<br>Smartivity Stop Drop Gravity Transporter consists of a pulley-mechanism, a cart and track section with dispensing holes and collectors for marbles. As children place or remove marbles, the speed with which the cart moves along the track changes. Children are challenged to deposit marbles in a particular collector. This task can be accomplished only at a particular speed of the cart. Children have to analyse and decide what particular weight will result in the right speed of the trolley’s movement .	\N	2	\N	15	14	\N	500	f
+f4970132-d927-4b44-81ae-e9b15ebe206e	Brilliant Basics Baby's First Blocks	1	50	A shape sorter with number of shapes.	Ten bright blocks are ready for baby to drop into the open bucket or through the shape-sorting lid. Filling the bucket with blocks, dumping them out, and starting over is great for eye-hand coordination and other early skills. Then baby can move on to sorting and stacking, learning about identifying and matching shapes while having fun!	\N	0	\N	7	0	\N	300	f
+d963c5c4-1f64-4fd0-9133-6fd35b441f44	Shape Sorting Hippo	1	150	A shape sorter with addition of moving hippo.	This is a cute hippo toy that spins on its hips and is an ideal gift for your kids. It is really fascinating and attracts your little ones. It comes in 4 pieces with different colours you�re your kids can match to form different shapes. Your kids can also get to learn a lot from this toy makings it very informative. The most interesting part is that it spins on its hips which can immediately make your child very happy and engage him for a long time. Benefits: Early learning of shapes and colours	\N	0	\N	7	5	\N	500	f
+2aaac05d-b654-4d15-a542-3d390ad4ee72	3 in 1 Walker n Play Activity Station	1	400	3 activities for a new born in his early stages.	Three activity station modes grow with your baby Can convert from a baby gym to a stationary toy to a walker with simple adjustments Help teach cause and effect with soundi, motion and lights Press the key, turn gears or pull the hanging toys to activate sound and lights Helps establish balance when learning to walk	\N	0	\N	7	5	\N	1500	f
+5b5e91bc-1928-4813-bb47-d831a09c75f3	Busy Basics Step Start Walk n Ride	1	350	Busy Basics Step Start Walk n Ride	It's two great toys in one! As a sturdy, stable walker, the Step Start Walk n' Ride helps babies learn to stand, take their first steps, and walk. Then it easily converts to a first ride-on toy!	\N	0	\N	7	5	\N	1500	f
+bf164121-05e6-4c1b-918a-e53e40ed23c3	Learn and Discover Driver	1	700	Learning and enjoying the toy with sound	Your Baby Drives the Discovery. Little ones will earn their license to learn in no time! Grab a hold of the big, blue steering wheel and spin the learning rollers to discover fun lessons in numbers, letters, animals, colors and shapes.	\N	0	\N	7	9	\N	2000	t
+3932ff78-a15c-4904-8b63-fe79755422c6	Peek-A-Boo Cuckoo	1	250	Real life clocks experience. Kids enjoy having there own clock	Surprise baby with songs, lights and activities Clock has friendly peek-a-boo bird pops out when pressing the button on top Learn about times of day by batting at the sun/moon dial Press the light-up nose to hear a fun counting song Endless fun by batting at the clock hands, playing peek-a-boo with the mouse, or turning the key	\N	0	\N	7	0	\N	1000	f
+8ab8cbdb-f6ee-4e3b-80c3-f5dba14d919c	Precious Planet Colorful Fun Book	1	200	Colorful fun book to have book reading experience in small age	Baby will love hearing music, sounds and a sweet story about colourful animal creatures. Easy-to-flip pages and a big light-up button to press, plus a handle for take-along fun! Power/volume control for quiet play	\N	0	\N	7	0	\N	500	f
+f0cf9652-a0af-413f-8660-148f78da60ab	Popping Play Piano	1	350	Piano along with popping bubles	4 modes: numbers, Colors, music and free play! Each press sets balls in motion. 30+ musical and learning responses! > Learn about colors with every key > Count from 1-8 for a full octave of fun > Play along with 8 fun preschool tunes > Helps build motor skills with every press > Select from 8 instrumental and silly sounds & explore the keyboard	\N	0	\N	7	6	\N	1500	f
+ea89c6a8-f29d-4277-b20e-df1e78d63ae5	Discover Sound Shape, Sort & Scatter	1	300	Shape recognition along with color and numbers	le Tikes Scatter Shapes is a great learning toy with 3 modes to interact with children as they grow. Features: -3 stages: shape sorting for infants,learning shapes for toddlers and shape game for pre-schoolers -Free Play Shape Sorting: allows the child to sort shapes.The toy gives feedback by telling the shape and color of the fish that was inserted.Once all the shapes have been collected, they will be dropped and scattered. At any time the child can hit the button on top to drop the floor. -Directed Shape Sorting: learning mode for toddlers.The toy will prompt the child to find certain shapes, colors or numbers. If the child sorts the right piece they will be rewarded with a glowing or flashing light. If the child inserts the wrong shape the floor will automatically drop and shapes will drop/scatter. -Game Play: game mode for older children.This stage is for children that have learned their shapes, colors and numbers. It will be a race against the clock, where the kids will have to race to find the correct shape,number or color called out by the toy.	\N	0	\N	7	3	\N	1000	f
+91c7a4a8-6f0e-4f0c-a863-ac06fa76a0b0	Silly Speedsters Rock n Roll Wagon	1	650	Rock n Roll Wagon for walking with help of it	Watch your little one get up and go with the Fisher-Price Rock n Roll Wagon! This action-packed wagon features two modes of play that will grow with baby. In Sit & Play mode, there are lots of busy activities to entertain baby, including a bat-at rollerball, colorful clicker steering wheel, peek-a-boo flip page and a clacker-bead flag. When baby flips down the tailgate and presses the lever, he�ll be rewarded with fun sound effects and cars that race out the back�encouraging crawl and chase fun! In Stand & Walk mode, baby will be encouraged to walk with exciting music and cars that rock back and forth on the ramps as he pulls the wagon along. Includes two Silly Speedsters� vehicles with rollerball bottoms and rattle bead sounds. Product Features Two modes of play grow with baby and help develop gross motor skills Sit & Play mode features lots of busy activities: bat-at-rollerball, spinning and clicking steering wheel, peek-a-boo flip page, and clacker-bead flag Stand & Walk mode encourages baby to walk with rewarding music and cars that rock back and forth as wagon is pulled long Flip down the tailgate and press the lever to activate great sound effects and send cars racing out the back for crawl & chase fun Includes two Friendly Racers vehicles with rollerball bottoms and rattle bead sounds	\N	0	\N	7	0	\N	2000	f
+8f66e20e-708a-4369-b077-5cb77ffe366c	Musical Pop-Up Eggs	1	250	After pressing the buttons eggs pop up with different character	Fisher Price Pop-Up Musical Eggs are a great infant toy sure to entertain your child. Each egg has a different character which pop up from individual eggs-chick, turtle and toucan. This toy is great for repetitive play. Each egg features a different activation for baby. It rewards baby with lights, sounds and a surprise pop-up character which will help to work on key fine motor skills- push, slide and twist. Key Features �Lights, bright colors and fun sounds stimulate baby�s developing senses �Lights, sounds, music, and 3 pop-up animal friends �Baby�s actions make fun things happen, introducing baby to cause & effect �Helps baby develop fine motor skills �Each egg features a different activation for baby	\N	0	\N	7	0	\N	1002	f
+e3f222aa-4327-48e6-8c21-240c437aa1d3	Toot Toot Trumpet	1	150	Best way to start learning basics about music	Musical toy trumpet featuring motion sensor Introduces instruments and music 3 light-up musical note buttons play do-re-mi Features friendly phrases, sounds and melodies Encourages fine motor skill development, enhances social and emotional skills	\N	0	\N	7	9	\N	500	f
+c5b12b6f-da75-45d1-a3b0-333b7e78709c	Laugh and Learn Smart Stages Toolbox	1	230	Learning to handle different real life objects starting from screw driver	The Laugh & Learn Smart Stages Toolbox lets baby hammer away at role play fun while hearing songs, words and phrases. When baby pounds the 3 light-up shape pegs with the rattle-bead hammer, he's introduced to colors, numbers and shapes. Opening and closing the toolbox lid teaches baby about opposites. Baby can spin the roller for fun sounds & songs - and move the slide ruler for number & counting fun. And there's an easy-carry handle, so your little do-it-yourselfer can keep working on-the-go!	\N	0	\N	7	0	\N	1000	f
+e8dff48f-87ba-4ad6-b827-e6eade49172b	Laugh and Learn Learning Lantern	1	300	Feeling the lantern's importance	Musical lantern lights the way to learning fun with sing-along songs, dancing lights and animal sounds Baby will learn about numbers, opposites, animals, greetings and more Night time mode for up to 5 minutes of soft glowing lights, soothing songs and nature sounds.	\N	0	\N	7	0	\N	1000	f
+d054f1ea-b0c6-4e79-9a85-304881d43ea8	Laugh & Learn Counting Friends Phone	1	300	Enjoying the real life telephones	Buttons to press, pages to flip, friends to call ... and so much to learn! This phone introduces baby to numbers and counting, animals and their sounds, first words, and more. Animal friends greet baby with fun sounds and four special songs. And there's pull-along fun for new walkers!	\N	0	\N	7	7	\N	1000	f
+b6820fef-294b-44f8-810b-634d1941492a	Pic n Pop	1	300	Collect the shapesI AND POP THEM WHEB BIT REEDED	Play to Learn Pic N Pop is a unique and fun popper unit that gets toddlers on the move! One click of the button launches a colourful ball from the chute, then simply roll over the ball with the popper unit and the ball will be magically picked up, ready for the fun to start again. Pic N Pop does not require batteries. Suitable for indoor and outdoor use.	\N	0	\N	7	8	\N	1500	f
+b4a7e835-b9f5-4c47-ae7a-4fb80fb9deee	Puppy & Friends Learning Table MultiColor	1	700	Learning table for leaarning like an adult	Join in on the fun with puppy and pals learning table. This activity table features all of baby's favorite laugh and learn characters. Puppy and pals interactive content encourages baby to cruise around the table to learn and play. After baby stops playing with one activity, another activity will light up and speak to baby. Encouraging him to move around the table. Features a laptop that opens and closes for realistic role-play, interactive 1st words book, counting phone with detachable receiver and piano keys. With 4 modes of play 1) Learning, 2) Music, 3)Imagination and 4) Bilingual, baby learns all about letters, numbers, opposites, shapes, colors, greetings and 1st words. There are over 60 sung songs, tunes and phrases for lots of learning fun. The legs can also be detached for younger age floor play.	\N	0	\N	7	0	\N	2000	f
+20527f58-c85a-48ac-839a-9959be9df477	Rolling & Blinking Goofy Golfer Stacker	1	100	Understanding the golf by palying with them	B-Kids rolling and blinking goofy golfer stacker allows little golfers to get a better understanding on golf sport. This comes with one club, two balls and goofy golfer stackers. Kids can arrange the stacker one above the other and watch the blinking ball roll all over. Great for fine Motor Skills and stimulation of senses!	\N	0	\N	7	4	\N	300	f
+c3caabf2-6d07-45a4-bf35-e763d81ce55e	Remote Controlled Railway	1	300	Remote controlled railway	Simple remote sends Thomas forward and backwards. When the train is moving forward, the Thomas theme song will play Press and hold backward arrow button to drive train in reverse and when the train is moving backwards, the Chuh-Chuh-Chuh-Chuhg SFX will play.	\N	0	\N	7	0	\N	1500	f
+6a231e04-f6bc-4e4a-a2ca-71339261bf0b	Fit and Fun Fishing Island	1	280	Fishing with music	Sound and light feedback when the fish has been caught. The light suggests which fish to take. 25 melodies and sound effects. Stimulate and motivate motor development. Encourages children to adopt a healthy lifestyle. Light and sound are activated for each fish you catch.	\N	2	\N	7	3	\N	1500	f
+b3e5b5e4-f241-4e34-8e76-67e4c61ba3f3	Danny drift remote control car	1	450	Remote controlled car	A high quality remote control car with focus on development of controlled motions in children	\N	2	\N	7	1	\N	2000	f
+9a7f9447-61ac-4b32-b314-b164fc660481	Walk n Whirl popper	1	230	A walker and popper for kids to play with and have fun.	Pop, pop, pop! Baby scoops up colorful balls, whirls them around, and sends them popping with the friendly push-along character! Exciting action holds baby's attention while walking, balance, and eye-hand coordination are enhanced by easy-to-push popper. Pick up and pop rewards help toddlers think about cause & effect�learning has never been more fun! Requires: No. of parts: Popper + 3 balls	\N	2	\N	7	0	\N	1000	t
+bff55cac-739f-4856-9e40-95f39e9c306a	Puppet Robot	\N	800	A robotic toy which enables kids to build multiple robotic project.	FLEXIBLE ROBOT KIT: This robotics kit can be transformed into  different types of robots. Gesture Controlled Robot, Line-Following robot, Obstacle Avoider Robot ,Obstacle Follower Robot , Edge-Detection Robot, Interactive Bluetooth Controlled Robot and many more.<br>\n<br>\nSIMPLE ROBOT ASSEMBLY: The STEMBOT Smart’s electronic circuits are kid-friendly with easy wiring and no soldering required. We’ve the designed the kit to be simple and safe so your child can learn without any risk of getting hurt.<br>\nRobotics kit includes a full set of tools for building real robots, including motors, circuit boards, and Chasis. Batteries are included, manual and helpful tutorial videos are available  that will help you start programming and building immediately!	\N	4	\N	7	12	\N	1000	t
+b464345d-6d14-404b-8710-855514208b79	Homemade Vacuum Cleaner	1	150	Build the model of a miniature vacuum cleaner and Make a mini shooter and a balloon balance	Learning Objectives:<br>\n1. Learning about properties and components of air<br>\n2. Understanding the working of a fan and an exhaust fan<br>\n3. Using the property of air suction to design and understand the working of a vacuum cleaner<br>\n<br>\nHow does it help?<br>\nHelps the kid understand mechanisms and improves his soft skills while keeping the entertainment quotient high. It directs the kid’s curiosity to help him learn and explore.<br>\n<br>\nKit components:<br>\n1. Colourful child friendly rubber pieces<br>\n2. Electrical components running on batteries with the connections<br>\n3. Plastic moulded components for easy working of the model<br>\n4. Various materials for mini experiments to understand the properties of air<br>	\N	4	\N	7	13	\N	300	t
+a791e7f2-b8a9-46c2-b79c-d23c77822bc7	Senior Electricity Kit	1	150	Learn to make an electric circuits by connecting the resistors in different ways	Learning Objectives<br>\nLearn to make an electric circuits by connecting the resistors in different ways and their advantages and disadvantages.<br>\nMaking a rheostat and utilizing it to control to observe the change in the glow of a bulb.<br>\n<br>\nKit Components<br>\nA set up of bulbs, batteries and wires are given to connect and observe them<br>\nA unique arrangement of variable resistance with a long sprial conductor, bulb and batteries<br>\nMulticolour workbook containing detailed explaination on how to conduct the activity<br>\n20+ exercise<br>\n<br>\nHow does it help?<br>\nIt helps the kid to identify the useful connection for the daily like house hold wiring and function lighting.<br>\nIt helps the kid to understand that variable resistnace control an electric appliance.<br>	\N	4	\N	7	13	\N	300	f
+ae4320f9-9a63-43bc-91f8-89cc7d351460	Gravitation	1	150	Make a spring balance, Make a miniature boat, Make a setup for Archimedes principle	Learning Objectives:<br>\n1. Difference between mass and weight.<br>\n2. Calibration and its importance<br>\n3. How do heavy ships float? – Difference between the volume of the shape and volume of the material<br>\n4. Archimedes principle<br>\n<br>\nHow does it help?<br>\nYour Child will make a spring balance that will help him understand the link between the weight of an object and earth’s gravity and also the concept that makes a heavy iron boat float on water ( Archimedes principle).<br>	\N	4	\N	7	13	\N	300	t
+0e6bdbaf-4635-4c6d-916a-5f6a52586657	Sound	1	150	Build a model of Human ear & Make a Wave Generator	Sound – Vibrations<br>\nMake a sound instrument – musical balloon – and a vibration detector to understand:<br>\nDifference between frequency and amplitude<br>\nHow to change frequency and amplitude of sound in an instrument.<br>\n<br>\nMake a toy telephone to understand how sound travels through solids<br>\n<br>\nSound – Frequency & amplitude<br>\nMake a wave generator to understand:<br>\nCharacteristics of sound wave – frequency, wavelength, amplitude<br>\nRelation between frequency and wavelength<br>\n<br>\nPressure & density in a sound wave<br>\n<br>\nPropagation of a sound wave through a medium as a longitudinal wave<br>	\N	4	\N	7	13	\N	300	f
+64f72a3e-b66d-4b89-83db-1c7adc2663c0	Pump It Move It Hydraulic Crane	\N	300	Help your children understand the basics of hydraulic mechanisms.	Hydraulic Machines use the power of water pressure to carry out specified tasks. From cranes to braking mechanisms, hydraulic power finds widespread use in daily life.<br>\n    <br>\n    One of the coolest Smartivity STEM Learning Educational D.I.Y. Toy Kits, the Smartivity Pump It Move It Hydraulic Crane introduces children to the fundamentals of hydraulic machines in the most playful and engagement filled manner.<br>\n    <br>\n    The kit contains all the elements essential to build a fully-functional hydraulic crane, richly-illustrated and easy-to-understand step-by-step Instruction booklet and tools to embellish the project once built.<br>\n    <br>\n    Once assembled, children can use their Hydraulic Cranes to life objects and move them around. The project assembly provides at least an hour-long engagement and the game-play ensures that children proudly continue to play with the project even after.<br>	\N	4	\N	7	14	\N	500	f
+f379b27b-f9af-44f7-b1d4-07550e05ce0e	Blast Off Space Rocket	\N	200	Let the countdown begin... It's time for blast off!	Every child wants to be an astronaut. And with Smartivity's Blast Off Space Rocket S.T.E.M. Educational D.I.Y. Toy kit, your child (6+ years) can bring their imagination to life. This kit is based on the principles of elasticity, gravity, thrust and propulsion. The kit contains all the elements that a child can assemble a rocket and rocket-launcher and launch their own missions.<br>\n    The rocket launcher plate has a locking mechanism designed to make the game even more fun. Once assembled, children can experiment with their rockets by varying the weight of the rocket and elasticity of the launch plate to understand the fundamentals scientific concepts.	\N	3	\N	7	14	\N	300	f
+b2ab6122-e21f-4bd0-bc7b-ae74d13b5969	Mechanical Xylofun Music Machine	\N	300	Let's make music!	The coolest and latest S.T.E.M. Learning based D.I.Y. kit from Smartivity is music to every ear... With this project, children can actually compose their own music tunes. The project includes all the elements required to build a music machine, including pegs for arranging and rearranging notes.<br>\n    Once assembled, children learn about music notations and can compose their own tunes by placing the pegs in different slots. The box also contains instructions for composing two simple tunes and allows children to explore the magical, wonderful world of music.	\N	4	\N	7	14	\N	500	t
+7862f5cc-2646-4f42-a8cb-dd67491da919	Farm Cube Puzzle	1	200	Kids love puzzle. A cube puzzle with picture of farm	Put colorful blocks together to create friendly farm animals cow, pig, horse, duck, sheep, rooster Each image is beautifully illustrated on solid wooden blocks There are 6 Puzzles in all Entertaining, challenging and a tremendous value Recommended Age Range 3 Years and up. Total 6 puzzles can be created	\N	0	\N	7	0	\N	500	t
+f81efe47-6191-4c80-81a0-14cf3c1a58ef	Green Science Dynamo Robot	1	400	4M toys aim to inspire children to be creative.	. Give your child the advantage when it comes to understanding how machines and robots work with the 4M Kidz Labs Green Science Dynamo Robot. The Green Science Dynamo Robot requires your children to use some imagination to bring the robot to life. Use household items to create the body for the robot which is powered by a hand driven generator. Use the remote control to move this robot backwards or forwards. The Green Science Dynamo Robot kit comes with many parts which include a mechanical plastic robot body, an axle with gear system, 2 wheels and a winding handle. This Green Science Dynamo Robot kit is suitable for both boys and girls over the age of 8 who are interested in science related subjects.	\N	2	\N	15	26	\N	1000	f
+4a58adac-7867-47fa-851e-9fa00e1783a3	Beetle Robot	1	200	Beetle Bot is great for teaching kids about making, working with basic electronics	Beetle Bot is great for teaching kids about making, working with basic electronics, and thinking out od the box with minimalist “Robot” Design. The ‘Bot’ moves like a beetle insect and turns as its antennas hit the an obstruction. With Wheels/Motors on both sides, its amazing fun to play and learn with.<br>The Kit comes with the parts you need to build your own Beetle Bot. These are easy to make, fun to personalize, and a great parent-child project.	\N	2	\N	15	27	\N	600	f
+c9f48955-d260-4b92-a576-cb872a47b4d7	Levers	1	150	Understand the difference in position of load, effort and fulcrum.	Make class 1 and class 2 levers and understand how they help ease our efforts.<br>Compare the working of a force (class 3 lever) with that of the other 2 to understand the difference in position of load, effort and fulcrum.	\N	3	\N	15	13	\N	300	f
+689fc6fd-f406-4024-9754-24ab615b649f	Rain Water Harvesting	\N	150	Make houses and water pump	Make houses with different roof tops ( slant and flat) to understand:<br>•    Channeling mechanisms for flat and slant roofed houses<br>•    Collection pit<br>Make a water pump to understand the complete mechanism:<br>•    Collecting rain water (roofs) - Storing ( in a sump) - and then retrieving (using a pump).	\N	3	\N	15	13	\N	300	f
+a6e6e05e-9117-4a85-a415-9aeba61453a9	Systems in Human Body	1	150	Identify & learn about eight systems & their location.	Make a working model of the lungs to understand:<br>•    Role of diaphragm in the process of respiration.<br>•    In and out movement of air due to pressure difference created by the diaphragm<br>•    What happens if only one lung is working? If trachea is blocked? If diaphragm is rigid?	\N	3	\N	15	13	\N	300	f
+7e8eda6a-014f-4eee-97be-89eb79395ce5	Kaleidoscope	1	150	Do an exercise using a plane mirror to find lines of symmetry of different shapes	Make your own Kaleidoscope and understand:<br>•    Symmetry through reflections in mirrors<br>•    How patterns are created by multiple reflections.	\N	3	\N	15	13	\N	300	f
+50cfa62c-02fe-4e42-b379-0ceb86282718	Numbers, Factors and Multiples	1	150	Use math wonder mat for properties	Use math wonder mat to find:<br>•    Factors of a given number by dividing it into different number of groups.<br>•    Multiples of a number by making multiplication tables.Play the Pirates of Prime board game to know composite, prime and perfect square numbers below 100	\N	3	\N	15	13	\N	300	f
+24b1db6e-077d-4ae5-a8d9-b748a0c40dfd	Components Of Food	\N	150	Do food tests (carbs, proteins, fats and vitamin c)	Do food tests (carbs, proteins, fats and vitamin c) and test various food items for these nutrients. Play the nutrimania game and challenge your friends on nutrient content of various food items to understand: Nutritional information of 49 different raw food items. Importance of balance diet. Know which food item is the best for which particular nutirent. Why is a particular nutrient necessary ?	\N	3	\N	15	13	\N	300	f
+8802e5af-21aa-4517-b805-282a29a7bc86	Separation of Substances	\N	150	Make your own multi level assembly – to separate a given mixture	• Need for different ways of separating mixtures based on their physical properties<br>• Different separation methods: Hand-picking, Sieving, Winnowing, Sedimentation, Decantation, Filtration & Evaporation.	\N	3	\N	15	13	\N	300	f
+ebc61fd5-411a-4363-8440-d22f571f7f02	Body Movements	1	150	Understanding different joins in human body	Make joints - ball and socket joint, hinge joint and pivot joint and understand :<br>•    Names of different joints and their location in human body<br>•    The structure of various joints in human body<br>•    Importance of joints in movement<br>•    Degrees of freedom of Hinge and Ball & Socket joints. <br>Play a game - Dig dug bono to understand different types of bones and their location in our body	\N	3	\N	15	13	\N	300	f
+bb9d7c9f-69f7-4e92-96c1-4b084a6ba785	Integers - Positive & Negative	1	150	Make a number line to understand this	Make your own number line from jumbled up integer puzzle pieces to understand:<br>•    Number line and position of positive & negative integers<br>•    Significance of negative sign in deciding which integer is bigger - number line arrangement.<br>Play the integer maze game( level 1 and level 2) and learn:<br>•    Operations - Addition and Subtraction of integers<br>•    Comparing integers (Positive and negative)<br>	\N	3	\N	15	13	\N	300	f
+e28b655d-1925-44e7-b6d4-4bedd8b0dd73	Mensuration - Area, Perimeter	1	150	Understanding the concept of area and perimeter	Use a measuring tape to measure perimeter of regular figures<br>Use transparent graphical slims to measure area of irregular figures<br>Make your own house plan & find its area & perimeter role of an architect	\N	3	\N	15	13	\N	300	f
+5a11669a-996f-4c65-b904-aba9fdce4109	Algebra: Expressions & Equation	1	150	Solving Algebra	Make algebraic expressions and equations using algebraic tiles to understand:<br>•    Representation of algebraic expressions.<br>•    Solving algebraic equations.<br>•    Converting word problems to algebraic representation<br>Make a 7 segment LED display and understand real life application of algebra	\N	3	\N	15	13	\N	300	f
+0a2835e6-8cad-4aeb-a187-d6295c7b7b5b	Motion and Time	1	150	Simple Pendulum	Make a simple pendulum set with provision for adjusting the length of the pendulum to understand:<br>•    Time period of a simple pendulum and how to calculate it<br>•    Dependence of time period on various factor (mass of the bob, length of the pendulum etc) <br>Make a air propelling bazooka car to calculate speed of a moving object. Generate data to plot the distance-time graph by playing a game. Make a sundial and understand the working of one of the oldest known time devices.	\N	3	\N	15	13	\N	300	f
+e3066fc5-2779-4262-a35f-5ad08bca3e67	Light - Image & Object	1	150	Make models to understand image of the object	•  Make a model to understand the properties of convex and concave mirrors - Diverging and Converging.<br>•    Make a model to understand the properties of image formed by a plane mirror.<br>•    Make a ray optics set up to learn and understand what is an object, image and screen<br>•    How to capture an image on the screen using a biconvex lens?<br>•    Make different colours (secondary and tertiary) using primary colours.	\N	3	\N	15	13	\N	300	f
+c5726122-6e68-4b51-a228-afc543977c62	Comparing Quantities	1	150	Compare different quantities to understand mutual relation.	Make conversion tools (Using elastic bands, sliders and rulers) to learn and understand:<br>•    Ratios, fractions, decimals and percentages<br>•    How to convert fractions to percentages and vice versa.<br>•    How to convert decimals to percentages and vice versa.<br>•    Compare fractions by converting them to either decimals or percentages.<br>Play the fraction game and understand use of comparing different quantities.	\N	3	\N	15	13	\N	300	f
+ce8d83e8-0b2b-4cbd-aef9-b59f6729bb26	Exponents & Powers	1	150	Compare different quantities to understand mutual relation.	Make conversion tools (Using elastic bands, sliders and rulers) to learn and understand:<br>•    Ratios, fractions, decimals and percentages<br>•    How to convert fractions to percentages and vice versa.<br>•    How to convert decimals to percentages and vice versa.<br>•    Compare fractions by converting them to either decimals or percentages.<br>Play the fraction game and understand use of comparing different quantities.	\N	3	\N	15	13	\N	300	f
+3943cbff-3844-4614-b5c8-a1a0bda5b0cd	Rotational Symmetry	1	150	Understanding symmetry of objects	Find line of symmetry for a given figure<br>Make shapes with given no.of lines of symmetry<br>Make a model to verify if a shape is rotationally symmetric or not.<br>Find order & degree of rotational symmetry<br>Schedule a tournament using the concept of Rotational Symmetry	\N	3	\N	15	13	\N	300	f
+e93f0cf4-e4d3-4810-a216-efeeac4f7368	Synthetic Fiber	\N	150	Compare structure of linear & cross linkage polymers	Make a model to test the strength of different polymers<br>    Make a linear chain polymer – OOBLECK and a cross linkage polymer to understand their properties & differences<br>    Perform burn test to differentiate synthetic and natural fibres<br>    Make shapes using thermosetting plastic to understand how they differ from thermoplastics	\N	4	\N	15	13	\N	300	f
+e83c895b-cbef-4ec3-847d-effb39efd42a	Friction	1	150	BUILD YOUR OWN HYDRAULIC BRAKE.	Friction<br>Make a hydraulic disc brake system & understand its working<br>Make a friction feed model to see how rollers in printers work to move the paper<br>Use lubricants (grease, powder) to see how they reduce friction between surfaces<br>Learn how ball bearings reduce friction by converting sliding friction to rolling friction	\N	4	\N	15	13	\N	300	f
+2c2266e2-7602-424f-8ea6-95048186f833	Chemical Effects of Electric Current	\N	150	Make a miniature electroplating unit	The Science of Electrifying Chemistry!     <br>Can chemical reactions produce electricity? Further, can electric current cause chemical reaction?<br>Yes, and yes, indeed!<br>With the help of this hands-on kit, assimilate an elementary understanding of the Chemical effects of Electric Current.<br>With this kit, you will create your own battery with the help of water, salt (thus acting as an electrolyte) and two diodes to light a bulb!<br>Next, learn about the effect of electroplating: the deposition of one diode’s metal on the other!<br>With the help of an apparatus similar to the first experiment, use Copper Sulphate in water as an electrolyte, and connect all kinds of objects in the place of the cathode: use an iron nail, wooden stick, iron sheet and aluminum sheet and sit back and observe the fascinating chemical reaction that occurs!<br>With the experiential lesson this experiment teaches, your child will learn the practical applications of chemically-induced electric current and the applications of electroplating!<br>With the experiments of this kit, allow your child to develop a perseverant understanding of the science behind the chemical effects of electric current, in addition to a sense of accomplishment after successfully completing this elegant yet highly practically applicable experiment!	\N	4	\N	15	13	\N	300	f
+03ecc188-3c25-436b-9976-eff140b1fb19	Static Electricity	1	150	Behavior of electric charges,Electroscope, Triboelectric series	Make a static spinner to understand the types of charges and their behavior<br>Make an electroscope to detect presence of static charges<br>Make a polarity finder to find type of static charge on a surface	\N	4	\N	15	13	\N	300	f
+43bd19c2-7343-4d30-b95b-bd83c5ce0533	Mensuration	1	150	Surface Areas and Volumes	•    Use a screen & a torch to visualize 3D shapes in 2 dimensions -Top view, Front view & Side view<br>•    Make 2D drawings of objects using different views<br>•    Make 3D structures for the given views( front, top) using unit cubes<br>•    Make different 3D shapes (cube, cuboid, prism, pyramid, cylinder, cone) using the given nets - Net diagrams	\N	4	\N	15	13	\N	300	f
+b8d2ac20-54ce-4f6e-86e4-df46eef32929	Heat – Modes of transfer	1	150	Experiment to understand the concept of heat and temperature.	Learning Objectives:<br>1. The random movement of particles while heating a substance can be simulated in the activity.<br>2. Understanding the behaviour of metals towards heat conductivity by testing them.<br>3. Understanding the process of convection, land breeze and sea breeze by building a model.<br>4. Real life application scenarios of knowing the importance of copper bottomed vessels, various instruments used to heat substances, hot air balloons etc.	\N	3	\N	15	13	\N	300	f
+0c6ef524-fe98-41f1-a7d5-d17dbb553bb0	Magnetic Levitation Project	1	150	Understand the applications of magnetic levitation	Test materials and categorize them into magnetic and non-magnetic material<br>Make a magnet float in air & understand poles of a magnet & their behavior <br>Make a pencil levitation model to understand:<br>•    Poles of a ring & solid magnets<br>•    Application of magnets in real life - Maglev trains.<br>Make a Magneto Tracer that traces a metallic object using magnetic induction	\N	3	\N	15	13	\N	300	f
+451054a9-ae53-4333-93ca-82bdb794e09d	Force and laws of motion	1	150	Make models to understand conecpt of force	Description<br>Your child will make exciting models. Ex: Newton cycloid model, Newton spinner) to verify Newtons’s laws of motion and law of conservation of momentum.<br>Learning Objectives:<br>1.Newton’s laws of motion (First, Second, Third)<br>2.Law of conservation of momentum ( head on and oblique collisions)	\N	4	\N	15	13	\N	300	f
+a53de3b6-c3db-4ec9-949f-6fd334c5efc2	Work and Energy	1	150	Make models to understand concept of work and energy	Learning Objectives:<br>1. Types of energies – Potential and kinetic energy<br>2. Interconversion of energy ( potential to kinetic and vice versa)<br>3. Law of conservation of energy<br>4. Factors that effect the potential energy possessed by an object<br>How does it help? <br>Your child will make a mini trebuchet – an ancient weapon used to bring down huge castles and understand the real life application of potential and kinetic energy principles.	\N	4	\N	15	13	\N	300	f
+ca7e0707-98d9-4749-a0b9-bf647a5a10a3	Wind, Storms & Cyclones	1	150	Finding direction & speed of wind	Make a wind vane, anemometer & a wind sock and understand:<br>•    How to calculate the speed of the wind<br>•    How to know the direction of the wind<br>Make a spray gun to understand Bernoulli’s principle - high speed winds cause low pressure Understand the categorization of wind storms - Beaufort’s scale	\N	3	\N	15	13	\N	300	f
+9f8d4fa1-26fc-4ca8-84fd-46021d9ac75f	Circles	1	150	Using circle board to understand different properties	This Circular Kit consists of a Board which can be used for exploring a variety of mathematical topics introduced in the middle and higher grades. Learners stretch bands around pegs to form line segments, polygons, Circle and make discoveries about Tangents, Secants and many more.<br>Learning Objectives:<br>By Using this Circles board as a guide, students would<br>• Make lines and angles to understand different properties of a circle<br>• Understand properties of Tangents and secants<br>• Find the Angle between tangent and radius<br>• Find the maximum number of tangents from an external point<br>• Find the Lengths of tangents from a common point<br>• Find the relation between tangent and secant from a point<br>• Verify the alternate segment theorem, secant theorem<br>How does it help?<br>It would help the kid to understand the relation between the line and a circle. It would also help the kid to increase his interest in designing and architecture.	\N	4	\N	15	13	\N	300	f
+50b6ab67-c6b2-42cf-afc5-21609cec93c7	Application of Trigonmetry	1	150	Understanding trigonmetry and it's application	Learning Objectives:<br>To understand trignometry and its ratios<br>Finding unknown lengths of triangles and deriving the trignomteric identities<br>Kit components:<br>An innovative tool to prove trignometry and its ratios<br>A setup to derive trignometric identities<br>Multicolour workbook containing: detailed explaination on how to conduct the activity 20+ exercise<br>How does it help?<br>It helps the kid to understand the relation between lengths and angles<br>It is a practical proof of theory of trignomtery	\N	4	\N	15	13	\N	300	f
+5dd1011d-56d2-4324-a91d-bfb3c382d375	Area of triangles and parallelograms	1	150	Understanding area	Learning Objectives:<br>1. Properties of parallelogram.<br>2. Triangle – mid point theorem<br>3. Area of triangles and parallelograms drawn between same parallel lines<br>4. Proving area of triangle = 1/2 area of parallelogram drawn on the same base.<br>How does it help?<br>Children construct a slider tool that helps them in making different types of triangles and parallelograms with just a slide and experiment with them	\N	4	\N	15	13	\N	300	f
+3b671e54-383f-420b-b6be-cd22ea159522	Is matter around us pure?	\N	150	Make different models ( centrifuge, chromatograph)	Make and learn:<br>1. Centrifuge: Principal behind skimming of milk a concept with huge real life application.<br>2. Emulsificaion process: A pharmaceutical method that is used to prepare emulsion, a type of mixture.<br>3. Tyndall effect: How to differentiate mixtures (colloidal, suspension and true solution)<br>Learning Objectives:<br>1.Different types of mixtures – Colloidal, suspension and true solution.<br>2. Different methods for separation of mixtures<br>3. Difference between mixtures and pure substances<br>4. Emulsification process	\N	4	\N	15	13	\N	300	f
+d4fe3db5-da8a-4ce4-b728-258a31031231	Chemical reactions and equations	\N	150	The kid would understand about the behaviour of elements by conducting experiments	Learning Objectives:<br>To understand the ability of an element reacting with other element and its result<br>One kit Contains:<br>1. A set up of chemicals to understand different type of reactions<br>2. An arrangement of chemicals to understand the reactive nature of them<br>3. Multicolour workbook containing:<br>a. Detailed explanation on how to conduct the activity<br>b. 20+ exercise questions	\N	4	\N	15	13	\N	300	f
+4ff92d91-c429-417c-8d8d-65fc64cfb0ae	4 in 1 Chemistry Kit	\N	150	Make your own mini chemistry lab and perform tests	Learning Objectives<br>1. Making your own mini chemistry lab and perform various tests.<br>2. Physical and chemical changes.<br>3. Acids and Bases – Properties, Identification, Strength (titration).	\N	4	\N	15	13	\N	300	f
+f6036d2e-945d-4cf4-930c-16029a054acc	Light Kit	1	150	Working of Human Eye	Make a model of the human eye to understand:<br>• Structure of the human eye,<br>• How images are formed in the human eye?<br>• Different parts of the eye<br>Make a model of a defective eye with hypermetropia to understand:<br>• the difference in image formed<br>• the defect and its correction using an convex lens<br>Make an adjustable lens to understand how our eye lens works <br>Different types of cataract, their cause and cure	\N	4	\N	15	13	\N	300	f
+7ef6290f-8b02-456f-980d-b2ada9b24d9f	Life Processes	1	150	Understanding different life processses in nature	Kids will understand how the functions of the body are interrelated.<br>Learning Objectives:<br>1. Understanding the process of respiration in an organism<br>2. Working of a human heart and the importance of one way valve<br>3. Study of human circulatory system<br>One Kit Contains:<br>1. A setup to understand the process of respiration<br>2. Components to build a human heart<br>3. A multicolour workbook containing:<br>a. Detailed explaination on how to conduct the activities<br>b. 20+ thought provoking questions	\N	4	\N	15	13	\N	300	f
+350c719b-f6ab-40a9-8e6b-6c2672f59458	Control and Coordination	1	150	Understand functioning of brain	Learning Objectives:<br>Study of nervous system<br>Understand the working of reflection arc<br>To know the different parts of the brain and their functions<br>Kit components:<br>A long scale which measures the reaction time<br>A colourful reflex arc set up with syringes, pipes and a stand<br>A colourful board with set of cards to understand brain and its functions<br>Multicolour workbook containing detailed explaination on how to conduct the activity 20+ exercise<br>How does it help?<br>Better understanding of the functions of brain and its parts<br>The kid tries to play with scale and tries to improve his reaction time and be alert	\N	4	\N	15	13	\N	300	f
+c789443b-5969-4ebf-ba5e-95249f3a28f0	Fibre to Fabric	1	150	Animal Fibers	Learning Objectives:<br>1. Knowledge about various animals which produce fibres<br>2. An exciting game that makes child understands and remembers the various steps that are involved in making fabrics from animal fibres.<br>3. Builds a working model of an instrument that Simulates of silk reeling from cocoon by using artificial cocoons.<br>4. Understands every step and importance in the procedure of silk extraction.<br>Activities:<br>1. Animal fibres<br>2. Animals from which fibres are available<br>3. Various steps involved in making the fibre to fabric<br>4. Silk extraction<br>5. Real life applications	\N	4	\N	15	13	\N	300	f
+8b865d98-5853-43de-9b0c-2a701cf52800	NASA Tech 50 Items In 1 Kit	1	200	Parts for many DIY kits	This Super Kit contains 50 items for various science, school, college, hobby, personal and learning projects. Instruction manual is provided with the kit. You can make many projects like Street light, Home light, Fan, Electromagnet, Disco lights, Home lighting system, Motor direction control, Alarm buzzer and many other projects.	\N	4	\N	15	28	\N	300	f
+e620c1c0-6a86-4189-a272-ab1706d62a11	Magnetic security system - kit	1	350	Build magnetic security system	Now control any device with magnets. Use the magnetism concept to build your own security system to restrict access to un-authorized entry in your house premise.	\N	4	\N	15	29	\N	500	f
+4064772b-2b9b-436c-b6b3-115b989618ec	Electromagnetism	1	350	Learn with Fun Science Learning Project Do It Yourself, DIY Kit	Kit helps you perform over 40 activities using electromagnet, DC motor, magnets and bulb.<br>It will help kids to learn basics about magnetism and electromagnetism. <br>Understand principles of motor, electromagnetic break and crane<br>Experiments are battery based and safe<br>The kit has powerful electromagnet. Children can make models like Relay etc<br>Ideal tool for doing science projects.	\N	3	\N	15	30	\N	500	f
+6e8ef90e-a983-4dfe-8d73-3a7693da2c39	Electricity Generation	1	450	Learn about different methods of electricity generation	DC Generator Electricity-<br> Kit to make working model of electricity generator or dynamo<br>Make a hand operated generator and show glow of LED by generating electricity.<br>It will help kids to learn basics of electricity generation using mechanical energy. <br>Wind Mill -<br> Kit to make real working model of windmill to glow LEDs. Develop scientific creativity. Perfect Gift. School project.<br>Two options of usage. Option 1): Generate electricity by manually rotating pulley which in turn rotates fan mounted on a tower, like wind mill<br><br>We can't easily spin fan blowing wind everywhere every time. So kit has this option of fan rotation by using hand operated pulley<br>Usage option 2): Remove rubber band from pulley. Blow against windmill fan blades. Blow rotates fan and glows LED<br>Solar Energy - ncludes Solar Panel of 1.5 V 150 mA with soldered wires for easy use in your own projects<br>Includes good quality small DC motor with plastic bush and two blade fan to fit on the shaft. Use it as a wind mill demo or as a dynamo to produce electricity.<br>Demonstrate use of solar energy to rotate motor and its fan<br>Hydro Electricity -  Kit to make working model of hydroelectricity power generation plant<br>This device shows how rotation water turbine generates electricity and glows LEDs<br>Hold the water turbine under flowing water and electricity is generated. Can be successfully run using tap water at home.	\N	3	\N	15	30	\N	800	f
+f721b29b-8248-43ac-a58a-278085986ca1	Motorized Eclipse Demonstration	1	200	Demonstration of eclipse	Make a working model to demonstrate and Understand natural phenomena of Eclipse Kit comes with AC Motor, Earth, Sun, Moon model and set up to demonstrate how their relative positions cause eclipse.	\N	3	\N	15	30	\N	300	f
+1581923b-f0d8-4113-a5cf-e190b70c47ff	Pulleys in Use	1	200	Understand working of pulley	Use of one and two moving pulleys to understand applied force, mechanical Advantage.	\N	3	\N	15	30	\N	300	f
+8d477031-9eef-4072-87cd-d788f58d1910	Geared Car	1	150	Understand the mechanism behind the gears of car	Understand Gears and builds your own motorised gear changing cars. Can easily and quickly construct the models and dismantle too. High Powered Motorised gearbox to work smoothly. New kinds & systems of gears We can learn to experiments with the working models in each and every steps.	\N	2	\N	15	17	\N	400	f
+52e264f7-7e90-48a2-8604-26ee90b15634	Battle Station Transporter	1	200	Let your child explore battle field at home	How to play: <br><br>    Step by Step fix the spare parts with help of bolts and nuts.<br>    To fit the bolts tightly, make use of spanner holding the nuts , given inside the box.<br>    Do accordingly the whole process & make your battle station transporter set to go. Package Content:<br><br>    5 Models<br>    353 pieces.	\N	2	\N	15	18	\N	500	f
+7f2daa44-a4e1-4a03-8999-131dae66fcfc	Mechanix - 4	1	150	Construct a Crane and lift the objects using it	How to play: <br>    Step by Step fix the spare parts with help of bolts and nuts.<br>    To fit the bolts tightly, make use of spanner holding the nuts , given inside the box.<br>    Assemble accordingly the whole process to make your Mechanix- 4 have a robotics experience.<br>Package Content:<br>    20 Models<br>    263 Pieces	\N	2	\N	15	18	\N	500	f
+7bbc5219-a027-4037-a850-40b945dff9dd	Robotix - 1	1	150	Let your kid have fun of building robot at early ages	How to play: <br>    Step by Step fix the spare parts with help of bolts and nuts.<br>    To fit the bolts tightly, make use of spanner holding the nuts , given inside the box.<br>    Assemble accordingly the whole process to make your motorized robotix- 1 run smoothly.<br>Package Content:<br>    Motor Powered<br>    Flexible Steel Pieces<br>    115 Pieces<br>    8 models	\N	2	\N	15	18	\N	200	f
+28b6c13b-81ef-43f4-aa06-892c986b458f	Robotix - 3	1	200	Your kid will assemble a robot which runs on battery	How to play: <br>    Step by Step fix the spare parts with help of bolts and nuts.<br>    To fit the bolts tightly, make use of spanner holding the nuts , given inside the box.<br>    Assemble accordingly the whole process to make your motorized robotix- 3 run smoothly and create their own car and planes out of it.<br>Package Content:<br>    High Powered Motor<br>    Flexible Steel Pieces<br>    215 Pieces<br>    8 models<br>    A manual along with 2 bonus experiments in it	\N	2	\N	15	18	\N	500	f
+152b5d52-a7af-4013-912b-d1f93aef8ed0	Starter Bikes	1	100	Teach your kid basic construction of the models	Package Content:<br>    No of pcs: 47 with tools included<br>    No. of models: 2 Mini Models	\N	1	\N	15	18	\N	100	f
+74d5bfc5-5e9c-4d13-bc0a-5fe292237743	Power Screw	1	200	An important mechanism used in many places	How to play: <br>    Step by Step fix the spare parts with help of non toxic plastic connector and patti & dismantle with the help of Remover Tool as given in the manual.<br>    Assemble accordingly the whole process & zoom around your house with it.<br>Package Content:<br>    7 Model<br>    208 pieces<br>    High Powered Motorised Gearbox(Newly added)<br>    Power Screw Mechanism for linear motion of the motor (Newly added)<br>2 way switch	\N	2	\N	15	17	\N	500	f
+8b1ad853-66b4-4bd1-ac81-4511300ee20e	Starter Bulldozer	1	100	Teach your kid basic construction of the models	Package Content:<br>    No of pcs: 62 with tools included<br>    No. of models: 2 Mini Models	\N	1	\N	15	18	\N	100	f
+0e3a77f0-e01a-4c5a-aee1-56eeb061e771	Starter Giant Wheel	1	100	Teach your kid basic construction of the models	Package Content:<br>    No of pcs: 62 with tools included<br>    No. of models: 2 Mini Models	\N	1	\N	15	18	\N	100	f
+916e01df-42b3-4bb3-b336-6a082ee89227	Starter Helicopter	1	100	Teach your kid basic construction of the models	Package Content:<br>    No of pcs: 47 with tools included<br>    No. of models: 2 Mini Models	\N	1	\N	15	18	\N	100	f
+23763127-8dc2-44a1-85c9-ff9ea3ab3b96	Starter Racers	1	100	Teach your kid basic construction of the models	Package Content:<br>    No of pcs: 54 with tools included<br>    No. of models: 2 Mini Models	\N	1	\N	15	18	\N	100	f
+931d5a39-441f-4d76-848a-02f2eb33a64c	Starter Robots	1	100	Teach your kid basic construction of the models	Package Content:<br>    No of pcs: 44 with tools included<br>    No. of models: 2 Mini Models	\N	1	\N	15	18	\N	100	f
+f4ad5476-df7a-48ad-8d84-446b5762000c	Discover India	1	100	Let your kids learn about Indian Territory	Learn the States of India with this map puzzle showing the Indian States and capitals.	\N	2	\N	15	31	\N	200	f
+a5224b40-2ada-42d0-85e7-87d0d3a5924d	Dog n Bone	1	100	Build strategic skills in your kid	How to play: <br>    Place the dog in the centre of the base line on your side & place your bone on the opposite side of the board, beyond the field.<br>    When its your turn, you can move your dog forward, backward, left or right,only one square at a time or can either put up a fence.<br>    Fence can block only two squares completely & your opponent cannot be blocked completely,one route must be available.<br>    When two dogs come face to face, one dog can jump over the other in its turn. If there is a fence behind, the dog can jump to the left or right of the opponent's dog.<br>    The dog that reaches first on any square on the side of his bone is the winner.	\N	2	\N	15	31	\N	200	f
+\.
+
+
+--
+-- Data for Name: nav_toys_skills; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY nav_toys_skills (_id, toys_id, skill) FROM stdin;
+19df31e1-79a0-4818-8f89-6a2ed927dab6	82596a16-4ed2-4486-92aa-f9a8c0746e73	15
+5099cc37-58a9-4c5f-bf4b-350cd37ff16e	fb3882c6-4580-4348-92b9-915b58e8dec9	24
+bf50677c-d667-4618-88cd-aa874d02802f	1395b89e-a688-407e-8d82-036f74e29281	24
+8f9fbbb1-5741-4c96-ab28-e8fcdad25059	8619a44b-5011-4b12-b602-2f88d82d18ae	13
+37cb5b8a-5f09-4ce0-898f-1747792d9e4f	8d477031-9eef-4072-87cd-d788f58d1910	22
+5485763e-0ebf-4109-a83a-1682045ef677	bf4ea4a2-e149-4667-a81e-92029de2817f	22
+c4ab9896-dff3-4af9-ae19-94608b269a89	b209fe89-136e-4d03-9ff0-13cadec7c061	22
+e7ba1c42-48d7-4437-885b-5ae648df456c	73e7b4ba-ed51-4d58-b383-53276294ac2d	22
+5823ab8b-3d5f-407c-a9d8-826f7515e084	31ce667d-3953-4193-be65-284a3b63f17d	22
+0d8dacb4-83c0-4b13-a708-01129232b27d	e74bd000-57c8-4e31-8e08-77dcf3d8dc68	22
+c6655205-1f00-438d-8952-b52658facbe6	1919a6e3-e24f-4f95-a5b0-ad425e789262	22
+065a314e-fab2-4bde-a144-e1a6e1a4ce0d	aab20392-06ed-45da-9fc1-57df51667c68	22
+595e8f78-8d18-4e23-a007-a606dccdc62f	21cc1a01-d9d7-4976-be93-c4db8aa4acfc	22
+44d5da59-8270-459e-8a8a-e2c15e82843d	92783ef6-5873-4763-ac8f-bcd6cd5d1fc5	22
+191ec1bb-1b9a-4416-a395-54777a8a670d	2eec9819-3353-4758-a8d8-3a4125d3a24f	22
+eefcda6f-5e57-417a-9d16-22518e559837	d35ddeb1-9008-4dd0-96bc-a27bfa194601	22
+eea17045-fab2-4b61-8e10-5dd8abedd78e	c3b27b74-bb88-4ec5-b919-7cd2ef4243f8	22
+970ed993-2eac-4d27-a162-032c80a2d557	5142fd47-5302-476d-91de-18161b3d7850	22
+833bcda2-0f0c-478c-9d10-ca5a063f7de9	226f4e91-41f0-4804-b537-71ad409cd21e	22
+1ed6477c-73ee-4eb1-adc5-36590240748d	7c2e8f3f-611c-4f3f-8776-cbe684c31b02	22
+aa040295-57df-45a4-ac9d-215d2daeaa4e	e1e12173-884f-48b5-bef1-58c095146f5f	22
+e7ff33cd-a4fc-496a-acbd-96eaa5e11994	75c8345e-d362-4a94-98d5-5819ef211840	22
+ad592ed3-d3ae-4128-8d96-0046631d363b	2026714e-a5db-415e-80be-c27c5f2574f7	22
+d3d5a758-aae2-4d58-9d72-248c97c5ce6f	fa2ff199-944b-43f9-a6ca-8710e67f49d3	22
+589eb77e-2556-49f1-832a-5ac234f98619	3f47fd2d-c3fa-4716-a739-f2f0eb28fced	22
+d4db6cb3-a0d0-498a-8baf-b37782bc8db8	5b57be39-7a99-4e07-9738-1ccda40abdea	22
+237076ba-5641-45ef-b778-1853646d9fee	ec91d087-092c-4d05-ab19-ab1bcbedd2cd	22
+e632401d-2102-4fb0-aeba-791cd4e1e141	706511aa-fe9d-4fb7-9acb-f0d00737b5d8	22
+1cc23f36-6020-4f12-a4d9-95799153dc87	138383ac-b617-4a54-87a7-262b8e25db1b	22
+16334867-cecf-4e59-9728-836b05af795b	6b7d582b-d4e8-4a7e-a676-4ce5209b65c9	22
+730e86f7-6eec-4fe7-83d9-e02e54612e67	ea74eae3-fc2e-42d2-881a-506128edb2d9	22
+0c27412c-e7f2-4990-b4b1-b8860743599e	09f00d6b-03bc-491d-bdf9-276772c1db31	22
+7c8a1acf-1a92-4cee-beda-9e9eb5aca392	7dddf9b8-7e86-48d2-8145-403298ec95a0	22
+e9f75b42-a444-4b04-807c-5a130f07f284	9a385ee0-e508-4a98-a956-16f70ec36c8f	22
+1c9b8fbf-0f4d-40e1-8a2c-35bf8e1398b3	9de1a40a-4ca5-44c6-8faf-aa942e6278c9	22
+dff0f019-7a7a-417c-adb1-e74e44e49f8b	8c3d1e06-8cdb-4ce5-9ab3-178da7ab9e53	22
+8abc533d-7e7a-4a1d-a75e-9268f9b3e237	3da2b06d-587f-4e51-89a8-cd05563ad47c	22
+8907db63-a3ca-4d74-b224-eb781ed0402a	b9ec64ea-fcdb-4e69-b71c-b749225ac065	22
+82ed0c10-3bc8-4324-a56e-82ba812a95c1	baef0769-8586-49ff-90ff-3e347d2dd98b	22
+3b59a3f5-aae5-48cf-8001-8ff68feecea4	c0072e91-862b-4f5d-a9f5-e56badfab251	22
+df0f4629-5bd8-41ba-ade5-2c20e366e333	3b74dd6a-6673-4eb7-8883-a5d026778293	23
+39e92812-1481-4104-8477-084bd44a1ae7	f81efe47-6191-4c80-81a0-14cf3c1a58ef	23
+73131a3f-9753-475d-8580-c7bda51fb89e	4a58adac-7867-47fa-851e-9fa00e1783a3	23
+126c6407-e1e2-439b-88a2-f4b1e3dddf17	c9f48955-d260-4b92-a576-cb872a47b4d7	22
+2265ee60-ba72-4205-bfce-893759441a92	689fc6fd-f406-4024-9754-24ab615b649f	22
+551712f5-ae8b-4533-831a-c423b4040492	a6e6e05e-9117-4a85-a415-9aeba61453a9	22
+56aca2ce-bb9b-4cf1-8a92-88a6ae28b0b6	7e8eda6a-014f-4eee-97be-89eb79395ce5	22
+726462e3-bbb9-4743-9c96-1467612bb5ec	50cfa62c-02fe-4e42-b379-0ceb86282718	22
+fe73a807-16cd-4030-bb88-b026558647a2	24b1db6e-077d-4ae5-a8d9-b748a0c40dfd	22
+51181ed4-7372-46b4-969a-0489676a39f6	8802e5af-21aa-4517-b805-282a29a7bc86	22
+84b5c784-39b2-4655-9c66-cac4ffaa031e	ebc61fd5-411a-4363-8440-d22f571f7f02	22
+9f81ce64-3265-4eda-880a-71a7baff2d33	f4970132-d927-4b44-81ae-e9b15ebe206e	0
+4ade5dbd-2ac7-4a39-b87b-868b00b6759e	f4970132-d927-4b44-81ae-e9b15ebe206e	1
+e2d9b785-1ff1-4e59-8300-302246ea21f9	f4970132-d927-4b44-81ae-e9b15ebe206e	2
+fc830475-07a8-4363-b00e-dc79681345c5	f4970132-d927-4b44-81ae-e9b15ebe206e	3
+ca1c3190-c63a-4786-aff9-7ffef9c067e5	f4970132-d927-4b44-81ae-e9b15ebe206e	4
+8ae8f264-aba3-48ca-8dc0-082f538dedfe	f4970132-d927-4b44-81ae-e9b15ebe206e	6
+f336f928-e5d2-41d2-985c-b4bfe973fba7	d963c5c4-1f64-4fd0-9133-6fd35b441f44	0
+834b803c-9928-49c3-9632-e8c22186b584	d963c5c4-1f64-4fd0-9133-6fd35b441f44	1
+93e38a84-d341-4d76-8630-ecca1f11543b	d963c5c4-1f64-4fd0-9133-6fd35b441f44	2
+bb0ba07d-8eff-4bbd-ae69-6e9f966efe19	d963c5c4-1f64-4fd0-9133-6fd35b441f44	3
+54aa82ec-1e61-455f-992f-74f55eaa6988	d963c5c4-1f64-4fd0-9133-6fd35b441f44	4
+bc279fe2-451a-4894-a324-8df9638994c3	d963c5c4-1f64-4fd0-9133-6fd35b441f44	6
+b69847d7-2cc0-49a6-aaf2-3b6688169a25	2aaac05d-b654-4d15-a542-3d390ad4ee72	4
+92ff7bfc-2de6-44a8-8e53-b00d1d446d3f	2aaac05d-b654-4d15-a542-3d390ad4ee72	5
+a1a5d4fc-459c-4cc9-9f85-8be475cb8f2e	2aaac05d-b654-4d15-a542-3d390ad4ee72	9
+52142788-bbe5-42cd-8cd3-70d3946acad2	5b5e91bc-1928-4813-bb47-d831a09c75f3	5
+02c1d9dc-a53d-4722-a623-7130b7e2f72c	5b5e91bc-1928-4813-bb47-d831a09c75f3	6
+860d822c-9d5d-49d9-8e28-07563f3abc5f	bf164121-05e6-4c1b-918a-e53e40ed23c3	8
+7b5bff51-aa67-4bf3-ad2b-6874c96b4a0f	bf164121-05e6-4c1b-918a-e53e40ed23c3	10
+91480537-a3f8-4c44-8fa7-5bad9c56bb16	bf164121-05e6-4c1b-918a-e53e40ed23c3	4
+9a1b22b6-771e-4e9c-8416-1b9b640b5470	8cdbe165-b10e-486a-9b63-aad47e16f9b5	5
+9bcc05e0-0a2e-4279-8dda-31f26d8f327d	8cdbe165-b10e-486a-9b63-aad47e16f9b5	11
+fc308c82-af99-47f5-8c30-6beb594329aa	8cdbe165-b10e-486a-9b63-aad47e16f9b5	8
+51b1462b-ae0a-4e1f-9b24-70ff85dfb663	8cdbe165-b10e-486a-9b63-aad47e16f9b5	9
+9345d0ca-d303-45ae-83dd-e96ed3c468f5	3932ff78-a15c-4904-8b63-fe79755422c6	8
+6e807944-20f2-4b7a-9b8b-185e953466c1	3932ff78-a15c-4904-8b63-fe79755422c6	15
+778f7f32-8eb0-4aac-8377-0179dc952f42	3932ff78-a15c-4904-8b63-fe79755422c6	14
+9b29de3a-6d22-4d80-8f05-e73b1a2c198c	8ab8cbdb-f6ee-4e3b-80c3-f5dba14d919c	4
+aaf4789e-af61-4f13-944f-d9cbece4b98b	8ab8cbdb-f6ee-4e3b-80c3-f5dba14d919c	11
+45202234-c686-45b9-8bbd-bf953f3faec6	8ab8cbdb-f6ee-4e3b-80c3-f5dba14d919c	14
+cb395307-93b8-4b8c-b034-e39f2977cbf9	f0cf9652-a0af-413f-8660-148f78da60ab	13
+00c66f23-d8b7-451b-87d4-2c8c2731a4c2	f0cf9652-a0af-413f-8660-148f78da60ab	14
+17ba3a21-7c74-42d9-b311-1878a2ef6f84	f0cf9652-a0af-413f-8660-148f78da60ab	17
+b3edeff7-f924-468d-a02e-2b961342e1d7	f0cf9652-a0af-413f-8660-148f78da60ab	4
+884efd1d-e86c-4d46-b6ba-8c51f9cbf070	f0cf9652-a0af-413f-8660-148f78da60ab	6
+2995d09e-ab3c-4640-b9d1-1020e12e8da5	ea89c6a8-f29d-4277-b20e-df1e78d63ae5	0
+f9967f89-fe53-4135-8791-e226bdaefb07	ea89c6a8-f29d-4277-b20e-df1e78d63ae5	2
+dd7957eb-6410-41bb-b97b-e282151bc52d	ea89c6a8-f29d-4277-b20e-df1e78d63ae5	3
+2ef1afc6-7a86-4f41-a161-f84112aa0bf1	ea89c6a8-f29d-4277-b20e-df1e78d63ae5	4
+31ac8dc6-112d-4b2d-84d2-900992593032	ea89c6a8-f29d-4277-b20e-df1e78d63ae5	13
+242c142d-c18b-4eaf-b5f5-615086e1a050	ea89c6a8-f29d-4277-b20e-df1e78d63ae5	17
+5e6ebfcb-c3e0-4c52-ba2a-4298453e2e67	ea89c6a8-f29d-4277-b20e-df1e78d63ae5	18
+c7ed9f0c-51b5-417a-a12f-13c6507455ca	ea89c6a8-f29d-4277-b20e-df1e78d63ae5	19
+674d272a-ef15-46d6-8259-01638c7e53e4	91c7a4a8-6f0e-4f0c-a863-ac06fa76a0b0	4
+e29137b5-a48a-47ec-88c7-a07e39fd0154	91c7a4a8-6f0e-4f0c-a863-ac06fa76a0b0	5
+4467a09f-9793-497b-b82c-8af6214e85c1	8f66e20e-708a-4369-b077-5cb77ffe366c	4
+5010e6a5-a746-4f08-b63f-4773eac34fa3	8f66e20e-708a-4369-b077-5cb77ffe366c	8
+50bee22b-d78d-4f06-a93f-246000d85d6d	8f66e20e-708a-4369-b077-5cb77ffe366c	14
+b6d3ccad-953d-4e3b-9897-01cae9d4a994	8f66e20e-708a-4369-b077-5cb77ffe366c	15
+943746ae-348a-4551-823f-0a7e73b2626a	bb9d7c9f-69f7-4e92-96c1-4b084a6ba785	22
+979cf4a5-3b93-49a8-bc2c-e1a8329e7cad	e28b655d-1925-44e7-b6d4-4bedd8b0dd73	22
+32b56fff-7ac7-4b03-98ad-557c64149859	5a11669a-996f-4c65-b904-aba9fdce4109	22
+eea7084f-347f-4fe7-bf3a-79ffac06d1b6	e3f222aa-4327-48e6-8c21-240c437aa1d3	14
+4950c8f0-6610-4cd1-9a96-e46ce95c258e	e3f222aa-4327-48e6-8c21-240c437aa1d3	7
+029af5e4-33ce-431d-b416-5d2ef42511d4	e3f222aa-4327-48e6-8c21-240c437aa1d3	4
+e864abdc-a061-46a5-9717-8497be039295	c5b12b6f-da75-45d1-a3b0-333b7e78709c	13
+491578e2-7242-4ccd-92b7-48f502aa7e61	0a2835e6-8cad-4aeb-a187-d6295c7b7b5b	22
+7bc5a7df-d571-4f29-8aac-9901c29a5bba	e3066fc5-2779-4262-a35f-5ad08bca3e67	22
+1d31431d-24e8-410c-ac8e-323cdf5c1464	c5726122-6e68-4b51-a228-afc543977c62	22
+79fe34d5-21aa-4852-b326-f694aa705e39	ce8d83e8-0b2b-4cbd-aef9-b59f6729bb26	22
+a7ed4871-d04b-4110-982a-cd9c07adebcc	3943cbff-3844-4614-b5c8-a1a0bda5b0cd	22
+283a1b3f-e380-4b93-ab3d-c17be60255a9	e93f0cf4-e4d3-4810-a216-efeeac4f7368	22
+809a3e28-0ffd-4a4e-972e-23970420c65a	e83c895b-cbef-4ec3-847d-effb39efd42a	22
+572cdf80-082f-42d9-863a-365fea06697d	2c2266e2-7602-424f-8ea6-95048186f833	22
+201d84fa-bceb-4b1e-9095-ab216a9ef991	03ecc188-3c25-436b-9976-eff140b1fb19	22
+ffe74832-2c5c-4d14-a5c6-f42aad2e3685	43bd19c2-7343-4d30-b95b-bd83c5ce0533	22
+11b392cf-78e3-47a4-b3c5-f95eea33c36e	b8d2ac20-54ce-4f6e-86e4-df46eef32929	22
+d585d4c7-a01f-4b36-9795-4bc2b03bf5b5	0c6ef524-fe98-41f1-a7d5-d17dbb553bb0	22
+e5e78146-3c49-4b6d-8e5c-cf1dc9dab865	451054a9-ae53-4333-93ca-82bdb794e09d	22
+b495d11f-5067-499b-8979-973e383985c3	a53de3b6-c3db-4ec9-949f-6fd334c5efc2	22
+555b5526-11d9-4d13-9f12-8e486c97d53d	ca7e0707-98d9-4749-a0b9-bf647a5a10a3	22
+359b5e0f-bf2a-4624-b27d-6553f2df31c4	9f8d4fa1-26fc-4ca8-84fd-46021d9ac75f	22
+df37e79a-037c-42f4-ab88-0d2c3605ef17	50b6ab67-c6b2-42cf-afc5-21609cec93c7	22
+c694b41f-6142-428b-9272-1414cc82580a	5dd1011d-56d2-4324-a91d-bfb3c382d375	22
+32b48101-a747-468c-bb24-4db7dffc5d4f	3b671e54-383f-420b-b6be-cd22ea159522	22
+46bbb73a-4aff-427d-8cd8-c93891644927	d4fe3db5-da8a-4ce4-b728-258a31031231	22
+ff50562b-0182-4ead-9f04-2f595e369810	4ff92d91-c429-417c-8d8d-65fc64cfb0ae	22
+16c2d751-d9b1-4116-9111-38aac5eefcfa	c5b12b6f-da75-45d1-a3b0-333b7e78709c	17
+0d45b8e7-0d56-4cff-b65a-384b0d17c844	f6036d2e-945d-4cf4-930c-16029a054acc	22
+8488cce1-34bb-4467-8172-3e322891760a	7ef6290f-8b02-456f-980d-b2ada9b24d9f	22
+a51abd94-7849-4f69-8701-498fb63901dd	350c719b-f6ab-40a9-8e6b-6c2672f59458	22
+87c6efb1-3b98-45c8-b948-59c4658a44f8	c789443b-5969-4ebf-ba5e-95249f3a28f0	22
+d74efde7-fbab-45d4-88cb-28b186e204af	8b865d98-5853-43de-9b0c-2a701cf52800	22
+b537606e-6585-483a-af27-6d66aac25b62	e620c1c0-6a86-4189-a272-ab1706d62a11	22
+72a2023d-191a-4567-a268-06fb2ff50477	4064772b-2b9b-436c-b6b3-115b989618ec	22
+c170ba08-6a7e-4268-9737-19152f28f08e	6e8ef90e-a983-4dfe-8d73-3a7693da2c39	22
+83a9660f-6bbe-478d-be36-275a91c21174	f721b29b-8248-43ac-a58a-278085986ca1	22
+1e02dc79-7081-4d27-acca-fdf3791ec1d2	1581923b-f0d8-4113-a5cf-e190b70c47ff	22
+f34736a4-86f1-41ba-b30b-91c158fbb2ca	c5b12b6f-da75-45d1-a3b0-333b7e78709c	4
+f80c3f4f-c88f-4eab-a14c-17a1780c1d44	c5b12b6f-da75-45d1-a3b0-333b7e78709c	14
+bacc5f4a-11d8-4511-a98d-267345277186	e8dff48f-87ba-4ad6-b827-e6eade49172b	14
+5dc2b153-c9a3-4472-9d34-bac925f4c678	e8dff48f-87ba-4ad6-b827-e6eade49172b	8
+e5986553-3f4d-4aa5-a148-459d0cde236b	e8dff48f-87ba-4ad6-b827-e6eade49172b	4
+860d1037-8204-482e-a1e7-91c8bd2836de	e8dff48f-87ba-4ad6-b827-e6eade49172b	2
+ae9eff2e-93a1-4089-82ca-adeee39b0ab8	e8dff48f-87ba-4ad6-b827-e6eade49172b	12
+7d47af37-2870-45b3-963e-235ef20a19ce	d054f1ea-b0c6-4e79-9a85-304881d43ea8	0
+498221e2-6d26-45c2-bb1a-1c1f0844f50d	d054f1ea-b0c6-4e79-9a85-304881d43ea8	4
+1ff2b989-ba62-4034-8e29-108cbc773d4d	d054f1ea-b0c6-4e79-9a85-304881d43ea8	5
+66352545-a5e7-43ac-a9b0-574eccae8201	d054f1ea-b0c6-4e79-9a85-304881d43ea8	13
+a3c0d925-61e0-4faa-827d-6805cc038bd2	d054f1ea-b0c6-4e79-9a85-304881d43ea8	17
+e2f6d33e-385a-49bb-a4f2-5f11e6ef5c13	b6820fef-294b-44f8-810b-634d1941492a	5
+36be4136-284d-4807-b148-a587e893de13	b6820fef-294b-44f8-810b-634d1941492a	6
+daa9c89a-2273-4800-9083-5616580531cc	b4a7e835-b9f5-4c47-ae7a-4fb80fb9deee	12
+bbb0926b-8d28-4629-953a-15e48c17b892	b4a7e835-b9f5-4c47-ae7a-4fb80fb9deee	13
+f151675c-28cf-4e6c-86b6-494ee0f4d189	b4a7e835-b9f5-4c47-ae7a-4fb80fb9deee	14
+a23b42f3-8dca-45df-840a-426507c16781	b4a7e835-b9f5-4c47-ae7a-4fb80fb9deee	17
+397de55b-2c73-4beb-8dfe-74f1bc5d3c90	b4a7e835-b9f5-4c47-ae7a-4fb80fb9deee	20
+ddfac79d-20b2-4622-bbcf-995a42623637	20527f58-c85a-48ac-839a-9959be9df477	21
+2033013a-9c23-4ef3-a3f5-3eede5ffe18d	20527f58-c85a-48ac-839a-9959be9df477	4
+d30fcc6b-f6d3-497c-9b7b-aa5268bffba7	c3caabf2-6d07-45a4-bf35-e763d81ce55e	22
+ea055521-6e00-430e-922b-1aed9ed48fda	c3caabf2-6d07-45a4-bf35-e763d81ce55e	15
+8e756558-c90f-4bc7-a6e7-4a676f44fe79	6a231e04-f6bc-4e4a-a2ca-71339261bf0b	5
+ea758313-fee9-493f-b672-57a7373f5ad6	b3e5b5e4-f241-4e34-8e76-67e4c61ba3f3	9
+33828a55-c970-455e-8efd-482fc31fdce1	9a7f9447-61ac-4b32-b314-b164fc660481	0
+9c207b0b-fdbd-42b1-a4a9-acc67d092471	9a7f9447-61ac-4b32-b314-b164fc660481	5
+8e53eee4-025e-4bf7-860f-885e29a9587d	9a7f9447-61ac-4b32-b314-b164fc660481	9
+07959108-1420-484d-87e0-c2a7ef41d972	bff55cac-739f-4856-9e40-95f39e9c306a	22
+09432878-c7ab-4848-94aa-54d8ccfffef5	bff55cac-739f-4856-9e40-95f39e9c306a	23
+c4f73b52-345e-49a8-bb24-6f24d82e22a9	15018929-fd0a-43dd-a134-c97110d69ed7	22
+8c1cd74a-fee8-43ac-b31f-62e0cfc64ba8	b464345d-6d14-404b-8710-855514208b79	22
+ae9dc1e9-4155-47e3-87ae-0f87a5197721	a791e7f2-b8a9-46c2-b79c-d23c77822bc7	22
+f3b70bcf-bd04-4a47-8f97-2890ab295988	ae4320f9-9a63-43bc-91f8-89cc7d351460	22
+386a2d1f-ef90-4ded-985d-b6f8a5f80f74	0e6bdbaf-4635-4c6d-916a-5f6a52586657	22
+3fb49b41-ae25-48eb-9fa4-90a09959cccd	64f72a3e-b66d-4b89-83db-1c7adc2663c0	22
+50958370-e703-44b1-9a19-3cdc8cdc788d	f379b27b-f9af-44f7-b1d4-07550e05ce0e	22
+9121f351-3fb7-482c-95b1-4420b5652199	b2ab6122-e21f-4bd0-bc7b-ae74d13b5969	22
+c39ba4f5-737d-4dca-8038-df8754461dc5	7862f5cc-2646-4f42-a8cb-dd67491da919	0
+bdc8011b-90f0-424e-9306-39ccd9c3c47a	7862f5cc-2646-4f42-a8cb-dd67491da919	2
+ff154673-c478-4505-8fd5-f16ff786795a	7862f5cc-2646-4f42-a8cb-dd67491da919	4
+c3e7855c-485f-4afd-badb-954fecb11141	7862f5cc-2646-4f42-a8cb-dd67491da919	11
+888be5e5-f3e5-42d3-84b0-bdcb0fe49f1b	7862f5cc-2646-4f42-a8cb-dd67491da919	20
+041cd2a1-859d-442c-9a8c-5af857cb8007	652ef496-672d-4084-b0f9-77289cb60ff3	8
+a7ca4594-2d50-4542-aff1-3d2409f94814	652ef496-672d-4084-b0f9-77289cb60ff3	12
+031eacbd-5208-49da-a1c4-c20cda621434	016fb1ab-2d97-497f-9cec-b739c1efe6f8	21
+c230948c-6025-4061-a121-4deda3446b15	016fb1ab-2d97-497f-9cec-b739c1efe6f8	15
+a4395f81-7213-469e-a8e5-afb398da8d4e	43245c04-d6a7-4eac-b2c3-f34078433638	22
+3e0cdee1-5f01-412e-b1e8-b720857bae7a	313b6719-5d48-4dbf-8795-12eb735210f7	22
+1304522e-9f4c-4242-a275-e90ce115903a	52e264f7-7e90-48a2-8604-26ee90b15634	22
+f5e53231-4046-4f98-9892-09f3f80167c1	7f2daa44-a4e1-4a03-8999-131dae66fcfc	22
+f2ac42e9-102b-46b0-9f52-f4270992b7fe	7bbc5219-a027-4037-a850-40b945dff9dd	22
+cdd975ee-caa0-4784-b79b-5f7f63359249	28b6c13b-81ef-43f4-aa06-892c986b458f	22
+d060aa3f-d3cf-4b09-ae7f-007676b4eb05	152b5d52-a7af-4013-912b-d1f93aef8ed0	22
+e37ebcc4-ec44-46c8-ab75-c07a1a03a9fa	74d5bfc5-5e9c-4d13-bc0a-5fe292237743	22
+7ac28414-6969-44e7-9bba-178dfe85697c	8b1ad853-66b4-4bd1-ac81-4511300ee20e	22
+c00979bc-56de-4a66-93b4-52bf336bd92c	0e3a77f0-e01a-4c5a-aee1-56eeb061e771	22
+e5b718ca-2f6c-4404-9e0b-cd1ba29403b0	916e01df-42b3-4bb3-b336-6a082ee89227	22
+db7ab3d2-322b-4da9-b554-9af47ac2e290	23763127-8dc2-44a1-85c9-ff9ea3ab3b96	22
+d0cd79cc-2b88-4b5a-b9f5-0be86863aa76	931d5a39-441f-4d76-848a-02f2eb33a64c	22
+433d5c17-fb83-4649-a7cc-e3cf1589f7ae	f4ad5476-df7a-48ad-8d84-446b5762000c	22
+4bf305af-4511-441e-ab08-f3a0f5629cd8	a5224b40-2ada-42d0-85e7-87d0d3a5924d	22
+\.
+
+
+--
+-- Data for Name: nav_user; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY nav_user (_id, first_name, last_name, email_address, mobile_no, password, email_verification, subscribed_plan, points, balance, deposit, address, city, state, membership_expiry, enrollment_date, pin_code, user_type, reset_password) FROM stdin;
+45058a54-b3e2-4a3b-96ab-c13dcf3023e3	Admin	\N	_root_@localhost.com	\N	$2a$10$2Wa2Y0nPg0R4gYipS/RnJe6Y6KTgKvqLD7wEZx36e0VNHCWJU8uay	\N	\N	\N	0	0	\N	\N	\N	\N	\N	\N	0	\N
+5c3f3f04-43ba-4c65-b9bc-ee7ffd79c263	Atul	Patil	atulpatil83@gmail.com	9921201929	$2a$10$FRDWhLOBDKuO9OrjzWWERuX2rFa5uyv1lxJ9OUO1SWuuM/4LcPrzK	\N	\N	\N	0	0	Nanded city	\N	\N	\N	1510720453643	411041	\N	\N
+2cbd1fc8-7ec7-4c15-a6d1-8a114f2b79d5	\N	\N	gkhairnar@gmail.com	9850988448	$2a$10$WfazYLwAbKBrzxJOFTz9XO48b8mDn7u.pa9XXE.EGOe4FIncbD34i	9436a450-9d52-4145-9c2a-e409ed488135	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+18d57428-9f99-4f7f-a11a-141a0e14041e	Sumit	Toshniwal	sumittoshniwal92@gmail.com	7588415318	$2a$10$INroC2SYpb0OKZ0STRxVsOZqpqD7mAW6q.93Yj6rUHs1OO6k3ssBi	\N	\N	\N	0	300	Dhayari, Pune	\N	\N	\N	1503841807722	411068	\N	\N
+22d9f2cb-f59f-4a89-bde8-303803da0f8f	\N	\N	toshniwalami0@gmail.com	9619503031	$2a$10$1B2k.QjNz2gMz/GBhgLcS.1.DrbWUhOecKBl/KKNlQ5/Zhv1LvJly	39619f48-ea53-4b97-94b2-bd2d8bd1cb5d	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+da1bb34e-1b90-45a8-b02f-9fd068b31260	Sagar	Lathi	lathisagar@gmail.com	7767067001	$2a$10$1HZuH//9e1N1u2ofgmCx0.OkWiR3RrpRAo9gJDoajADb4eYuq8d2.	\N	\N	\N	0	0	Plot no 97, Girivihar Colony, Opp Indira Mangal Karyalay, Nandurbar 	\N	\N	\N	1503850737631	425412	\N	\N
+1c9f7ac8-1e58-4f4f-bbae-b5a51623262f	\N	\N	shilpam2009@gmail.com	9764336468	$2a$10$SfCY2oKVwTjTvAfOqMQuo.iPrCblSFEbnBNLpbv5Sj652Nu3R.33y	7db48fa9-7e40-4764-a565-10269c70184c	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+6f99f429-25d5-4439-bd4d-c624c5cad1e1	\N	\N	web-554cg@mail-tester.com	7588415318	$2a$10$ApiioN.BI7CS1bLykUMNPe12v15Zm5Hx0IqzmYBAcWj/qUy9QCpgy	e0914263-5a3c-4b31-a6f9-7b008a3c337b	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+6673f58a-465a-4c2c-a015-1b7061ae6428	\N	\N	web-die5c@mail-tester.com	7588415318	$2a$10$lIp2wq5t0xwDVpHXVSWUwuuZmlejAZc4RghBvKHiJmntPnndTlPsC	bbe83adc-cf32-44b8-b3fe-a4b97fd24735	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+b412a5d5-c80d-4e43-aaf1-e5d998fb6f29	\N	\N	web-2uyva@mail-tester.com	7588415318	$2a$10$zdqDZ0uWqDHXaU37.FwjVO7qd9k4Q1S.3b1GzO.BfqxZVwQSsfQ62	c12d4a23-5a24-4a26-b871-8d2ab51bcfb1	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+fc9d93c8-6146-404c-89ed-bd8b92e84c18	\N	\N	web-p8nac@mail-tester.com	7588415318	$2a$10$b.4COsVnkV.hRWf9iPwxR.5HX3Op/LygasW6s34Arx8Aju4..hwgS	244642d0-7426-4bc6-991b-dc96b29c27e3	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+953bd93a-69f8-404d-aba5-41b9b766aae4	\N	\N	web-in0gh@mail-tester.com	7588415318	$2a$10$RjWCemRnQ2BG9B/VASm2EOfQzefKd.lFohAMLlfMYVKQXNSkmo01q	786eb126-4c85-46ff-91c9-22a9315f4d0a	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+f387edbb-9c3b-4e1e-bcae-9f4a43a7c7ad	\N	\N	Sumit1311.runme.spam.all@previews.emailonacid.com	7588415318	$2a$10$YCa5rPh.elW4x6pTq0JTG.7fQReEfpLltv.frwut4kGtUFhpGEjQq	c5c7d5e0-eada-42bd-863f-ff24c8a7ab77	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+8efde24a-733d-4970-b8e3-449f0d421cc6	NIKHIL	KOTHARI	nkothari135@gmail.com	9939863545	$2a$10$52yylzZHts2tsK4gPGfsuOPNx0VWktpNC/ntm.lLb3vgVddotBTPK	\N	\N	\N	0	0	D-36, Nigahi Colony, NCL Singrauli	\N	\N	\N	1504349277729	486884	\N	\N
+13b53c8e-1f9c-40a4-8dd4-780f2d9b4af7	Priyanka	Pasalkar	priyanka.dhamdhere@gmail.com	9881836999	$2a$10$K1GzSkuP/9EUGaNmdtBBV.rgTqEIXqoCTLusVo2Rc7DCLbrUyWp6K	\N	\N	\N	0	0	Sno 60 Sharpadma housing soc, Sainagar, Kondhwa bk 	\N	\N	\N	1510043490028	411048	\N	\N
+803ed1e2-8563-4d89-bf8c-0c10d3ca8581	\N	\N	snehagod0912@gmail.com	7030893584	$2a$10$FgU/oD6E8L8FBe75LKfJNuN0gUeuVPNXJ6eSDhzwCrjg/soaIae6m	edd6c685-e115-443b-8488-43667e077b4f	\N	\N	0	0	\N	\N	\N	\N	\N	\N	\N	\N
+\.
+
+
+--
+-- Name: nav_child nav_child_id; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_child
+    ADD CONSTRAINT nav_child_id PRIMARY KEY (_id);
+
+
+--
+-- Name: nav_enquiry nav_enquiry_id; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_enquiry
+    ADD CONSTRAINT nav_enquiry_id PRIMARY KEY (_id);
+
+
+--
+-- Name: nav_payments nav_payments_id; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_payments
+    ADD CONSTRAINT nav_payments_id PRIMARY KEY (_id);
+
+
+--
+-- Name: nav_rentals nav_rental_id_pk; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_rentals
+    ADD CONSTRAINT nav_rental_id_pk PRIMARY KEY (_id);
+
+
+--
+-- Name: nav_toys nav_toys_id_pk; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_toys
+    ADD CONSTRAINT nav_toys_id_pk PRIMARY KEY (_id);
+
+
+--
+-- Name: nav_toys_skills nav_toys_skills_id_pk; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_toys_skills
+    ADD CONSTRAINT nav_toys_skills_id_pk PRIMARY KEY (_id);
+
+
+--
+-- Name: nav_user nav_user_id_pk; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_user
+    ADD CONSTRAINT nav_user_id_pk PRIMARY KEY (_id);
+
+
+--
+-- Name: nav_child nav_child_id_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_child
+    ADD CONSTRAINT nav_child_id_user_id_fk FOREIGN KEY (user_id) REFERENCES nav_user(_id) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: nav_payments nav_payments_user_id; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_payments
+    ADD CONSTRAINT nav_payments_user_id FOREIGN KEY (user_id) REFERENCES nav_user(_id) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: nav_rentals nav_rentals_toys_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_rentals
+    ADD CONSTRAINT nav_rentals_toys_id_fk FOREIGN KEY (toys_id) REFERENCES nav_toys(_id) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: nav_rentals nav_rentals_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_rentals
+    ADD CONSTRAINT nav_rentals_user_id_fk FOREIGN KEY (user_id) REFERENCES nav_user(_id) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: nav_toys nav_toys_parent_toys_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_toys
+    ADD CONSTRAINT nav_toys_parent_toys_id_fk FOREIGN KEY (parent_toys_id) REFERENCES nav_toys(_id) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: nav_toys_skills nav_toys_skills_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY nav_toys_skills
+    ADD CONSTRAINT nav_toys_skills_id_fk FOREIGN KEY (toys_id) REFERENCES nav_toys(_id) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

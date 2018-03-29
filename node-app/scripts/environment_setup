@@ -9,3 +9,4 @@ export REDISCLOUD_URL="redis://127.0.0.1:6379"
 export PORT=3000
 export HOST_NAME="ajab-gajab.com"
 export APP_DIR="/home/geek/workspace/navnirmitee/node-app"
+export BACKUP_DIR=20180329
