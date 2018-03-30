@@ -36,16 +36,16 @@ RUN apt-get install -y certbot -t jessie-backports
 
 COPY . /src/app
 RUN cp /src/app/ajabgajab.conf /etc/nginx/conf.d/ajabgajab.conf
-RUN mkdir /etc/letsencrypt
+#RUN mkdir /etc/letsencrypt
 RUN cp -r /src/app/letsencrypt/* /etc/letsencrypt
 #RUN chown -R root:root /etc/letsencrypt
-RUN mkdir /var/www/ajab-gajab.com/.well-known/
+RUN mkdir -p /var/www/ajab-gajab.com/.well-known/
 
 #RUN /src/app/scripts/db-setup.sh
 #RUN git config --global core.gitproxy /src/app/scripts/gitproxy.sh
 
 RUN npm install
 
-EXPOSE 80 443
+EXPOSE 80 443 5432 6379
 
 ENTRYPOINT ["/src/app/docker/entrypoint.sh"]

@@ -3,6 +3,8 @@
 
 cp /etc/postgresql/9.6/main/pg_hba.conf /etc/postgresql/9.6/main/pg_hba.conf.back
 sed -i 's/^host *all *all *127.0.0.1\/32 *md5/host all all 0.0.0.0\/0 password/' /etc/postgresql/9.6/main/pg_hba.conf
+sed -i 's/\/home\/ubuntu\/app\/navnirmitee\/public/\/src\/app\/public/' /etc/nginx/conf.d/ajabgajab.conf
+sed -i 's/sudo/ /g' /src/app/scripts/cert-autorenewal.sh
 service nginx start
 nginx -s
 service redis-server start
